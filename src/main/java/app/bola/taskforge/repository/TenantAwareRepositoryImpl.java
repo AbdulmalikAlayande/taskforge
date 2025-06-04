@@ -11,14 +11,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public class TenantAwareRepositoryImplementation<T extends BaseEntity, ID extends Serializable>
+public class TenantAwareRepositoryImpl<T extends BaseEntity, ID extends Serializable>
 												extends SimpleJpaRepository<T, ID>
 												implements TenantAwareRepository<T, ID> {
 	
 	private final EntityManager entityManager;
 	private final JpaEntityInformation<T, ?> entityInformation;
 	
-	public TenantAwareRepositoryImplementation(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+	public TenantAwareRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
 		this.entityInformation = entityInformation;
 		this.entityManager = entityManager;

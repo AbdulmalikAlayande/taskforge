@@ -35,7 +35,7 @@ public class TenantAwareRepositoryFactoryBean<R extends JpaRepository<T, ID>, T,
 		@SuppressWarnings(value = "unchecked")
 		protected @NonNull JpaRepositoryImplementation<?, ?> getTargetRepository(RepositoryInformation info, @NonNull EntityManager entityManager) {
 			JpaEntityInformation<?, ?> entityInfo = getEntityInformation(info.getDomainType());
-			return new TenantAwareRepositoryImplementation<>((JpaEntityInformation<BaseEntity, ?>) entityInfo, entityManager);
+			return new TenantAwareRepositoryImpl<>((JpaEntityInformation<BaseEntity, ?>) entityInfo, entityManager);
 		}
 	}
 }
