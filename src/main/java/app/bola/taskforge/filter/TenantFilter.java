@@ -1,15 +1,19 @@
-package app.bola.taskforge.security.filter;
+package app.bola.taskforge.filter;
 
 import app.bola.taskforge.domain.context.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Order(1) // I want to make sure that this filter runs before any other filters that depend on the tenant context
+@Component
 public class TenantFilter extends OncePerRequestFilter {
 	
 	
