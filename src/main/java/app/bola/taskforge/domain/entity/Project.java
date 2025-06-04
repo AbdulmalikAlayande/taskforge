@@ -23,8 +23,7 @@ public class Project extends BaseEntity {
 	private String name;
 	private String description;
 	private boolean archived;
-	private LocalDate startDate;
-	private LocalDate endDate;
+	private DateRange dateRange;
 	
 	@ManyToOne
 	private Organization organization;
