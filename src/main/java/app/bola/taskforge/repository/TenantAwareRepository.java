@@ -9,7 +9,15 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface TenantAwareRepository<T, ID> extends JpaRepository<T, ID> {
 
-	Optional<T> findByIdScoped(ID id);
-	List<T> findAllScoped();
-	void deleteByIdScoped(ID id);
+	default Optional<T> findByIdScoped(ID id) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
+	default List<T> findAllScoped(){
+		throw new UnsupportedOperationException("Not implemented");
+	}
+	
+	default void deleteByIdScoped(ID id) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
 }

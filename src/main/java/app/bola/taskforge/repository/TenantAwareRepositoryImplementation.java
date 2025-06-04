@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public class TenantAwareRepositoryImplementation<T extends BaseEntity, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements TenantAwareRepository<T, ID> {
+public class TenantAwareRepositoryImplementation<T extends BaseEntity, ID extends Serializable>
+												extends SimpleJpaRepository<T, ID>
+												implements TenantAwareRepository<T, ID> {
 	
 	private final EntityManager entityManager;
 	private final JpaEntityInformation<T, ?> entityInformation;
@@ -31,8 +33,8 @@ public class TenantAwareRepositoryImplementation<T extends BaseEntity, ID extend
 		
 		query.select(root)
 			 .where(criteriaBuilder.and(
-				 criteriaBuilder.equal(root.get("id"), id),
-				 criteriaBuilder.equal(root.get("tenant").get("id"), TenantContext.getCurrentTenant())
+				 criteriaBuilder.equal(root.get("public_id"), id),
+				 criteriaBuilder.equal(root.get("tenant").get("public_id"), TenantContext.getCurrentTenant())
 			 ));
 		
 		try {

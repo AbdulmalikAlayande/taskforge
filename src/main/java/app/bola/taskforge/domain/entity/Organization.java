@@ -16,7 +16,7 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tenant extends BaseEntity {
+public class Organization extends BaseEntity {
 	
 	private String name;
 	
@@ -29,11 +29,11 @@ public class Tenant extends BaseEntity {
 	private String contactEmail;
 	private String contactPhone;
 	
-	@OneToMany(mappedBy = "tenant")
+	@OneToMany(mappedBy = "organization")
 	@Builder.Default
 	private Set<User> users = new HashSet<>();
 	
-	@OneToMany(mappedBy = "tenant")
+	@OneToMany(mappedBy = "organization")
 	@Builder.Default
 	private Set<Project> projects = new HashSet<>();
 }

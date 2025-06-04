@@ -27,7 +27,7 @@ public class Project extends BaseEntity {
 	private LocalDate endDate;
 	
 	@ManyToOne
-	private Tenant tenant;
+	private Organization organization;
 	
 	@Enumerated(value = EnumType.STRING)
 	private ProjectCategory category;

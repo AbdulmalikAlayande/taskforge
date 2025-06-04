@@ -21,7 +21,7 @@ public class User extends BaseEntity {
 	private String lastName;
 	
 	@ManyToOne
-	private Tenant tenant;
+	private Organization organization;
 	
 	private boolean active;
 	

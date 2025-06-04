@@ -35,7 +35,7 @@ public class Task extends BaseEntity {
 	private User assignee;
 	
 	@ManyToOne
-	private Tenant tenant;
+	private Organization organization;
 	
 	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default

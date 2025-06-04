@@ -19,5 +19,5 @@ public class WorkspaceSetting extends BaseEntity {
     private String defaultTaskView; // "kanban" or "list".
 
     @OneToOne
-    private Tenant tenant;
+    private Organization organization;
 }
