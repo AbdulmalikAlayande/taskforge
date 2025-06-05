@@ -13,6 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Embeddable
 public class DateRange {
-   private LocalDate start;
-   private LocalDate end;
+   private LocalDate startDate;
+   private LocalDate endDate;
 }

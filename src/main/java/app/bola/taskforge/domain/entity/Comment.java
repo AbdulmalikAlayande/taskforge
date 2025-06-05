@@ -22,7 +22,7 @@ public class Comment extends BaseEntity {
 	private boolean resolved;
 	
 	@ManyToOne
-	private User author;
+	private Member author;
 	
 	@ManyToOne
 	private Task task;

@@ -21,7 +21,7 @@ public class Notification extends BaseEntity {
     private String referenceId;
     
     @ManyToOne
-    private User recipient;
+    private Member recipient;
     
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;

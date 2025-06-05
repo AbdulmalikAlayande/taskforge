@@ -20,18 +20,18 @@ public class Organization extends BaseEntity {
 	
 	private String name;
 	
-	@Column(unique = true, nullable = false)
-	private String slug;
 	
 	private String industry;
 	private String country;
 	private String timeZone;
+	@Column(unique = true, nullable = false)
+	private String slug;
 	private String contactEmail;
 	private String contactPhone;
 	
 	@OneToMany(mappedBy = "organization")
 	@Builder.Default
-	private Set<User> users = new HashSet<>();
+	private Set<Member> members = new HashSet<>();
 	
 	@OneToMany(mappedBy = "organization")
 	@Builder.Default
