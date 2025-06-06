@@ -8,4 +8,7 @@ public interface BaseService<REQ, ENT extends BaseEntity, RES> {
 	
 	
 	RES createNew(REQ req);
+	default RES toResponse(ENT entity) {
+		return null;
+	}
 }

@@ -20,7 +20,6 @@ public class Organization extends BaseEntity {
 	
 	private String name;
 	
-	
 	private String industry;
 	private String country;
 	private String timeZone;
