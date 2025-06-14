@@ -19,7 +19,7 @@ import java.util.Set;
 public class Organization extends BaseEntity {
 	
 	private String name;
-	
+	private String description;
 	private String industry;
 	private String country;
 	private String timeZone;
@@ -27,10 +27,12 @@ public class Organization extends BaseEntity {
 	private String slug;
 	private String contactEmail;
 	private String contactPhone;
+	private String logoUrl;
+	private String websiteUrl;
 	
 	@OneToMany(mappedBy = "organization")
 	@Builder.Default
-	private Set<Member> members = new HashSet<>();
+	private Set<User> members = new HashSet<>();
 	
 	@OneToMany(mappedBy = "organization")
 	@Builder.Default

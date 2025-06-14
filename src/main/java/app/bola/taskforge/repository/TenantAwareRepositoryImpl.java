@@ -14,53 +14,68 @@ import java.util.Optional;
 public class TenantAwareRepositoryImpl<T extends BaseEntity, ID extends Serializable>
 												extends SimpleJpaRepository<T, ID>
 												implements TenantAwareRepository<T, ID> {
-	
+
 	private final EntityManager entityManager;
 	private final JpaEntityInformation<T, ?> entityInformation;
-	
+
 	public TenantAwareRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
 		this.entityInformation = entityInformation;
 		this.entityManager = entityManager;
 	}
-	
+
 	@Override
 	public Optional<T> findByIdScoped(ID id) {
-		
+
 		var criteriaBuilder = entityManager.getCriteriaBuilder();
 		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
 		var root = query.from(entityInformation.getJavaType());
-		
+
 		query.select(root)
 			 .where(criteriaBuilder.and(
 				 criteriaBuilder.equal(root.get("public_id"), id),
 				 criteriaBuilder.equal(root.get("tenant").get("public_id"), TenantContext.getCurrentTenant())
 			 ));
-		
+
 		try {
 			return Optional.of(entityManager.createQuery(query).getSingleResult());
 		}catch (NoResultException exception){
 			return Optional.empty();
 		}
 	}
-	
+
 	@Override
 	public List<T> findAllScoped() {
 		var criteriaBuilder = entityManager.getCriteriaBuilder();
 		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
 		var root = query.from(entityInformation.getJavaType());
-		
+
 		query.select(root)
 			 .where(criteriaBuilder.equal(root.get("tenant").get("id"), TenantContext.getCurrentTenant()));
-		
+
 		return entityManager.createQuery(query).getResultList();
 	}
-	
+
 	@Override
 	public void deleteByIdScoped(ID id) {
 		this.findByIdScoped(id).ifPresent(entity -> {
 			entity.setDeleted(true);
 			entityManager.merge(entity);
 		});
+	}
+
+	@Override
+	public List<T> findAllByIdScoped(List<ID> id) {
+		var criteriaBuilder = entityManager.getCriteriaBuilder();
+		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
+		var root = query.from(entityInformation.getJavaType());
+
+		query.select(root)
+			 .where(criteriaBuilder.and(
+				 root.get("public_id").in(id),
+				 criteriaBuilder.equal(root.get("tenant").get("id"), TenantContext.getCurrentTenant())
+			 ));
+
+		return entityManager.createQuery(query).getResultList();
 	}
 }

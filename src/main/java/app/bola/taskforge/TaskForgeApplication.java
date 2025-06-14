@@ -6,11 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EnableJpaAuditing
+//@EnableJpaAuditing
 @SpringBootApplication
 @EnableJpaRepositories(
-		repositoryFactoryBeanClass = TenantAwareRepositoryFactoryBean.class,
-		basePackages = "app.bola.taskforge.repository"
+		repositoryFactoryBeanClass = TenantAwareRepositoryFactoryBean.class
 )
 public class TaskForgeApplication {
 	

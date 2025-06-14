@@ -23,5 +23,5 @@ public class Attachment extends BaseEntity {
     private Task task;
 
     @ManyToOne
-    private Member uploadedBy;
+    private User uploadedBy;
 }

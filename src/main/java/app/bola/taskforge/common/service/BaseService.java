@@ -1,14 +1,32 @@
 package app.bola.taskforge.common.service;
 
 import app.bola.taskforge.common.entity.BaseEntity;
-import app.bola.taskforge.service.dto.OrganizationRequest;
-import app.bola.taskforge.service.dto.OrganizationResponse;
+import app.bola.taskforge.exception.InvalidRequestException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import org.springframework.lang.NonNull;
+
+import java.util.Set;
+import java.util.stream.Stream;
 
 public interface BaseService<REQ, ENT extends BaseEntity, RES> {
 	
 	
-	RES createNew(REQ req);
+	RES createNew(@NonNull REQ req);
+	
 	default RES toResponse(ENT entity) {
 		return null;
+	}
+	
+	default  <T> void performValidation(Validator validator, T request, Class<T> clazz){
+		
+		Set<ConstraintViolation<T>> violations = validator.validate(request, clazz);
+		Stream<String> errorMessageStream = violations.stream().map(ConstraintViolation::getMessage);
+		
+		if (!violations.isEmpty()) {
+			throw new InvalidRequestException(
+					errorMessageStream.reduce((message1, message2) -> message1 + ", " + message2).orElse("Invalid request")
+			);
+		}
 	}
 }

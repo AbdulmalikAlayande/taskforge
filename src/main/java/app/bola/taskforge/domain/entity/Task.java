@@ -32,7 +32,7 @@ public class Task extends BaseEntity {
 	private Project project;
 	
 	@OneToOne
-	private Member assignee;
+	private User assignee;
 	
 	@ManyToOne
 	private Organization organization;

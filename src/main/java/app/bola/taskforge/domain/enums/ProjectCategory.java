@@ -2,7 +2,8 @@ package app.bola.taskforge.domain.enums;
 
 public enum ProjectCategory {
 	
-	DEVELOPMENT,
+	BUILDING,
+	SOFTWARE,
 	DESIGN,
 	MARKETING,
 	SALES,

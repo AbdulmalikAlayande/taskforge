@@ -2,7 +2,7 @@ package app.bola.taskforge.domain.enums;
 
 public enum Role {
 	
-	MEMBER,
-	ADMIN,
-	OWNER,
+	ORGANIZATION_MEMBER,
+	ORGANIZATION_ADMIN,
+	ORGANIZATION_OWNER,
 }

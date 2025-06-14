@@ -16,12 +16,13 @@ import lombok.experimental.SuperBuilder;
 public class Notification extends BaseEntity {
     
     private String title;
+    
     private String message;
     private boolean read;
     private String referenceId;
     
     @ManyToOne
-    private Member recipient;
+    private User recipient;
     
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
