@@ -32,6 +32,6 @@ public class Project extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private ProjectStatus status;
 	
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<User> members = new HashSet<>();
 }
