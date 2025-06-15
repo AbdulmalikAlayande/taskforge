@@ -2,6 +2,7 @@ package app.bola.taskforge.domain.entity;
 
 import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.domain.enums.ProjectCategory;
+import app.bola.taskforge.domain.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -27,6 +28,9 @@ public class Project extends BaseEntity {
 	
 	@Enumerated(value = EnumType.STRING)
 	private ProjectCategory category;
+	
+	@Enumerated(value = EnumType.STRING)
+	private ProjectStatus status;
 	
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<User> members = new HashSet<>();

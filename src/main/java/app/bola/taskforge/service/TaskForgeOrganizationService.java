@@ -18,10 +18,10 @@ import app.bola.taskforge.service.dto.OrganizationRequest;
 import app.bola.taskforge.service.dto.OrganizationResponse;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -54,6 +54,11 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		Organization savedEntity = organizationRepository.save(organization);
 		
 		return toResponse(savedEntity);
+	}
+	
+	@Override
+	public OrganizationResponse update(String publicId, @NonNull OrganizationRequest organizationRequest) {
+		return null;
 	}
 	
 	@Override

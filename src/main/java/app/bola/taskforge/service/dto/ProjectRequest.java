@@ -23,5 +23,6 @@ public class ProjectRequest implements Serializable {
 	LocalDate startDate;
 	String organizationId;
 	String category;
+	String status;
 	List<String> memberIds;
 }

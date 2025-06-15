@@ -28,4 +28,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @AutoConfigureMockMvc
 @Transactional
 public class OrganizationIntegrationTest {
+
+
 }

@@ -46,6 +46,11 @@ public class TaskForgeMemberService implements MemberService {
 	}
 	
 	@Override
+	public UserResponse update(String publicId, @NonNull MemberRequest memberRequest) {
+		return null;
+	}
+	
+	@Override
 	public UserResponse toResponse(User entity) {
 		return modelMapper.map(entity, UserResponse.class);
 	}

@@ -11,4 +11,9 @@ public class TaskForgeTaskService implements TaskService{
 	public TaskResponse createNew(@NonNull TaskRequest taskRequest) {
 		return null;
 	}
+	
+	@Override
+	public TaskResponse update(String publicId, @NonNull TaskRequest taskRequest) {
+		return null;
+	}
 }
