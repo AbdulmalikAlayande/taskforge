@@ -17,9 +17,9 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InvitationRequest implements Serializable {
 	
-	String inviteeName;
-	
 	@NotBlank
+	String name;
+	
 	String invitedBy;
 	
 	@NotBlank
@@ -27,7 +27,7 @@ public class InvitationRequest implements Serializable {
 	
 	@Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
 	@NotBlank
-	String inviteeEmail;
+	String email;
 	
 	@NotBlank
 	String role;

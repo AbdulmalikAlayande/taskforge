@@ -58,10 +58,10 @@ public class OrganizationRequest {
 	private String timeZone;
 	
 	@Size(max = 255)
-	@URL(regexp = "^(https?://)?[\\w.-]+\\.[a-z]{2,}$", message = "Website URL must be valid")
+	@URL(message = "Website URL must be valid")
 	String websiteUrl;
 	
 	@Size(max = 255)
-	@URL(regexp = "^(https?://)?[\\w.-]+\\.[a-z]{2,}$", message = "Website URL must be valid")
+	@URL(message = "Website URL must be valid")
 	String logoUrl;
 }

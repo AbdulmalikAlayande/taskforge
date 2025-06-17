@@ -12,9 +12,15 @@ public class BeanConfig {
 	@Bean
 	public ModelMapper modelMapper() {
 		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.getConfiguration().setAmbiguityIgnored(true);
-		modelMapper.getConfiguration().setFieldMatchingEnabled(true);
-		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		modelMapper.getConfiguration()
+				.setAmbiguityIgnored(true)
+				.setFieldMatchingEnabled(true)
+				.setMatchingStrategy(MatchingStrategies.STRICT)
+				.setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
+				.setMethodAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PUBLIC)
+				.setSkipNullEnabled(true)
+				.setSourceNamingConvention(org.modelmapper.convention.NamingConventions.JAVABEANS_ACCESSOR)
+				.setDestinationNamingConvention(org.modelmapper.convention.NamingConventions.JAVABEANS_ACCESSOR);;
 		return modelMapper;
 	}
 	

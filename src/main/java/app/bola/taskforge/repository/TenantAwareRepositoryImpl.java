@@ -31,11 +31,17 @@ public class TenantAwareRepositoryImpl<T extends BaseEntity, ID extends Serializ
 		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
 		var root = query.from(entityInformation.getJavaType());
 
+		if (hasOrganizationField()) {
+			query.select(root)
+				 .where(criteriaBuilder.and(
+					 criteriaBuilder.equal(root.get("publicId"), id),
+					 criteriaBuilder.equal(root.get("organization").get("publicId"), TenantContext.getCurrentTenant())
+				 ));
+			return entityManager.createQuery(query).getResultStream().findFirst();
+		}
+
 		query.select(root)
-			 .where(criteriaBuilder.and(
-				 criteriaBuilder.equal(root.get("public_id"), id),
-				 criteriaBuilder.equal(root.get("tenant").get("public_id"), TenantContext.getCurrentTenant())
-			 ));
+			 .where(criteriaBuilder.equal(root.get("public_id"), id));
 
 		try {
 			return Optional.of(entityManager.createQuery(query).getSingleResult());
@@ -50,32 +56,65 @@ public class TenantAwareRepositoryImpl<T extends BaseEntity, ID extends Serializ
 		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
 		var root = query.from(entityInformation.getJavaType());
 
-		query.select(root)
-			 .where(criteriaBuilder.equal(root.get("tenant").get("id"), TenantContext.getCurrentTenant()));
+		if (hasOrganizationField()) {
+			query.select(root)
+					.where(criteriaBuilder.equal(root.get("organization").get("publicId"), TenantContext.getCurrentTenant()));
+		} else {
+			query.select(root);
+		}
 
 		return entityManager.createQuery(query).getResultList();
 	}
 
 	@Override
-	public void deleteByIdScoped(ID id) {
-		this.findByIdScoped(id).ifPresent(entity -> {
-			entity.setDeleted(true);
-			entityManager.merge(entity);
-		});
-	}
-
-	@Override
-	public List<T> findAllByIdScoped(List<ID> id) {
+	public void deleteByIdScopedInternal(ID id, String tenantId) {
 		var criteriaBuilder = entityManager.getCriteriaBuilder();
 		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
 		var root = query.from(entityInformation.getJavaType());
 
 		query.select(root)
 			 .where(criteriaBuilder.and(
-				 root.get("public_id").in(id),
-				 criteriaBuilder.equal(root.get("tenant").get("id"), TenantContext.getCurrentTenant())
+				 criteriaBuilder.equal(root.get("publicId"), id),
+				 criteriaBuilder.equal(root.get("organization").get("publicId"), tenantId)
 			 ));
 
+		entityManager.createQuery(query).getResultStream().findFirst().ifPresent(entity -> {
+			entity.setDeleted(true);
+			entityManager.merge(entity);
+		});
+	}
+
+	@Override
+	public void deleteByIdScoped(ID id) {
+		deleteByIdScopedInternal(id, TenantContext.getCurrentTenant());
+	}
+
+	@Override
+	public List<T> findAllByIdScoped(List<ID> ids) {
+		var criteriaBuilder = entityManager.getCriteriaBuilder();
+		var query = criteriaBuilder.createQuery(entityInformation.getJavaType());
+		var root = query.from(entityInformation.getJavaType());
+
+		if (hasOrganizationField()) {
+			query.select(root)
+					.where(criteriaBuilder.and(
+							root.get("publicId").in(ids),
+							criteriaBuilder.equal(root.get("organization").get("publicId"), TenantContext.getCurrentTenant())
+					));
+		} else {
+			query.select(root)
+					.where(root.get("publicId").in(ids));
+		}
+
 		return entityManager.createQuery(query).getResultList();
+	}
+
+	private boolean hasOrganizationField() {
+		try {
+			entityInformation.getJavaType().getDeclaredField("organization");
+			return true;
+		} catch (NoSuchFieldException e) {
+			return false;
+		}
 	}
 }

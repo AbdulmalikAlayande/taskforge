@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -24,7 +23,7 @@ public class ProjectResponse implements Serializable {
 	LocalDate startDate;
 	LocalDateTime createdAt;
 	LocalDateTime lastModifiedAt;
-	Set<UserResponse> members;
+	Set<MemberResponse> members;
 	OrganizationResponse organization;
 	
 	

@@ -1,7 +1,7 @@
 package app.bola.taskforge.service;
 
 import app.bola.taskforge.domain.entity.Invitation;
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.enums.InvitationStatus;
 import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.repository.InvitationRepository;
@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,7 +45,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	
 	@Override
 	public OrganizationResponse createNew(@NonNull OrganizationRequest organizationRequest) {
-		performValidation(validator, organizationRequest, OrganizationRequest.class);
+		performValidation(validator, organizationRequest);
 		
 		if (organizationRepository.existsByName(organizationRequest.getName())) {
 			log.error("Organization with name {} already exists", organizationRequest.getName());
@@ -68,54 +70,57 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	
 	@Override
 	public InvitationResponse inviteMember(InvitationRequest request) {
-		performValidation(validator, request, InvitationRequest.class);
+		performValidation(validator, request);
 		
-		userRepository.findByEmail(request.getInviteeEmail()).ifPresent(entity -> {
-			throw new TaskForgeException("User with email %s already exists and belongs to %s org".formatted(request.getInviteeEmail(), entity.getOrganization().getName()));
+		userRepository.findByEmail(request.getEmail()).ifPresent(entity -> {
+			throw new TaskForgeException("User with email %s already exists and belongs to %s org".formatted(request.getEmail(), entity.getOrganization().getName()));
 		});
 		
-		invitationRepository.findByInviteeEmail(request.getInviteeEmail()).ifPresent(invitation -> {
+		invitationRepository.findByEmail(request.getEmail()).ifPresent(invitation -> {
 			if (invitation.getStatus() == InvitationStatus.ACCEPTED) {
-				throw new TaskForgeException("User with email %s already accepted an invitation".formatted(request.getInviteeEmail()));
+				throw new TaskForgeException("User with email %s already accepted an invitation".formatted(request.getEmail()));
 			} else if (invitation.getStatus() == InvitationStatus.PENDING || invitation.getExpiresAt().isAfter(LocalDateTime.now())) {
-				throw new TaskForgeException("User with email %s already has a pending invitation".formatted(request.getInviteeEmail()));
+				throw new TaskForgeException("User with email %s already has a pending invitation".formatted(request.getEmail()));
 			}
 		});
 		
 		Organization organization = organizationRepository.findByIdScoped(request.getOrganizationId())
 				                            .orElseThrow(() -> new EntityNotFoundException("Organization not found:: Identifier: " + request.getOrganizationId()));
 		
-		if (invitationRepository.existsByInviteeEmailAndOrganization(request.getInviteeEmail(), organization)) {
-			throw new TaskForgeException("User already invited");
+		Member invitedBy = null;
+		Optional<Member> optionalMember = userRepository.findByIdScoped(request.getInvitedBy());
+		if (optionalMember.isEmpty()) {
+			if (!Objects.equals(request.getRole(), Role.ORGANIZATION_ADMIN.name()))
+				throw new EntityNotFoundException("Member(InvitedBy) with id: %s not found".formatted(request.getInvitedBy()));
+		} else {
+			invitedBy = optionalMember.get();
 		}
 		
-		User member = userRepository.findByIdScoped(request.getInvitedBy())
-				                .orElseThrow(() -> new EntityNotFoundException("Member(InvitedBy) not found"));
+		String token = jwtTokenProvider.generateToken(request.getEmail(), organization.getPublicId());
 		
-		String token = jwtTokenProvider.generateToken(request.getInviteeName(), organization.getPublicId());
-		
-		Invitation invitation = new Invitation();
+		Invitation invitation = modelMapper.map(request, Invitation.class);
 		invitation.setRole(Role.valueOf(request.getRole().toUpperCase()));
-		invitation.setInviteeEmail(request.getInviteeEmail());
 		invitation.setOrganization(organization);
-		invitation.setInvitedBy(member);
+		invitation.setInvitedBy(invitedBy);
 		invitation.setToken(token);
 		invitation.setStatus(InvitationStatus.PENDING);
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
 		
 		invitationRepository.save(invitation);
 		
-		ResponseEntity<?> response = mailSender.sendEmail(
-				List.of(new MailSender.Notification.Recipient(request.getInviteeEmail(), request.getInviteeName())),
+		ResponseEntity<?> mailResponse = mailSender.sendEmail(
+				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
 				"Invitation to join TaskForge",
 				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
 		);
-		String body = response != null ? String.valueOf(response.getBody()) : "Email sent successfully";
-		return InvitationResponse.builder()
-				       .message(body)
-				       .invitationLink("https://taskforge.com/accept?token=%s".formatted(token))
-				       .build();
+		
+		String body = mailResponse != null ? String.valueOf(mailResponse.getBody()) : "Email sent successfully";
+		InvitationResponse response = modelMapper.map(invitation, InvitationResponse.class);
+		response.setMessage(body);
+		response.setOrganizationId(organization.getPublicId());
+		response.setOrganizationName(organization.getName());
+		response.setInvitationLink("https://taskforge.com/accept?token=%s".formatted(token));
+		return response;
 	}
 	
-	// TODO: add acceptInvitation(String token)...
 }

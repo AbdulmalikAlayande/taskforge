@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface InvitationRepository extends TenantAwareRepository<Invitation, String> {
 	
-	boolean existsByInviteeEmailAndOrganization(String inviteeEmail, Organization organization);
+	boolean existsByEmailAndOrganization(String email, Organization organization);
 	
-	Optional<Invitation> findByInviteeEmail(String inviteeEmail);
+	Optional<Invitation> findByEmail(String email);
 }

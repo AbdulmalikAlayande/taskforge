@@ -33,5 +33,5 @@ public class Project extends BaseEntity {
 	private ProjectStatus status;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<User> members = new HashSet<>();
+	private Set<Member> members = new HashSet<>();
 }

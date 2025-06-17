@@ -1,9 +1,9 @@
 package app.bola.taskforge.repository;
 
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 
 import java.util.Optional;
 
-public interface UserRepository extends TenantAwareRepository<User, String> {
-	Optional<User> findByEmail(String email);
+public interface UserRepository extends TenantAwareRepository<Member, String> {
+	Optional<Member> findByEmail(String email);
 }

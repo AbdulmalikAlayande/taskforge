@@ -1,10 +1,9 @@
 package app.bola.taskforge.service;
 
 import app.bola.taskforge.domain.entity.DateRange;
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
-import app.bola.taskforge.domain.enums.ProjectCategory;
 import app.bola.taskforge.domain.enums.ProjectStatus;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
@@ -15,11 +14,11 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,29 +37,29 @@ public class TaskForgeProjectService implements ProjectService{
 	private final OrganizationRepository organizationRepository;
 	private final UserRepository userRepository;
 	private final ProjectRepository projectRepository;
+	private final Validator validator;
 	
 	@PostConstruct
 	public void init() {
-		modelMapper.addMappings(new PropertyMap<ProjectRequest, Project>() {
-			@Override
-			protected void configure() {
-				try {
-					map().setCategory(ProjectCategory.valueOf(source.getCategory().toUpperCase()));
-				} catch (Exception exception) {
-					throw new TaskForgeException("Invalid project category: "+source.getCategory(), exception);
+		modelMapper.typeMap(ProjectRequest.class, Project.class).addMappings(map -> {
+			map.using(context -> {
+				if (context.getSource() == null) {
+					return null;
 				}
-				map().setDateRange(new DateRange(source.getStartDate(), source.getEndDate()));
-			}
+				ProjectRequest request = (ProjectRequest) context.getSource();
+				return new DateRange(request.getStartDate(), request.getEndDate());
+			}).map(source -> source, Project::setDateRange);
 		});
 	}
 	
 	@Override
 	public ProjectResponse createNew(@NonNull ProjectRequest projectRequest) {
+		performValidation(validator, projectRequest);
 		
 		Organization organization = organizationRepository.findByIdScoped(projectRequest.getOrganizationId())
 				                            .orElseThrow(() -> new EntityNotFoundException("Organization not found with id: " + projectRequest.getOrganizationId()));
 		
-		List<User> members = userRepository.findAllByIdScoped(projectRequest.getMemberIds());
+		List<Member> members = userRepository.findAllByIdScoped(projectRequest.getMemberIds());
 		
 		if (members.size() != projectRequest.getMemberIds().size()) {
 			try {
@@ -105,9 +104,9 @@ public class TaskForgeProjectService implements ProjectService{
 			}
 			project.setDateRange(new DateRange(request.getStartDate(), request.getEndDate()));
 		}
-		if (request.getCategory() != null && !request.getCategory().isEmpty()) {
+		if (request.getCategory() != null) {
 			try {
-				project.setCategory(ProjectCategory.valueOf(request.getCategory().toUpperCase()));
+				project.setCategory(request.getCategory());
 			} catch (IllegalArgumentException e) {
 				throw new RuntimeException("Category '%s' is invalid".formatted(request.getCategory()), e);
 			}
@@ -119,7 +118,7 @@ public class TaskForgeProjectService implements ProjectService{
 	
 	@Override
 	public ProjectResponse addMember(String projectId, String memberId) {
-		User member = userRepository.findByIdScoped(memberId)
+		Member member = userRepository.findByIdScoped(memberId)
 				.orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
 		
 		Project project = projectRepository.findByIdScoped(projectId)
@@ -137,7 +136,7 @@ public class TaskForgeProjectService implements ProjectService{
 	
 	@Override
 	public ProjectResponse removeMember(String projectId, String memberId) {
-		User member = userRepository.findByIdScoped(memberId)
+		Member member = userRepository.findByIdScoped(memberId)
 				              .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
 		
 		Project project = projectRepository.findByIdScoped(projectId)

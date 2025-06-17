@@ -1,6 +1,6 @@
 package app.bola.taskforge.service.dto;
 
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -40,7 +40,7 @@ public class OrganizationResponse {
 	String websiteUrl;
 	LocalDateTime createdAt;
 	LocalDateTime lastModifiedAt;
-	Set<User> members;
+	Set<Member> members;
 	Set<Project> projects;
 	
 	@Override

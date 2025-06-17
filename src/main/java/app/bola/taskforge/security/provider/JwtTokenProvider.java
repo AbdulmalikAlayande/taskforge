@@ -1,6 +1,7 @@
 package app.bola.taskforge.security.provider;
 
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +12,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
 	
@@ -18,15 +20,15 @@ public class JwtTokenProvider {
 	private String tokenSecret;
 	
 	@Value("${app.jwt.expiration}")
-	private long tokenExpiration;
+	private String tokenExpiration;
 	
 	/**
-	 * Generates a JWT token with the given name and id.
+	 * Generates a JWT token with the given claims.
 	 *
 	 * @param claims: the claims to include in the token
 	 * @return a JWT token as a String
 	 */
-	public String generateToken(final Map<String, String> claims) {
+	public String generateToken(final Map<String, String> claims, long tokenExpiration) {
 		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
 		return Jwts.builder()
 				       .subject(claims.get("subject"))
@@ -45,26 +47,25 @@ public class JwtTokenProvider {
 	 * @return a JWT token as a String
 	 */
 	public String generateToken(final String name, String id) {
-		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
-		return Jwts.builder()
-				   .subject(name)
-				   .claims(Map.of("name", name, "id", id))
-			       .issuedAt(Date.from(Instant.now()))
-			       .expiration(Date.from(Instant.now().plusMillis(tokenExpiration)))
-			       .signWith(secretKey, Jwts.SIG.HS512)
-			       .compact();
+		return generateToken(Map.of("subject", name, "id", id), Long.parseLong(tokenExpiration));
 	}
 	
-	public String extractEmailFromToken(String token) {
+	public String extractClaimFromToken(String token) {
 		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
 		return Jwts.parser()
 				       .verifyWith(secretKey)
 				       .build()
 				       .parseSignedClaims(token)
 				       .getPayload()
-				       .get("email", String.class);
+				       .get("subject", String.class);
 	}
 	
+	/**
+	 * Checks if the token is expired.
+	 *
+	 * @param token the JWT token to check
+	 * @return true if the token is expired, false otherwise
+	 */
 	public boolean isExpiredToken(String token) {
 		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
 		Date expiration = Jwts.parser()
@@ -76,6 +77,12 @@ public class JwtTokenProvider {
 		return expiration.before(Date.from(Instant.now()));
 	}
 	
+	/**
+	 * Validates the JWT token.
+	 *
+	 * @param token the JWT token to validate
+	 * @return true if the token is valid, false otherwise
+	 */
 	public boolean isValidToken(String token) {
 		try {
 			SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());

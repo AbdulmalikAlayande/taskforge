@@ -30,10 +30,10 @@ public interface BaseService<REQ, ENT extends BaseEntity, RES> {
 	}
 	
 	
-	default  <T> void performValidation(Validator validator, T request, Class<T> clazz){
-		
-		Set<ConstraintViolation<T>> violations = validator.validate(request, clazz);
-		Stream<String> errorMessageStream = violations.stream().map(ConstraintViolation::getMessage);
+	default  <T> void performValidation(Validator validator, T request){
+		Set<ConstraintViolation<T>> violations = validator.validate(request);
+		Stream<String> errorMessageStream = violations.stream()
+                    .map(violation -> violation.getPropertyPath()+": "+violation.getMessage());
 		
 		if (!violations.isEmpty()) {
 			throw new InvalidRequestException(

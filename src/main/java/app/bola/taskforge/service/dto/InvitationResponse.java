@@ -27,8 +27,8 @@ public class InvitationResponse {
 	
 	String message;
 	String memberID;
-	Role memberRole;
-	String memberEmail;
+	Role role;
+	String email;
 	String publicId;
 	String invitationLink;
 	String organizationId;
@@ -45,8 +45,8 @@ public class InvitationResponse {
 				       .append("message", message)
 				       .append("invitationLink", invitationLink)
 				       .append("memberID", memberID)
-				       .append("memberEmail", memberEmail)
-				       .append("memberRole", memberRole)
+				       .append("memberEmail", email)
+				       .append("memberRole", role)
 				       .append("organizationId", organizationId)
 				       .append("organizationName", organizationName)
 				       .append("invitationStatus", status)

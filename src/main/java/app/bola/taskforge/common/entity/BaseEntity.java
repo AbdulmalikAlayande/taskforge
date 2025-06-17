@@ -47,4 +47,11 @@ public class BaseEntity {
 	private LocalDateTime lastModifiedAt;
 
 	private boolean deleted;
+	
+	@PrePersist
+	protected void onPrePersist() {
+		if (this.publicId == null) {
+			this.publicId = java.util.UUID.randomUUID().toString();
+		}
+	}
 }

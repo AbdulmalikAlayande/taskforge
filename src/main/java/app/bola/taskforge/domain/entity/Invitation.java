@@ -24,11 +24,11 @@ public class Invitation extends BaseEntity {
 	
 	@Lob
 	private String token;
-	private String inviteeEmail;
+	private String email;
 	private LocalDateTime expiresAt;
 	
 	@ManyToOne
-	private User invitedBy;
+	private Member invitedBy;
 	
 	@ManyToOne
 	private Organization organization;

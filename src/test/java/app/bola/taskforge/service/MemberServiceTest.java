@@ -1,7 +1,7 @@
 package app.bola.taskforge.service;
 
 import app.bola.taskforge.domain.entity.Invitation;
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.enums.InvitationStatus;
 import app.bola.taskforge.domain.enums.Role;
@@ -12,7 +12,7 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import app.bola.taskforge.service.dto.InvitationResponse;
 import app.bola.taskforge.service.dto.MemberRequest;
-import app.bola.taskforge.service.dto.UserResponse;
+import app.bola.taskforge.service.dto.MemberResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(value = MockitoExtension.class)
-public class UserServiceTest {
+public class MemberServiceTest {
 
 	@Mock
 	private ModelMapper modelMapper;
@@ -55,21 +55,21 @@ public class UserServiceTest {
 
 			Invitation invitation = mock(Invitation.class);
 			when(invitation.getOrganization()).thenReturn(organization);
-			when(invitation.getInviteeEmail()).thenReturn("email@gmail.com");
+			when(invitation.getEmail()).thenReturn("email@gmail.com");
 
 			//Given:
 			InvitationResponse response = InvitationResponse.builder()
-					                              .memberEmail("email@gmail.com")
+					                              .email("email@gmail.com")
 					                              .organizationId("org-id-123")
 					                              .message("Invitation accepted successfully").build();
 
 			when(jwtTokenProvider.isValidToken("some-token")).thenReturn(Boolean.TRUE);
 			when(jwtTokenProvider.isExpiredToken("some-token")).thenReturn(Boolean.FALSE);
-			when(jwtTokenProvider.extractEmailFromToken("some-token")).thenReturn("email@gmail.com");
-			when(invitationRepository.findByInviteeEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
+			when(jwtTokenProvider.extractClaimFromToken("some-token")).thenReturn("email@gmail.com");
+			when(invitationRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
 			when(modelMapper.map(any(Invitation.class), eq(InvitationResponse.class))).thenReturn(response);
 			when(invitation.getOrganization().getPublicId()).thenReturn("org-id-123");
-			when(invitation.getInviteeEmail()).thenReturn("email@gmail.com");
+			when(invitation.getEmail()).thenReturn("email@gmail.com");
 
 			InvitationResponse invitationResponse = memberService.acceptInvitation("some-token");
 			assertNotNull(invitationResponse);
@@ -94,8 +94,8 @@ public class UserServiceTest {
 		    // Given
 		    when(jwtTokenProvider.isValidToken("valid-token")).thenReturn(Boolean.TRUE);
 		    when(jwtTokenProvider.isExpiredToken("valid-token")).thenReturn(Boolean.FALSE);
-		    when(jwtTokenProvider.extractEmailFromToken("valid-token")).thenReturn("nonexistent@gmail.com");
-		    when(invitationRepository.findByInviteeEmail("nonexistent@gmail.com")).thenReturn(Optional.empty());
+		    when(jwtTokenProvider.extractClaimFromToken("valid-token")).thenReturn("nonexistent@gmail.com");
+		    when(invitationRepository.findByEmail("nonexistent@gmail.com")).thenReturn(Optional.empty());
 		
 		    // When & Then
 		    assertThrows(InvalidRequestException.class, () -> memberService.acceptInvitation("valid-token"));
@@ -112,8 +112,8 @@ public class UserServiceTest {
 		
 		    when(jwtTokenProvider.isValidToken("valid-token")).thenReturn(Boolean.TRUE);
 		    when(jwtTokenProvider.isExpiredToken("valid-token")).thenReturn(Boolean.FALSE);
-		    when(jwtTokenProvider.extractEmailFromToken("valid-token")).thenReturn("accepted@gmail.com");
-		    when(invitationRepository.findByInviteeEmail("accepted@gmail.com")).thenReturn(Optional.of(invitation));
+		    when(jwtTokenProvider.extractClaimFromToken("valid-token")).thenReturn("accepted@gmail.com");
+		    when(invitationRepository.findByEmail("accepted@gmail.com")).thenReturn(Optional.of(invitation));
 		
 		    // When & Then
 		    assertThrows(TaskForgeException.class, () -> memberService.acceptInvitation("valid-token"));
@@ -129,8 +129,8 @@ public class UserServiceTest {
 		
 		    when(jwtTokenProvider.isValidToken("valid-token")).thenReturn(Boolean.TRUE);
 		    when(jwtTokenProvider.isExpiredToken("valid-token")).thenReturn(Boolean.FALSE);
-		    when(jwtTokenProvider.extractEmailFromToken("valid-token")).thenReturn("email@gmail.com");
-		    when(invitationRepository.findByInviteeEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
+		    when(jwtTokenProvider.extractClaimFromToken("valid-token")).thenReturn("email@gmail.com");
+		    when(invitationRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
 		
 		    // When & Then
 		    assertThrows(InvalidRequestException.class, () -> memberService.acceptInvitation("valid-token"));
@@ -141,13 +141,13 @@ public class UserServiceTest {
 		public void shouldThrowInvalidRequestExceptionIfEmailDoesNotMatch() {
 		    // Given
 		    Invitation invitation = mock(Invitation.class);
-		    when(invitation.getInviteeEmail()).thenReturn("different@gmail.com");
+		    when(invitation.getEmail()).thenReturn("different@gmail.com");
 		    when(invitation.getStatus()).thenReturn(InvitationStatus.PENDING);
 		
 		    when(jwtTokenProvider.isValidToken("valid-token")).thenReturn(Boolean.TRUE);
 		    when(jwtTokenProvider.isExpiredToken("valid-token")).thenReturn(Boolean.FALSE);
-		    when(jwtTokenProvider.extractEmailFromToken("valid-token")).thenReturn("email@gmail.com");
-		    when(invitationRepository.findByInviteeEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
+		    when(jwtTokenProvider.extractClaimFromToken("valid-token")).thenReturn("email@gmail.com");
+		    when(invitationRepository.findByEmail("email@gmail.com")).thenReturn(Optional.of(invitation));
 		
 		    // When & Then
 		    assertThrows(InvalidRequestException.class, () -> memberService.acceptInvitation("valid-token"));
@@ -156,7 +156,7 @@ public class UserServiceTest {
 	
 	@Nested
 	@DisplayName("Create member tests, should test all edge cases related to creating a member of an organization")
-	class CreateUserTests {
+	class CreateMemberTests {
 		
 		@Test
 		@DisplayName("should create member with valid data")
@@ -169,7 +169,7 @@ public class UserServiceTest {
 		            .lastName("Doe")
 		            .build();
 		
-		    User savedMember = User.builder()
+		    Member savedMember = Member.builder()
 		            .email("test@example.com")
 		            .password("password123")
 		            .firstName("John")
@@ -178,7 +178,7 @@ public class UserServiceTest {
 		            .role(Role.ORGANIZATION_MEMBER)
 		            .build();
 		
-		    UserResponse expectedResponse = UserResponse.builder()
+		    MemberResponse expectedResponse = MemberResponse.builder()
 		            .email("test@example.com")
 		            .firstName("John")
 		            .lastName("Doe")
@@ -186,11 +186,11 @@ public class UserServiceTest {
 		            .role(Role.ORGANIZATION_MEMBER)
 		            .build();
 		
-		    when(userRepository.save(any(User.class))).thenReturn(savedMember);
-		    when(modelMapper.map(savedMember, UserResponse.class)).thenReturn(expectedResponse);
+		    when(userRepository.save(any(Member.class))).thenReturn(savedMember);
+		    when(modelMapper.map(savedMember, MemberResponse.class)).thenReturn(expectedResponse);
 		
 		    // When
-		    UserResponse response = memberService.createNew(request);
+		    MemberResponse response = memberService.createNew(request);
 		
 		    // Then
 		    assertNotNull(response);
@@ -200,8 +200,8 @@ public class UserServiceTest {
 		    assertTrue(response.isActive());
 		    assertEquals(Role.ORGANIZATION_MEMBER, response.getRole());
 		
-		    verify(userRepository).save(any(User.class));
-		    verify(modelMapper).map(savedMember, UserResponse.class);
+		    verify(userRepository).save(any(Member.class));
+		    verify(modelMapper).map(savedMember, MemberResponse.class);
 		}
 		
 		@Test
@@ -246,7 +246,7 @@ public class UserServiceTest {
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(requestWithEmptyPassword));
 		
 		    // Verify that repository was not called
-		    verify(userRepository, never()).save(any(User.class));
+		    verify(userRepository, never()).save(any(Member.class));
 		}
 		
 		@Test
@@ -288,7 +288,7 @@ public class UserServiceTest {
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(invalidRequest));
 		
 		    // Verify repository was not called
-		    verify(userRepository, never()).save(any(User.class));
+		    verify(userRepository, never()).save(any(Member.class));
 		}
 	}
 }

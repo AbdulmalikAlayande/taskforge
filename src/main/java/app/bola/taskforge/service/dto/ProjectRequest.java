@@ -1,6 +1,7 @@
 package app.bola.taskforge.service.dto;
 
 
+import app.bola.taskforge.domain.enums.ProjectCategory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.*;
@@ -22,7 +23,7 @@ public class ProjectRequest implements Serializable {
 	LocalDate endDate;
 	LocalDate startDate;
 	String organizationId;
-	String category;
 	String status;
 	List<String> memberIds;
+	ProjectCategory category;
 }

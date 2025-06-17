@@ -3,7 +3,7 @@ package app.bola.taskforge.service;
 import app.bola.taskforge.domain.entity.DateRange;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.enums.ProjectCategory;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.TaskForgeException;
@@ -13,7 +13,7 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.OrganizationResponse;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
-import app.bola.taskforge.service.dto.UserResponse;
+import app.bola.taskforge.service.dto.MemberResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ class ProjectServiceTest {
 			ProjectRequest projectRequest = ProjectRequest.builder()
 					.name("New  Project")
                     .description("This is a new project")
-                    .category("SOFTWARE")
+                    .category(ProjectCategory.SOFTWARE)
                     .startDate(LocalDate.now().plusDays(1))
                     .endDate(LocalDate.now().plusDays(31))
                     .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
@@ -82,26 +82,26 @@ class ProjectServiceTest {
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
 				.thenReturn(List.of(
-					User.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					User.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					User.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
+					Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+					Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
 				));
 			when(organizationRepository.findByIdScoped("organization-id-12345"))
 				.thenReturn(Optional.of(Organization.builder().id("organization-id-12345").name("Test Organization").build()));
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
 				.thenReturn(List.of(
-					User.builder().publicId("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					User.builder().publicId("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					User.builder().publicId("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					Member.builder().publicId("member-id-1").email("").firstName("John").lastName("Doe").build(),
+					Member.builder().publicId("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+					Member.builder().publicId("member-id-3").email("").firstName("Jim").lastName("Beam").build()
 				));
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(ProjectResponse.builder()
 					.name("New  Project").description("This is a new project").category(ProjectCategory.SOFTWARE.name())
 					.startDate(LocalDate.now().plusDays(1)).endDate(LocalDate.now().plusDays(31))
 					.members(Set.of(
-						UserResponse.builder().publicId("member-id-1").firstName("John").lastName("Doe").build(),
-						UserResponse.builder().publicId("member-id-2").firstName("Jane").lastName("Doe").build(),
-						UserResponse.builder().publicId("member-id-3").firstName("Jim").lastName("Beam").build()
+						MemberResponse.builder().publicId("member-id-1").firstName("John").lastName("Doe").build(),
+						MemberResponse.builder().publicId("member-id-2").firstName("Jane").lastName("Doe").build(),
+						MemberResponse.builder().publicId("member-id-3").firstName("Jim").lastName("Beam").build()
 					))
 					.organization(OrganizationResponse.builder().publicId("organization-id-12345").name("Test Organization").build())
 					.build());
@@ -125,7 +125,7 @@ class ProjectServiceTest {
 			ProjectRequest projectRequest = ProjectRequest.builder()
 					.name("New Project")
 					.description("This is a new project")
-					.category("SOFTWARE")
+					.category(ProjectCategory.SOFTWARE)
 					.startDate(LocalDate.now().plusDays(1))
 					.endDate(LocalDate.now().plusDays(31))
 					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
@@ -148,7 +148,7 @@ class ProjectServiceTest {
 			ProjectRequest projectRequest = ProjectRequest.builder()
 					.name("New Project")
 					.description("This is a new project")
-					.category("INVALID_CATEGORY") // Invalid category
+					.category(ProjectCategory.valueOf("INVALID_CATEGORY")) // Invalid category
 					.startDate(LocalDate.now().plusDays(1))
 					.endDate(LocalDate.now().plusDays(31))
 					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
@@ -160,9 +160,9 @@ class ProjectServiceTest {
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
 				.thenReturn(List.of(
-					User.builder().id("member-id-1").email("johndoe@gmail.com").firstName("John").lastName("Doe").build(),
-					User.builder().id("member-id-2").email("janedoe@gmail.com").firstName("Jane").lastName("Doe").build(),
-					User.builder().id("member-id-3").email("jimbeam@proton.mail").firstName("Jim").lastName("Beam").build()
+					Member.builder().id("member-id-1").email("johndoe@gmail.com").firstName("John").lastName("Doe").build(),
+					Member.builder().id("member-id-2").email("janedoe@gmail.com").firstName("Jane").lastName("Doe").build(),
+					Member.builder().id("member-id-3").email("jimbeam@proton.mail").firstName("Jim").lastName("Beam").build()
 				));
 			
 			when(modelMapper.map(projectRequest, Project.class)).thenReturn(
@@ -183,7 +183,7 @@ class ProjectServiceTest {
 			ProjectRequest projectRequest = ProjectRequest.builder()
 					.name("New Project")
 					.description("This is a new project")
-					.category("SOFTWARE")
+					.category(ProjectCategory.SOFTWARE)
 					.startDate(LocalDate.now().plusDays(31))
 					.endDate(LocalDate.now().plusDays(1))
 					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
@@ -200,9 +200,9 @@ class ProjectServiceTest {
 			);
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
 				.thenReturn(List.of(
-					User.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					User.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					User.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
+					Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+					Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
 				));
 			
 			TaskForgeException exception = assertThrows(TaskForgeException.class, () -> projectService.createNew(projectRequest));
@@ -222,11 +222,11 @@ class ProjectServiceTest {
 			String projectId = "project-id-12345";
 			String memberId = "member-id-12345";
 			
-			User member = User.builder().id(memberId).firstName("John").lastName("Doe").build();
+			Member member = Member.builder().id(memberId).firstName("John").lastName("Doe").build();
 			Project project = Project.builder().publicId(projectId).name("Test Project").members(Set.of(
-				User.builder().id("member-id-12345").email("").firstName("John").lastName("Doe").build(),
-				User.builder().id("member-id-2345").email("").firstName("Jane").lastName("Doe").build(),
-				User.builder().id("member-id-345").email("").firstName("Jim").lastName("Beam").build()
+				Member.builder().id("member-id-12345").email("").firstName("John").lastName("Doe").build(),
+				Member.builder().id("member-id-2345").email("").firstName("Jane").lastName("Doe").build(),
+				Member.builder().id("member-id-345").email("").firstName("Jim").lastName("Beam").build()
 			)).build();
 			
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(
@@ -236,7 +236,7 @@ class ProjectServiceTest {
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(member));
 			when(projectService.addMember(projectId, memberId)).thenReturn(
 				ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
-					UserResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
+					MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
 				)).build()
 			);
 			
@@ -258,7 +258,7 @@ class ProjectServiceTest {
 			String memberId = "member-id-12345";
 			
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(
-				User.builder().id(memberId).firstName("John").lastName("Doe").build()
+				Member.builder().id(memberId).firstName("John").lastName("Doe").build()
 			));
 			
 			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.empty());
@@ -288,12 +288,12 @@ class ProjectServiceTest {
 			String memberId = "member-id-12345";
 			
 			Project project = Project.builder().publicId(projectId).members(Set.of(
-					User.builder().publicId("member-id-12345").firstName("John").lastName("Doe").build(),
-					User.builder().publicId("member-id-2345").firstName("Jane").lastName("Doe").build(),
-					User.builder().publicId("member-id-345").firstName("Jim").lastName("Beam").build()
+					Member.builder().publicId("member-id-12345").firstName("John").lastName("Doe").build(),
+					Member.builder().publicId("member-id-2345").firstName("Jane").lastName("Doe").build(),
+					Member.builder().publicId("member-id-345").firstName("Jim").lastName("Beam").build()
 			)).name("Test Project").build();
 			
-			User member = User.builder().id(memberId).firstName("John").lastName("Doe").build();
+			Member member = Member.builder().id(memberId).firstName("John").lastName("Doe").build();
 			
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(
 				ProjectResponse.builder().publicId(projectId).name("Test Project").build()
@@ -303,7 +303,7 @@ class ProjectServiceTest {
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(member));
 			when(projectService.addMember(projectId, memberId)).thenReturn(
 				ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
-					UserResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
+					MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
 				)).build()
 			);
 			
@@ -325,12 +325,12 @@ class ProjectServiceTest {
 			String memberId = "member-id-12345";
 			
 			Project project = Project.builder().publicId(projectId).members(Set.of(
-					User.builder().publicId("member-id-12345").firstName("John").lastName("Doe").build(),
-					User.builder().publicId("member-id-2345").firstName("Jane").lastName("Doe").build(),
-					User.builder().publicId("member-id-345").firstName("Jim").lastName("Beam").build()
+					Member.builder().publicId("member-id-12345").firstName("John").lastName("Doe").build(),
+					Member.builder().publicId("member-id-2345").firstName("Jane").lastName("Doe").build(),
+					Member.builder().publicId("member-id-345").firstName("Jim").lastName("Beam").build()
 			)).name("Test Project").build();
 			
-			User member = User.builder().id(memberId).firstName("John").lastName("Doe").build();
+			Member member = Member.builder().id(memberId).firstName("John").lastName("Doe").build();
 			
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(
 					ProjectResponse.builder().publicId(projectId).name("Test Project").build()

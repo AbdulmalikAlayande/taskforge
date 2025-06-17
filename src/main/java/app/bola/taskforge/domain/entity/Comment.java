@@ -22,7 +22,7 @@ public class Comment extends BaseEntity {
 	private boolean resolved;
 	
 	@ManyToOne
-	private User author;
+	private Member author;
 	
 	@ManyToOne
 	private Task task;
@@ -32,6 +32,9 @@ public class Comment extends BaseEntity {
 	
 	@ManyToOne
 	private Comment parentComment;
+	
+	@ManyToOne
+	private Organization organization;
 	
 	@Builder.Default
 	@OneToMany(mappedBy = "parentComment")

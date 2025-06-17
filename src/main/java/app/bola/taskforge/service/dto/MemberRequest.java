@@ -1,6 +1,6 @@
 package app.bola.taskforge.service.dto;
 
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 
 /**
- * Request DTO for {@link User}
+ * Request DTO for {@link Member}
  */
 
 @Getter
@@ -31,4 +31,6 @@ public class MemberRequest implements Serializable {
 	String firstName;
 	@NotBlank
 	String lastName;
+	@NotBlank
+	String organizationId;
 }

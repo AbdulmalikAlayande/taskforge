@@ -1,6 +1,6 @@
 package app.bola.taskforge.service;
 
-import app.bola.taskforge.domain.entity.User;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
@@ -369,7 +369,7 @@ class OrganizationServiceTest {
 	
 	@Nested
 	@DisplayName("Member Invitation tests")
-	class UserInvitationTests {
+	class MemberInvitationTests {
 		OrganizationResponse organizationResponse;
 		
 		@BeforeEach
@@ -401,13 +401,13 @@ class OrganizationServiceTest {
 			                            .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 			                            .publicId("org-12345").build();
 			
-			User member = User.builder().publicId("member-id-123").firstName("Abdulmalik").lastName("Alayande")
+			Member member = Member.builder().publicId("member-id-123").firstName("Abdulmalik").lastName("Alayande")
 					              .email("alaabdulmalik03@gmail.com").password("password-123").build();
 			
 			
 			when(organizationService.createNew(orgRequest)).thenReturn(orgResponse);
 			when(organizationRepository.findByIdScoped("org-12345")).thenReturn(Optional.of(organization));
-			when(invitationRepository.existsByInviteeEmailAndOrganization("alaabdulmalik03@gmail.com", organization)).thenReturn(Boolean.FALSE);
+			when(invitationRepository.existsByEmailAndOrganization("alaabdulmalik03@gmail.com", organization)).thenReturn(Boolean.FALSE);
 			when(userRepository.findByIdScoped("member-id-123")).thenReturn(Optional.of(member));
 			when(jwtTokenProvider.generateToken("Alayande Abdulmalik", "org-12345")).thenReturn("some-jwt-token");
 			when(invitationRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -418,8 +418,8 @@ class OrganizationServiceTest {
 
 			InvitationRequest request = InvitationRequest.builder()
 					.organizationId(organizationResponse.getPublicId())
-					.inviteeEmail("alaabdulmalik03@gmail.com")
-                    .inviteeName("Alayande Abdulmalik")
+					.email("alaabdulmalik03@gmail.com")
+                    .name("Alayande Abdulmalik")
 					.invitedBy("member-id-123")
                     .role("ORGANIZATION_MEMBER")
                     .build();
@@ -455,20 +455,20 @@ class OrganizationServiceTest {
 					                                   .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 					                                   .publicId("org-public-id-12345").build();
 			
-			User member = User.builder().publicId("member-id-123").firstName("Abdulmalik").lastName("Alayande")
+			Member member = Member.builder().publicId("member-id-123").firstName("Abdulmalik").lastName("Alayande")
 					                                .email("alaabdulmalik03@gmail.com").password("password-123").build();
 			
 			when(organizationService.createNew(orgRequest)).thenReturn(orgResponse);
 			when(organizationRepository.findByIdScoped("org-public-id-12345")).thenReturn(Optional.of(organization));
-			when(invitationRepository.existsByInviteeEmailAndOrganization("alaabdulmalik03@gmail.com", organization)).thenReturn(Boolean.TRUE);
+			when(invitationRepository.existsByEmailAndOrganization("alaabdulmalik03@gmail.com", organization)).thenReturn(Boolean.TRUE);
 			
 			//Action: Create organization and invite member
 			organizationResponse = organizationService.createNew(orgRequest);
 			
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId(organizationResponse.getPublicId())
-					                            .inviteeEmail("alaabdulmalik03@gmail.com")
-					                            .inviteeName("Alayande Abdulmalik")
+					                            .email("alaabdulmalik03@gmail.com")
+					                            .name("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -486,8 +486,8 @@ class OrganizationServiceTest {
 			// Given: setup for a non-existent organization
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId("non-existent-org-id")
-					                            .inviteeEmail("alaabdulmalik03@gmail.com")
-					                            .inviteeName("Alayande Abdulmalik")
+					                            .email("alaabdulmalik03@gmail.com")
+					                            .name("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -509,8 +509,8 @@ class OrganizationServiceTest {
 			// Given: setup for an invalid email
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId("org-12345")
-					                            .inviteeEmail("invalid-email-format")
-					                            .inviteeName("Alayande Abdulmalik")
+					                            .email("invalid-email-format")
+					                            .name("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -533,8 +533,8 @@ class OrganizationServiceTest {
 			// Given: setup for an invalid request with missing fields
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId(null) // missing
-					                            .inviteeEmail("")     // missing
-					                            .inviteeName(null)    // missing
+					                            .email("")     // missing
+					                            .name(null)    // missing
 					                            .invitedBy("")        // missing
 					                            .role(null)           // missing
 					                            .build();
