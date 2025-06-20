@@ -23,6 +23,7 @@ public class Invitation extends BaseEntity {
 	private Role role;
 	
 	@Lob
+	@Column(columnDefinition = "TEXT", length = 100000)
 	private String token;
 	private String email;
 	private LocalDateTime expiresAt;

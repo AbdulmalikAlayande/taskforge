@@ -4,8 +4,10 @@ import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import module java.base;
 
 @Entity
 @Getter
@@ -27,6 +29,10 @@ public class Member extends BaseEntity {
 	
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
+	
+	@ManyToMany
+	@Builder.Default
+	private Set<Project> projects = new HashSet<>();
 	
 	@Override
 	public String toString() {

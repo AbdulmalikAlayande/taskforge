@@ -7,9 +7,7 @@ import app.bola.taskforge.service.dto.MemberRequest;
 import app.bola.taskforge.service.dto.MemberResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/members")
@@ -25,7 +23,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	}
 	
 	@PostMapping("/accept-invitation")
-	public ResponseEntity<InvitationResponse> acceptInvitation(String token) {
+	public ResponseEntity<InvitationResponse> acceptInvitation(@RequestParam String token) {
 		return ResponseEntity.ok(memberService.acceptInvitation(token));
 	}
 	

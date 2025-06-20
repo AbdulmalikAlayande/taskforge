@@ -1,8 +1,6 @@
 package app.bola.taskforge.service.dto;
 
-import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
-import app.bola.taskforge.domain.entity.Project;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,8 +38,8 @@ public class OrganizationResponse {
 	String websiteUrl;
 	LocalDateTime createdAt;
 	LocalDateTime lastModifiedAt;
-	Set<Member> members;
-	Set<Project> projects;
+	Set<MemberResponse> members;
+	Set<ProjectResponse> projects;
 	
 	@Override
 	public String toString() {

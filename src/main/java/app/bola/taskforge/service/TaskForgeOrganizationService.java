@@ -72,6 +72,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	public InvitationResponse inviteMember(InvitationRequest request) {
 		performValidation(validator, request);
 		
+		log.info("Inviting member with email: {} to organization with ID: {}", request.getEmail(), request.getOrganizationId());
 		userRepository.findByEmail(request.getEmail()).ifPresent(entity -> {
 			throw new TaskForgeException("User with email %s already exists and belongs to %s org".formatted(request.getEmail(), entity.getOrganization().getName()));
 		});
@@ -108,15 +109,15 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		
 		invitationRepository.save(invitation);
 		
-		ResponseEntity<?> mailResponse = mailSender.sendEmail(
-				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
-				"Invitation to join TaskForge",
-				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
-		);
-		
-		String body = mailResponse != null ? String.valueOf(mailResponse.getBody()) : "Email sent successfully";
+//		ResponseEntity<?> mailResponse = mailSender.sendEmail(
+//				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
+//				"Invitation to join TaskForge",
+//				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
+//		);
+//
+//		String body = mailResponse != null ? String.valueOf(mailResponse.getBody()) : "Email sent successfully";
 		InvitationResponse response = modelMapper.map(invitation, InvitationResponse.class);
-		response.setMessage(body);
+		response.setMessage("invited");
 		response.setOrganizationId(organization.getPublicId());
 		response.setOrganizationName(organization.getName());
 		response.setInvitationLink("https://taskforge.com/accept?token=%s".formatted(token));

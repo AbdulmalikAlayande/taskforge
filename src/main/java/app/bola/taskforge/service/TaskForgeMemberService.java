@@ -4,7 +4,6 @@ import app.bola.taskforge.domain.entity.Invitation;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.enums.InvitationStatus;
-import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.exception.TaskForgeException;
@@ -21,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import jakarta.validation.Validator;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -38,33 +38,41 @@ public class TaskForgeMemberService implements MemberService {
 	private final OrganizationRepository organizationRepository;
 
 	@Override
+	@Transactional
 	public MemberResponse createNew(@NonNull MemberRequest memberRequest) {
 
 		performValidation(validator, memberRequest);
 
 		Optional<Invitation> optionalInvitation = invitationRepository.findByEmail(memberRequest.getEmail());
-		if (optionalInvitation.isPresent()) {
-			Invitation invitation = optionalInvitation.get();
-			if (invitation.getStatus() != InvitationStatus.PENDING) {
-				throw new InvalidRequestException("Invitation is not valid or has already been accepted");
-			}
-		}else {
-			throw new InvalidRequestException("No invitation found for email: " + memberRequest.getEmail());
-		}
-
+		Invitation invitation = checkInvitationPresence(memberRequest, optionalInvitation);
+		
 		Organization organization = organizationRepository.findByIdScoped(memberRequest.getOrganizationId())
 				.orElseThrow(() -> new EntityNotFoundException("Organization not found with ID: " + memberRequest.getOrganizationId()));
 
 		Member member = modelMapper.map(memberRequest, Member.class);
 		member.setActive(true);
-		member.setRole(Role.ORGANIZATION_MEMBER);
+		member.setRole(invitation.getRole());
 		member.setOrganization(organization);
-
+		
 		Member savedMember = userRepository.save(member);
-
 		return toResponse(savedMember);
 	}
-
+	
+	private Invitation checkInvitationPresence(MemberRequest memberRequest, Optional<Invitation> optionalInvitation) {
+		Invitation invitation;
+		if (optionalInvitation.isPresent()) {
+			invitation = optionalInvitation.get();
+			if (invitation.getStatus() == InvitationStatus.PENDING) {
+				throw new InvalidRequestException("You have a pending Invitation, please accept the invitation");
+			} else if (invitation.getStatus() == InvitationStatus.EXPIRED || invitation.getStatus() == InvitationStatus.REVOKED) {
+				throw new InvalidRequestException("Invitation is expired or revoked, please request a new invitation");
+			}
+		}else {
+			throw new InvalidRequestException("No invitation found for email: " + memberRequest.getEmail());
+		}
+		return invitation;
+	}
+	
 	@Override
 	public MemberResponse update(String publicId, @NonNull MemberRequest memberRequest) {
 		return null;
@@ -76,8 +84,9 @@ public class TaskForgeMemberService implements MemberService {
 	}
 
 	@Override
+	@Transactional
 	public InvitationResponse acceptInvitation(String token) {
-
+		log.info("Accepting invitation with token: {}", token);
 		if (jwtTokenProvider.isValidToken(token)) {
 			if (jwtTokenProvider.isExpiredToken(token)) {
 				throw new InvalidRequestException("Invitation token is expired");

@@ -10,7 +10,6 @@ import app.bola.taskforge.exception.TaskForgeException;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.UserRepository;
-import app.bola.taskforge.service.dto.OrganizationResponse;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
 import app.bola.taskforge.service.dto.MemberResponse;
@@ -103,7 +102,6 @@ class ProjectServiceTest {
 						MemberResponse.builder().publicId("member-id-2").firstName("Jane").lastName("Doe").build(),
 						MemberResponse.builder().publicId("member-id-3").firstName("Jim").lastName("Beam").build()
 					))
-					.organization(OrganizationResponse.builder().publicId("organization-id-12345").name("Test Organization").build())
 					.build());
 			
 			//When

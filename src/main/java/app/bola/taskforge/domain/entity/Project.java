@@ -16,6 +16,7 @@ import java.util.Set;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "organization_id"}))
 public class Project extends BaseEntity {
 
 	private String name;
@@ -32,6 +33,7 @@ public class Project extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private ProjectStatus status;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@Builder.Default
 	private Set<Member> members = new HashSet<>();
 }

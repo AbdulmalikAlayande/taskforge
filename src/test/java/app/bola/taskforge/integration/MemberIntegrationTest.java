@@ -52,8 +52,11 @@ public class MemberIntegrationTest {
 		InvitationRequest initInvRequest = InvitationRequest.builder()
 			.organizationId(orgResponse.getPublicId()).name("Test Admin").email("testadminuser1@gmail.com")
             .role("ORGANIZATION_ADMIN").invitedBy("").build();
-
-		organizationService.inviteMember(initInvRequest);
+		
+		InvitationResponse invitationResponse = organizationService.inviteMember(initInvRequest);
+		
+		String token = invitationResponse.getInvitationLink().split("=")[1];
+		memberService.acceptInvitation(token);
 		
 		MemberRequest memberRequest = MemberRequest.builder()
               .organizationId(orgResponse.getPublicId()).firstName("Test Admin").lastName("Member")
@@ -174,6 +177,8 @@ public class MemberIntegrationTest {
                 .role("ORGANIZATION_MEMBER").invitedBy(testMember.getPublicId()).build();
 			
 			invitationResponse = organizationService.inviteMember(request);
+			
+			memberService.acceptInvitation(invitationResponse.getInvitationLink().split("=")[1]);
 		}
 		
 		@AfterEach
@@ -286,11 +291,8 @@ public class MemberIntegrationTest {
 	        // Given
 	        // Use the email of the testMember that's already created in the setup method
 	        MemberRequest memberRequest = MemberRequest.builder()
-	            .organizationId(orgResponse.getPublicId())
-	            .firstName("Duplicate")
-	            .lastName("Member")
-	            .email(testMember.getEmail()) // Use the same email as the existing member
-	            .password("password123")
+				.organizationId(orgResponse.getPublicId()).firstName("Test Admin").lastName("Member")
+				.email("testadminuser1@gmail.com").password("test#admin$password123#")
 	            .build();
 	
 	        // When & Then
@@ -301,7 +303,7 @@ public class MemberIntegrationTest {
 	    @DisplayName("Should throw EntityNotFoundException If Organization does not exist")
 	    public void shouldFailIfOrganizationDoesNotExist() {
 	        // Given
-	        String nonExistentOrgId = "non-existent-org-" + java.util.UUID.randomUUID().toString();
+	        String nonExistentOrgId = "non-existent-org-" + java.util.UUID.randomUUID();
 	
 	        MemberRequest memberRequest = MemberRequest.builder()
 	            .organizationId(nonExistentOrgId)

@@ -1,5 +1,6 @@
 package app.bola.taskforge.service;
 
+import app.bola.taskforge.domain.context.TenantContext;
 import app.bola.taskforge.domain.entity.DateRange;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
@@ -78,7 +79,9 @@ public class TaskForgeProjectService implements ProjectService{
 		project.setOrganization(organization);
 		project.setStatus(ProjectStatus.ACTIVE);
 		project.setMembers(Set.copyOf(members));
-		return toResponse(project);
+		
+		Project savedProject = projectRepository.save(project);
+		return toResponse(savedProject);
 	}
 	
 	@Override
@@ -169,6 +172,12 @@ public class TaskForgeProjectService implements ProjectService{
 				                            .orElseThrow(() -> new EntityNotFoundException(""));
 		List<Project> projects = projectRepository.findAllByOrganization(organization);
 		return toResponse(projects);
+	}
+	
+	@Override
+	public Set<ProjectResponse> findAll() {
+		List<Project> allProjects = projectRepository.findAllScoped();
+		return toResponse(allProjects);
 	}
 	
 	@Override

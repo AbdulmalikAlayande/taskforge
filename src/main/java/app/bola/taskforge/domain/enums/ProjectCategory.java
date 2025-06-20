@@ -12,5 +12,6 @@ public enum ProjectCategory {
 	OPERATIONS,
 	LEGAL,
 	IT_SUPPORT,
+	ENTERTAINMENT,
 	OTHER
 }

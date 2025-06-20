@@ -17,6 +17,6 @@ public interface ProjectService extends BaseService<ProjectRequest, Project, Pro
 	
 	ProjectResponse changeStatus(String projectId, String status);
 	Set<ProjectResponse> getAllByOrganizationId(String organizationId);
-	
+	Set<ProjectResponse> findAll();
 //	Object getActivityLog(String projectId);
 }
