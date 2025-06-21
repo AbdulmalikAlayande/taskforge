@@ -5,7 +5,13 @@ import app.bola.taskforge.domain.entity.Task;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
 
-public interface TaskService extends BaseService<TaskRequest, Task, TaskResponse> {
+import java.util.Set;
 
-	// Define any additional methods specific to TaskService here
+public interface TaskService extends BaseService<TaskRequest, Task, TaskResponse> {
+	
+	TaskResponse findById(String publicId);
+	Set<TaskResponse> findAll();
+	void deleteById(String publicId);
+	TaskResponse assignMember(String taskId, String memberId);
+	
 }

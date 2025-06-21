@@ -3,10 +3,12 @@
 -- ADD CONSTRAINT organization_name_slug_unique UNIQUE (name, slug);
 --
 -- INSERT INTO organization (
---     id, deleted, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
+--     id, public_id, deleted, version, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
 -- ) VALUES (
 --     gen_random_uuid(),
+--     gen_random_uuid(),
 --     false,
+--     0,
 --     'Acme Corp',
 --     'acme-corp',
 --     'A leading provider of widgets.',
@@ -22,11 +24,12 @@
 -- RETURNING *;
 --
 -- INSERT INTO organization (
---     id, public_id, deleted, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
+--     id, public_id, deleted, version, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
 -- ) VALUES (
 --     gen_random_uuid(),
 --     gen_random_uuid(),
 --     false,
+--     0,
 --     'Beta LLC',
 --     'beta-llc',
 --     'A startup focused on innovative solutions.',
@@ -42,10 +45,11 @@
 -- RETURNING *;
 --
 -- INSERT INTO organization (
---     id, public_id, deleted, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
+--     id, public_id, deleted, version, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
 -- ) VALUES (gen_random_uuid(),
 --           gen_random_uuid(),
 --           false,
+--           0,
 --           'Gamma Inc',
 --           'gamma-inc',
 --           'A global leader in tech solutions.',
@@ -60,11 +64,12 @@
 --   RETURNING *;
 --
 -- INSERT INTO organization (
---     id, public_id, deleted, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
+--     id, public_id, deleted, version, name, slug, description, industry, country, time_zone, contact_email, contact_phone, logo_url, website_url
 -- ) VALUES (
---         gen_random_uuid(),
+--           gen_random_uuid(),
 --           gen_random_uuid(),
 --           false,
+--           0,
 --           'Blue Corp',
 --           'blue-cap-corp',
 --           'A bluey film corporation',
@@ -74,13 +79,17 @@
 --           'info@bluecorp.com',
 --           '+23470000123',
 --           'https://bluecorp.ng',
---           'https://bluecorp.ng/logo.jpg')
+--           'https://bluecorp.ng/logo.jpg'
+--          )
+--   ON CONFLICT (name, slug) DO NOTHING
+--   RETURNING *;
 
 -- PROJECT --
 INSERT INTO project (
-     archived, deleted, end_date, start_date, created_at, last_modified_at, version, category, created_by, description, id, modified_by, name, organization_id, public_id, status
+     archived, version, deleted, end_date, start_date, created_at, last_modified_at, version, category, created_by, description, id, modified_by, name, organization_id, public_id, status
 ) VALUES (
         true,
+          0,
           false,
           null,
           null,

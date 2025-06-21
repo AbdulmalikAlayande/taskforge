@@ -7,7 +7,8 @@ import lombok.*;
 import lombok.experimental.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import module java.base;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter

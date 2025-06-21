@@ -14,6 +14,11 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An actionable unit of work to be done
+ */
+
+
 @Getter
 @Setter
 @Entity
@@ -22,11 +27,12 @@ import java.util.Set;
 @AllArgsConstructor
 public class Task extends BaseEntity {
 	
-	private String name;
+	private String title;
 	private String description;
 	private LocalDate dueDate;
-	private LocalDateTime completedAt;
+	private LocalDate startDate;
 	private boolean pinned;
+	private LocalDateTime completedAt;
 	
 	@ManyToOne
 	private Project project;

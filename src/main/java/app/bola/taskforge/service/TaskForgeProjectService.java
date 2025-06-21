@@ -1,6 +1,5 @@
 package app.bola.taskforge.service;
 
-import app.bola.taskforge.domain.context.TenantContext;
 import app.bola.taskforge.domain.entity.DateRange;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
@@ -8,7 +7,6 @@ import app.bola.taskforge.domain.entity.Project;
 import app.bola.taskforge.domain.enums.ProjectStatus;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
-import app.bola.taskforge.exception.TaskForgeException;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.UserRepository;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,7 +77,7 @@ public class TaskForgeProjectService implements ProjectService{
 		Project project = modelMapper.map(projectRequest, Project.class);
 		project.setOrganization(organization);
 		project.setStatus(ProjectStatus.ACTIVE);
-		project.setMembers(Set.copyOf(members));
+		project.setMembers(new HashSet<>(members));
 		
 		Project savedProject = projectRepository.save(project);
 		return toResponse(savedProject);
@@ -120,7 +119,7 @@ public class TaskForgeProjectService implements ProjectService{
 	}
 	
 	@Override
-	public ProjectResponse addMember(String projectId, String memberId) {
+	public ProjectResponse addMember(@NonNull String projectId, @NonNull String memberId) {
 		Member member = userRepository.findByIdScoped(memberId)
 				.orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
 		
@@ -128,17 +127,27 @@ public class TaskForgeProjectService implements ProjectService{
 				.orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
 		
 		if (project.getMembers().contains(member)) {
-			throw new TaskForgeException("Member already exists in the project");
+			throw new InvalidRequestException("Member already exists in the project");
 		}
 		
-		project.getMembers().add(member);
+		log.info("Project Members Size: {}", project.getMembers().size());
+		Set<Member> members = project.getMembers();
+		
+		if (members != null) {
+			members.add(member);
+		} else {
+			members = new HashSet<>();
+			members.add(member);
+		}
+		
+		project.setMembers(members);
 		
 		Project savedProject = projectRepository.save(project);
 		return toResponse(savedProject);
 	}
 	
 	@Override
-	public ProjectResponse removeMember(String projectId, String memberId) {
+	public ProjectResponse removeMember(@NonNull String projectId, @NonNull String memberId) {
 		Member member = userRepository.findByIdScoped(memberId)
 				              .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
 		
@@ -152,14 +161,14 @@ public class TaskForgeProjectService implements ProjectService{
 	}
 	
 	@Override
-	public ProjectResponse changeStatus(String projectId, String status) {
+	public ProjectResponse changeStatus(@NonNull String projectId, @NonNull String status) {
 		Project project = projectRepository.findByIdScoped(projectId)
 				                  .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
-		if (status != null && !status.isEmpty()) {
+		if (!status.isEmpty()) {
 			try {
 				project.setStatus(ProjectStatus.valueOf(status.toUpperCase()));
-			} catch (IllegalArgumentException e) {
-				throw new RuntimeException("Project status '%s' is invalid".formatted(status), e);
+			} catch (IllegalArgumentException exception) {
+				throw new InvalidRequestException("Project status '%s' is invalid".formatted(status), exception);
 			}
 		}
 		
@@ -177,8 +186,26 @@ public class TaskForgeProjectService implements ProjectService{
 	@Override
 	public Set<ProjectResponse> findAll() {
 		List<Project> allProjects = projectRepository.findAllScoped();
-		return toResponse(allProjects);
+		return toResponse(
+			allProjects.stream().filter(project -> !project.isDeleted()).collect(Collectors.toSet())
+		);
 	}
+	
+	@Override
+	public ProjectResponse findById(String publicId) {
+		Project project = projectRepository.findByIdScoped(publicId)
+				                  .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + publicId));
+		return project.isDeleted() ? null : toResponse(project);
+	}
+	
+	@Override
+	public void deleteById(String publicId) {
+		Project project = projectRepository.findByIdScoped(publicId)
+				                  .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+		project.setDeleted(true);
+		projectRepository.save(project);
+	}
+	
 	
 	@Override
 	public Set<ProjectResponse> toResponse(Collection<Project> entities){

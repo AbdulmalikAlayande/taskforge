@@ -32,7 +32,6 @@ public class ProjectRequest implements Serializable {
 	LocalDate startDate;
 	@NotBlank
 	String organizationId;
-	@NotEmpty
 	List<String> memberIds;
 	@NotNull
 	ProjectCategory category;
