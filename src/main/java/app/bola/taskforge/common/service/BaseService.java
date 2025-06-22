@@ -31,6 +31,9 @@ public interface BaseService<REQ, ENT extends BaseEntity, RES> {
 	
 	
 	default  <T> void performValidation(Validator validator, T request){
+		if (request == null) {
+			throw new NullPointerException("Request cannot be null");
+		}
 		Set<ConstraintViolation<T>> violations = validator.validate(request);
 		Stream<String> errorMessageStream = violations.stream()
                     .map(violation -> violation.getPropertyPath()+": "+violation.getMessage());

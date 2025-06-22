@@ -6,8 +6,9 @@ import app.bola.taskforge.domain.entity.Project;
 import app.bola.taskforge.domain.entity.Task;
 import app.bola.taskforge.domain.enums.TaskCategory;
 import app.bola.taskforge.domain.enums.TaskPriority;
+import app.bola.taskforge.domain.enums.TaskStatus;
+import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
-import app.bola.taskforge.exception.TaskForgeException;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.TaskRepository;
@@ -15,14 +16,14 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -30,14 +31,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(value = MockitoExtension.class)
 public class TaskServiceTest {
 	
+	private static final Logger log = LoggerFactory.getLogger(TaskServiceTest.class);
 	@Mock
 	private TaskRepository taskRepository;
 	@Mock
@@ -55,6 +56,29 @@ public class TaskServiceTest {
 	private TaskForgeTaskService taskService;
 	
 	
+	// Test data
+	TaskRequest taskRequest;
+	Project project;
+	Organization organization;
+	
+	@BeforeEach
+	public void setUp() {
+		String organizationId = UUID.randomUUID().toString();
+		organization = Organization.builder()
+				               .publicId(organizationId).name("Mock Organization").slug("mock-org").description("A mock Org")
+				               .contactPhone("+2347023456789").contactEmail("mockorgemail@gmail.com").industry("Technology").build();
+		
+		String projectId = UUID.randomUUID().toString();
+		project = Project.builder().name("Mock Project").publicId(projectId)
+				          .dateRange(new DateRange(LocalDate.now().plusDays(2), LocalDate.now().plusDays(5)))
+				          .build();
+		
+		taskRequest = TaskRequest.builder()
+				              .title("Mock Task").description("Mock Description").projectId(projectId).organizationId(organizationId)
+				              .dueDate(LocalDate.now().plusDays(3)).startDate(LocalDate.now().plusDays(1))
+				              .priority(TaskPriority.LOW).category(TaskCategory.FEATURE).build();
+	}
+	
 	@Nested
 	@DisplayName("Create New Task Tests")
 	public class CreateNewTaskTests {
@@ -62,35 +86,21 @@ public class TaskServiceTest {
 		@Test
 		@DisplayName("should create task successfully given valid request and all checks passed")
 		public void shouldCreateTaskSuccessfullyWhenAndAllChecksPassed() {
-			String organizationId = UUID.randomUUID().toString();
-			Organization organization = Organization.builder()
-				.publicId(organizationId).name("Mock Organization").slug("mock-org").description("A mock Org")
-                .contactPhone("+2347023456789").contactEmail("mockorgemail@gmail.com").industry("Technology").build();
-			
-			String projectId = UUID.randomUUID().toString();
-			Project project = Project.builder().name("Mock Project").publicId(projectId)
-				.dateRange(new DateRange(LocalDate.now().plusDays(2), LocalDate.now().plusDays(5)))
-				.build();
-			
-			TaskRequest request = TaskRequest.builder()
-				.title("Mock Task").description("Mock Description").projectId(projectId).organizationId(organizationId)
-				.dueDate(LocalDate.now().plusDays(3)).startDate(LocalDate.now().plusDays(1))
-				.priority(TaskPriority.LOW).category(TaskCategory.FEATURE).build();
 			
 			Task task = Task.builder()
 				.title("Mock Task").description("Mock Description").project(project).organization(organization)
 				.startDate(LocalDate.now().plusDays(1)).dueDate(LocalDate.now().plusDays(3))
 	            .priority(TaskPriority.LOW).category(TaskCategory.FEATURE).build();
 			
-			when(modelMapper.map(request, Task.class)).thenReturn(task);
-			when(validator.validate(request)).thenReturn(Set.of());
+			when(modelMapper.map(taskRequest, Task.class)).thenReturn(task);
+			when(validator.validate(taskRequest)).thenReturn(Set.of());
 			when(modelMapper.map(task, TaskResponse.class)).thenReturn(new TaskResponse());
 			when(organizationRepository.findByIdScoped(any())).thenReturn(Optional.of(organization));
-			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.of(project));
+			when(projectRepository.findByIdScoped(project.getPublicId())).thenReturn(Optional.of(project));
 			when(taskRepository.save(task)).thenReturn(task);
 			when(modelMapper.map(task, TaskResponse.class)).thenReturn(TaskResponse.builder().title("Mock Task").build());
 			
-			TaskResponse response = taskService.createNew(request);
+			TaskResponse response = taskService.createNew(taskRequest);
 
 			assertNotNull(response);
 			assertEquals("Mock Task", response.getTitle());
@@ -98,10 +108,10 @@ public class TaskServiceTest {
 		}
 		
 		@Test
-		@DisplayName("Should throw TaskForgeException when the request object is null")
+		@DisplayName("Should throw NullPointerException when the request object is null")
 		public void shouldFailWhenRequestIsNull() {
-			Exception exception = assertThrows(TaskForgeException.class, () -> taskService.createNew(null));
-			assertEquals("Task request cannot be null", exception.getMessage());
+			NullPointerException exception = assertThrows(NullPointerException.class, () -> taskService.createNew(null));
+			assertEquals("Request cannot be null", exception.getMessage());
 		}
 		
 		@Test
@@ -111,25 +121,232 @@ public class TaskServiceTest {
 			TaskRequest request = TaskRequest.builder()
 				.title("Mock Task").description("Mock Description").build();
 			
-			doThrow(new InvalidRequestException("")).when(validator.validate(request));
+			when(validator.validate(request)).thenThrow(new InvalidRequestException("Required field are missing"));
 			
 			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> taskService.createNew(request));
-			assertEquals("Required fields are missing", exception.getMessage());
+			assertEquals("Required field are missing", exception.getMessage());
 		}
 		
 		@Test
-		@DisplayName("should throw InvalidRequestException when due date is invalid or before start date")
-		public void shouldFailWhenDueDateIsInvalidOrDueDateIsBeforeStartDate() {
-		
+		@DisplayName("should throw InvalidRequestException when due date is before start date")
+		public void shouldFailWhenDueDateIsBeforeStartDate() {
+			taskRequest.setDueDate(LocalDate.now().minusDays(4));
+			when(validator.validate(taskRequest)).thenThrow(new InvalidRequestException("Start date is after due date"));
+			
+			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> taskService.createNew(taskRequest));
+			assertEquals("Start date is after due date", exception.getMessage());
 		}
 		
 		@Test
 		@DisplayName("should throw EntityNotFoundException when the project does not exist")
-		public void shouldFailGivenNonExistentProjectId() { }
+		public void shouldFailGivenNonExistentProjectId() {
+			String nonExistentProjectId = UUID.randomUUID().toString();
+			taskRequest.setProjectId(nonExistentProjectId);
+			
+			when(organizationRepository.findByIdScoped(any())).thenReturn(Optional.of(organization));
+			when(projectRepository.findByIdScoped(nonExistentProjectId)).thenReturn(Optional.empty());
+			
+			EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> taskService.createNew(taskRequest));
+			assertEquals("Project not found", exception.getMessage());
+		}
 		
-		@Test
-		void shouldThrowException_givenNonExistentMemberIds() { }
 	}
 	
-	
+	@Nested
+	@DisplayName("Update Task Tests")
+	public class UpdateTaskTests {
+		
+		Task task;
+		TaskResponse response;
+		
+		@BeforeEach
+		public void setUp(){
+			 task = Task.builder()
+					            .title("Mock Task").description("Mock Description").project(project).organization(organization)
+					            .startDate(LocalDate.now().plusDays(1)).dueDate(LocalDate.now().plusDays(3))
+					            .priority(TaskPriority.LOW).category(TaskCategory.FEATURE).build();
+			
+			when(modelMapper.map(taskRequest, Task.class)).thenReturn(task);
+			when(validator.validate(taskRequest)).thenReturn(Set.of());
+			when(organizationRepository.findByIdScoped(any())).thenReturn(Optional.of(organization));
+			when(projectRepository.findByIdScoped(project.getPublicId())).thenReturn(Optional.of(project));
+			when(taskRepository.save(task)).thenReturn(task);
+			when(modelMapper.map(any(Task.class), eq(TaskResponse.class))).thenAnswer(invocation -> {
+				Task taskArg = invocation.getArgument(0);
+				return TaskResponse.builder()
+					.title(taskArg.getTitle()).description(taskArg.getDescription()).dueDate(taskArg.getDueDate())
+					.startDate(taskArg.getStartDate()).priority(taskArg.getPriority()).category(taskArg.getCategory()).build();
+			});
+			response = taskService.createNew(taskRequest);
+			when(taskRepository.findByIdScoped(response.getPublicId())).thenReturn(Optional.of(task));
+		}
+		
+		@Test
+		@DisplayName("should update a task successfully")
+		public void shouldUpdateTaskSuccessfully() {
+			TaskRequest updateRequest = TaskRequest.builder()
+					.title("Updated Task Title")
+					.description("Updated Description")
+					.dueDate(LocalDate.now().plusDays(4))
+					.startDate(LocalDate.now().plusDays(2))
+					.priority(TaskPriority.HIGH)
+					.category(TaskCategory.BUG)
+					.build();
+			
+			String initialTitle = response.getTitle();
+			TaskCategory initialCategory = response.getCategory();
+			response = taskService.update(response.getPublicId(), updateRequest);
+			assertNotNull(response);
+			
+			String updatedTitle = response.getTitle();
+			TaskCategory updatedCategory = response.getCategory();
+			assertNotEquals(initialTitle,updatedTitle);
+			assertNotEquals(initialCategory, updatedCategory);
+			assertEquals("Updated Task Title", response.getTitle());
+			assertEquals(TaskPriority.HIGH, response.getPriority());
+			assertEquals(TaskCategory.BUG, response.getCategory());
+		}
+		
+		@Test
+		@DisplayName("should allow partial updates")
+		public void shouldAllowPartialUpdates() {
+			TaskRequest partialUpdateRequest = TaskRequest.builder()
+					.title("Partially Updated Task Title")
+					.build();
+			
+			String initialTitle = response.getTitle();
+			TaskCategory initialCategory = response.getCategory();
+			response = taskService.update(response.getPublicId(), partialUpdateRequest);
+			assertNotNull(response);
+			
+			String updatedTitle = response.getTitle();
+			TaskCategory updatedCategory = response.getCategory();
+			assertNotEquals(initialTitle, updatedTitle);
+			assertEquals("Partially Updated Task Title", response.getTitle());
+			assertEquals(initialCategory, updatedCategory);
+		}
+		
+		
+		@Test
+		@DisplayName("should throw EntityNotFoundException if taskId does not exist")
+		public void shouldThrowEntityNotFoundExceptionIfTaskIdDoesNotExist() {
+			String nonExistentTaskId = UUID.randomUUID().toString();
+			when(taskRepository.findByIdScoped(nonExistentTaskId)).thenReturn(Optional.empty());
+			
+			EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> taskService.update(nonExistentTaskId, taskRequest));
+			
+			assertEquals("Task not found", exception.getMessage());
+			verify(taskRepository, never()).save(any());
+		}
+		
+		@Test
+		@DisplayName("should fail if due date is in the past")
+		public void shouldFailIfDueDateIsInThePast() {
+			TaskRequest invalidDateRequest = TaskRequest.builder()
+					                                 .dueDate(LocalDate.now().minusDays(1))
+					                                 .build();
+			
+			Optional<Task> optionalTask = taskRepository.findByIdScoped(response.getPublicId());
+			assertTrue(optionalTask.isPresent(), "Expected task to be present");
+			
+			Task task = optionalTask.get();
+			LocalDate originalDueDate = task.getDueDate();
+			
+			assertThrows(InvalidRequestException.class, () -> taskService.update(response.getPublicId(), invalidDateRequest));
+			
+			assertEquals(originalDueDate, task.getDueDate());
+			verify(taskRepository, never()).save(any());
+		}
+		
+		@Test
+		@DisplayName("should fail if taskRequest is invalid or contains bad data")
+		public void shouldFailIfTaskRequestIsInvalidOrContainsBadData() {
+			TaskRequest invalidRequest = TaskRequest.builder()
+					                             .title("")
+					                             .description("Valid Description")
+					                             .build();
+			
+			when(validator.validate(invalidRequest)).thenThrow(new InvalidRequestException("Invalid title"));
+			
+			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> taskService.update(response.getPublicId(), invalidRequest));
+			
+			assertEquals("Invalid title", exception.getMessage());
+			verify(taskRepository, never()).save(any());
+		}
+		
+		@Test
+		@DisplayName("should fail if task is already marked as 'Done'")
+		public void shouldFailIfTaskIsAlreadyMarkedAsDone() {
+			Task doneTask = Task.builder()
+					                .title("Done Task")
+					                .status(TaskStatus.DONE)
+					                .build();
+			
+			when(taskRepository.findByIdScoped(response.getPublicId())).thenReturn(Optional.of(doneTask));
+			
+			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> taskService.update(response.getPublicId(), taskRequest));
+			
+			assertEquals("Cannot update a task that is already marked as Done", exception.getMessage());
+			verify(taskRepository, never()).save(any());
+		}
+		
+		@Test
+		@DisplayName("should update only provided fields while keeping others unchanged")
+		public void shouldUpdateOnlyProvidedFields() {
+			Task originalTask = taskRepository.findByIdScoped(response.getPublicId()).get();
+			String originalTitle = originalTask.getTitle();
+			String originalDescription = originalTask.getDescription();
+			LocalDate originalStartDate = originalTask.getStartDate();
+			
+			TaskRequest updateRequest = TaskRequest.builder().priority(TaskPriority.HIGH).build();
+			
+			TaskResponse updatedResponse = taskService.update(response.getPublicId(), updateRequest);
+			
+			assertEquals(TaskPriority.HIGH, updatedResponse.getPriority());
+			assertEquals(originalTitle, updatedResponse.getTitle());
+			assertEquals(originalDescription, updatedResponse.getDescription());
+			assertEquals(originalStartDate, updatedResponse.getStartDate());
+		}
+		
+		@Test
+		@DisplayName("should validate date consistency when only start date is provided")
+		public void shouldValidateDateConsistencyWhenOnlyStartDateProvided() {
+			TaskRequest invalidRequest = TaskRequest.builder().startDate(LocalDate.now().plusDays(10)).build();
+			
+			Optional<Task> optionalTask = taskRepository.findByIdScoped(response.getPublicId());
+			LocalDate originalDueDate;
+			if (optionalTask.isPresent()) {
+				originalDueDate = optionalTask.get().getDueDate();
+				
+				assertThrows(InvalidRequestException.class, () -> taskService.update(response.getPublicId(), invalidRequest));
+			
+				assertEquals(originalDueDate, task.getDueDate());
+				verify(taskRepository, never()).save(any());
+			}
+			else {
+				fail("Expected task to be present, but was empty");
+			}
+		}
+		
+		@Test
+		@DisplayName("should validate date consistency when only due date is provided")
+		public void shouldValidateDateConsistencyWhenOnlyDueDateProvided() {
+			TaskRequest invalidRequest = TaskRequest.builder()
+					                             .dueDate(LocalDate.now().minusDays(1))
+					                             .build();
+			
+			Optional<Task> optionalTask = taskRepository.findByIdScoped(response.getPublicId());
+			LocalDate originalStartDate;
+			
+			if (optionalTask.isPresent()) {
+				originalStartDate = optionalTask.get().getStartDate();
+				assertThrows(InvalidRequestException.class, () -> taskService.update(response.getPublicId(), invalidRequest));
+				assertEquals(originalStartDate, task.getStartDate());
+				verify(taskRepository, never()).save(any());
+			}
+			else {
+				fail("Expected task to be present, but was empty");
+			}
+		}
+	}
 }

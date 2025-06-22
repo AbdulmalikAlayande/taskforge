@@ -14,6 +14,7 @@ import java.time.LocalDate;
  * This class is used to encapsulate the data required for {@link Task} operations.
  */
 
+@Setter
 @Getter
 @Builder
 @NoArgsConstructor
