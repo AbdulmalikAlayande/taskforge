@@ -20,8 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -36,7 +34,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(value = MockitoExtension.class)
 public class TaskServiceTest {
 	
-	private static final Logger log = LoggerFactory.getLogger(TaskServiceTest.class);
 	@Mock
 	private TaskRepository taskRepository;
 	@Mock
@@ -451,7 +448,6 @@ public class TaskServiceTest {
 		@DisplayName("Should fail if the task is archived or deleted")
 		public void shouldFailIfTaskIsArchivedOrDeleted() {
 			String memberId = UUID.randomUUID().toString();
-			Member member = Member.builder().publicId(memberId).email("test@archived.com").build();
 			
 			task.setStatus(TaskStatus.ARCHIVED);
 			
