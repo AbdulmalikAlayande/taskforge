@@ -26,6 +26,7 @@ public class TaskResponse {
 	String publicId;
 	String projectId;
 	String assigneeId;
+	MemberResponse assignee;
 	String description;
 	String organizationId;
 	

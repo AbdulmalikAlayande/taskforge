@@ -29,5 +29,4 @@ public interface OrganizationRepository extends TenantAwareRepository<Organizati
 	@Modifying
 	@Query("UPDATE Organization o SET o.deleted = true WHERE o.publicId = :id")
 	void deleteByIdScopedInternal(@Param("id") String id, @Param("tenantId") String tenantId);
-	
 }

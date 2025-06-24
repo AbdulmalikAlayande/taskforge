@@ -1,5 +1,6 @@
 package app.bola.taskforge.service;
 
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
 import app.bola.taskforge.domain.entity.Task;
@@ -9,12 +10,15 @@ import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.TaskRepository;
+import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
@@ -22,7 +26,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TaskForgeTaskService implements TaskService{
@@ -32,6 +38,7 @@ public class TaskForgeTaskService implements TaskService{
 	private final TaskRepository taskRepository;
 	private final OrganizationRepository organizationRepository;
 	private final ProjectRepository projectRepository;
+	private final UserRepository userRepository;
 	
 	
 	@Override
@@ -69,6 +76,37 @@ public class TaskForgeTaskService implements TaskService{
 	@Override
 	public TaskResponse toResponse(Task entity) {
 		return modelMapper.map(entity, TaskResponse.class);
+	}
+	
+	@Override
+	public TaskResponse assignMember(String taskId, String memberId) {
+		Task task = taskRepository.findByIdScoped(taskId)
+				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+		
+		if (task.isCompleted()) {
+			throw new InvalidRequestException("Task is already completed, you can't assign a member to an already completed task");
+		}
+		
+		if (task.isArchived()) {
+			throw new InvalidRequestException("Task is archived, you can't assign a member to an archived task");
+		}
+		
+		if (task.getAssignee() != null){
+			if (task.getAssignee().getPublicId().equals(memberId)) {
+				throw new InvalidRequestException("Member is already assigned to this task");
+			}
+			log.warn("Reassigning member {} to task {}", memberId, taskId);
+			Member member = userRepository.findByIdScoped(memberId)
+					                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+			task.setAssignee(member);
+		}
+		
+		else {
+			Member member = userRepository.findByIdScoped(memberId)
+					                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+			task.setAssignee(member);
+		}
+		return toResponse(taskRepository.save(task));
 	}
 	
 	@Override
@@ -129,10 +167,5 @@ public class TaskForgeTaskService implements TaskService{
 	@Override
 	public void deleteById(String publicId) {
 	
-	}
-	
-	@Override
-	public TaskResponse assignMember(String taskId, String memberId) {
-		return null;
 	}
 }

@@ -56,4 +56,11 @@ public class Task extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private TaskCategory category;
 	
+	public boolean isCompleted() {
+		return this.status.equals(TaskStatus.DONE);
+	}
+	
+	public boolean isArchived() {
+		return this.status.equals(TaskStatus.ARCHIVED);
+	}
 }
