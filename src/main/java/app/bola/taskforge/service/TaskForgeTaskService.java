@@ -17,8 +17,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -56,6 +53,7 @@ public class TaskForgeTaskService implements TaskService{
 		Task task = modelMapper.map(taskRequest, Task.class);
 		task.setOrganization(organization);
 		task.setProject(project);
+		task.setStatus(TaskStatus.TODO);
 		
 		Task savedTask = taskRepository.save(task);
 		TaskResponse response = toResponse(savedTask);
