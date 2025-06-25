@@ -305,7 +305,6 @@ public class TaskIntegrationTest {
 		@Test
 		@DisplayName("should throw InvalidRequestException if task is already completed")
 		void shouldFailIfTaskIsCompleted() {
-			// simulate task marked as completed
 			Task task = taskRepository.findByIdScoped(taskResponse.getPublicId()).get();
 			task.setStatus(TaskStatus.DONE);
 			taskRepository.save(task);
@@ -417,13 +416,11 @@ public class TaskIntegrationTest {
 		@Test
 		@DisplayName("Should soft delete task by ID")
 		void shouldDeleteTaskById() {
-			// Confirm task exists
 			Optional<Task> beforeDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
 			assertTrue(beforeDelete.isPresent());
 			
 			taskService.deleteById(createdTask.getPublicId());
 			
-			// After deletion, findByIdScoped should not return it
 			Optional<Task> afterDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
 			assertFalse(afterDelete.isPresent());
 		}
