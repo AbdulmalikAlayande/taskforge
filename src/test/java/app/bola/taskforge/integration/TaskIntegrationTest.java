@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -356,6 +357,86 @@ public class TaskIntegrationTest {
 			
 			assertNotNull(updated.getAssignee());
 			assertEquals(secondMember.getPublicId(), updated.getAssignee().getPublicId());
+		}
+	}
+	
+	@Nested
+	@DisplayName("Find and Delete Task Tests")
+	class FindAndDeleteTaskTests {
+		
+		TaskResponse createdTask;
+		
+		@BeforeEach
+		void setUp() {
+			TaskRequest request = TaskRequest.builder()
+					                      .title("Sample Task")
+					                      .organizationId(orgResponse.getPublicId())
+					                      .projectId(projResponse.getPublicId())
+					                      .description("Sample Desc")
+					                      .category(TaskCategory.FEATURE)
+					                      .startDate(LocalDate.now())
+					                      .dueDate(LocalDate.now().plusDays(3))
+					                      .priority(TaskPriority.MEDIUM)
+					                      .build();
+			
+			createdTask = taskService.createNew(request);
+		}
+		
+		@Test
+		@DisplayName("Should find task by ID if exists")
+		void shouldFindTaskById() {
+			TaskResponse found = taskService.findById(createdTask.getPublicId());
+			
+			assertNotNull(found);
+			assertEquals(createdTask.getPublicId(), found.getPublicId());
+			assertEquals("Sample Task", found.getTitle());
+		}
+		
+		@Test
+		@DisplayName("Should throw EntityNotFoundException if task not found")
+		void shouldThrowIfTaskNotFound() {
+			String randomId = UUID.randomUUID().toString();
+			
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> taskService.findById(randomId));
+			
+			assertEquals("Task not found", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("Should return all tasks in the organization")
+		void shouldFindAllTasksInTenant() {
+			Set<TaskResponse> all = taskService.findAll();
+			
+			assertNotNull(all);
+			assertFalse(all.isEmpty());
+			
+			assertTrue(all.stream().anyMatch(t -> t.getPublicId().equals(createdTask.getPublicId())));
+		}
+		
+		@Test
+		@DisplayName("Should soft delete task by ID")
+		void shouldDeleteTaskById() {
+			// Confirm task exists
+			Optional<Task> beforeDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
+			assertTrue(beforeDelete.isPresent());
+			
+			taskService.deleteById(createdTask.getPublicId());
+			
+			// After deletion, findByIdScoped should not return it
+			Optional<Task> afterDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
+			assertFalse(afterDelete.isPresent());
+		}
+		
+		@Test
+		@DisplayName("Should throw EntityNotFoundException if deleting non-existent task")
+		void shouldThrowWhenDeletingNonexistentTask() {
+			String randomId = UUID.randomUUID().toString();
+			
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> taskService.deleteById(randomId));
+			
+			assertEquals("Task not found", ex.getMessage());
 		}
 	}
 	

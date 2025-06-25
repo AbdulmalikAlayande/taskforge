@@ -1,5 +1,6 @@
 package app.bola.taskforge.service;
 
+import app.bola.taskforge.domain.context.TenantContext;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
@@ -24,7 +25,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -160,16 +163,24 @@ public class TaskForgeTaskService implements TaskService{
 	
 	@Override
 	public TaskResponse findById(String publicId) {
-		return null;
+		Task task = taskRepository.findByIdScoped(publicId)
+				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+		return toResponse(task);
 	}
 	
 	@Override
 	public Set<TaskResponse> findAll() {
-		return Set.of();
+		List<Task> tasks = taskRepository.findAllScoped();
+		return tasks.stream()
+				       .map(this::toResponse)
+				       .collect(Collectors.toSet());
 	}
 	
 	@Override
 	public void deleteById(String publicId) {
-	
+		Task task = taskRepository.findByIdScoped(publicId)
+				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+		taskRepository.deleteByIdScoped(publicId);
+		log.info("Task [{}] soft-deleted under tenant [{}]", publicId, TenantContext.getCurrentTenant());
 	}
 }
