@@ -13,6 +13,7 @@ import app.bola.taskforge.repository.TaskRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
+import app.bola.taskforge.service.dto.TaskUpdateRequest;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -108,48 +109,53 @@ public class TaskForgeTaskService implements TaskService{
 	}
 	
 	@Override
-	public TaskResponse update(String publicId, @NonNull TaskRequest taskRequest) {
+	public TaskResponse update(String taskId, TaskUpdateRequest updateRequest) {
 		
-		Task task = taskRepository.findByIdScoped(publicId)
-			.orElseThrow(() -> new EntityNotFoundException("Task not found"));
+		Task task = taskRepository.findByIdScoped(taskId)
+				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 		
 		if (task.getStatus() == TaskStatus.DONE) {
 			throw new InvalidRequestException("Cannot update a completed task");
 		}
-		if (StringUtils.isNotBlank(taskRequest.getTitle())) {
-			task.setTitle(taskRequest.getTitle());
+		
+		if (StringUtils.isNotBlank(updateRequest.title())) {
+			task.setTitle(updateRequest.title());
 		}
 		
-		if (StringUtils.isNotBlank(taskRequest.getDescription())) {
-			task.setDescription(taskRequest.getDescription());
+		if (StringUtils.isNotBlank(updateRequest.description())) {
+			task.setDescription(updateRequest.description());
 		}
 		
-		if (taskRequest.getPriority() != null) {
-			task.setPriority(taskRequest.getPriority());
+		if (updateRequest.priority() != null) {
+			task.setPriority(updateRequest.priority());
 		}
 		
-		if (taskRequest.getCategory() != null) {
-			task.setCategory(taskRequest.getCategory());
+		if (updateRequest.category() != null) {
+			task.setCategory(updateRequest.category());
 		}
 		
-		if (taskRequest.getDueDate() != null && taskRequest.getStartDate() != null) {
-			validateTaskDateRange(taskRequest.getStartDate(), taskRequest.getDueDate());
-			task.setDueDate(taskRequest.getDueDate());
-			task.setStartDate(taskRequest.getStartDate());
+		if (updateRequest.dueDate() != null && updateRequest.startDate() != null) {
+			validateTaskDateRange(updateRequest.startDate(), updateRequest.dueDate());
+			task.setDueDate(updateRequest.dueDate());
+			task.setStartDate(updateRequest.startDate());
 		}
 		
-		if (taskRequest.getStartDate() != null && taskRequest.getDueDate() == null) {
-			validateTaskDateRange(taskRequest.getStartDate(), task.getDueDate());
-			task.setStartDate(taskRequest.getStartDate());
+		if (updateRequest.startDate() != null && updateRequest.dueDate() == null) {
+			validateTaskDateRange(updateRequest.startDate(), task.getDueDate());
+			task.setStartDate(updateRequest.startDate());
 		}
 		
-		if (taskRequest.getDueDate() != null && taskRequest.getStartDate() == null) {
-			validateTaskDateRange(task.getStartDate(), taskRequest.getDueDate());
-			task.setDueDate(taskRequest.getDueDate());
+		if (updateRequest.dueDate() != null && updateRequest.startDate() == null) {
+			validateTaskDateRange(task.getStartDate(), updateRequest.dueDate());
+			task.setDueDate(updateRequest.dueDate());
 		}
 		
 		Task updatedTask = taskRepository.save(task);
-		return toResponse(updatedTask);
+		return toResponse(updatedTask);	}
+	
+	@Override
+	public TaskResponse update(String publicId, @NonNull TaskRequest taskRequest) {
+		return update(publicId, modelMapper.map(taskRequest, TaskUpdateRequest.class));
 	}
 	
 	@Override

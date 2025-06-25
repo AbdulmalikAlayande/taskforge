@@ -1,14 +1,14 @@
 package app.bola.taskforge.integration;
 
 import app.bola.taskforge.domain.context.TenantContext;
+import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Task;
-import app.bola.taskforge.domain.enums.ProjectCategory;
-import app.bola.taskforge.domain.enums.TaskCategory;
-import app.bola.taskforge.domain.enums.TaskPriority;
-import app.bola.taskforge.domain.enums.TaskStatus;
+import app.bola.taskforge.domain.enums.*;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
+import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.TaskRepository;
+import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.OrganizationService;
 import app.bola.taskforge.service.ProjectService;
 import app.bola.taskforge.service.TaskService;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -45,31 +46,37 @@ public class TaskIntegrationTest {
 	private ProjectService projectService;
 	
 	
+	OrganizationResponse orgResponse;
+	ProjectResponse projResponse;
+	@Autowired
+	private OrganizationRepository organizationRepository;
+	@Autowired
+	private ModelMapper modelMapper;
+	@Autowired
+	private UserRepository userRepository;
+	
+	@BeforeEach
+	public void beforeEach() {
+		
+		OrganizationRequest orgRequest = OrganizationRequest.builder()
+				                                 .name("Test Organization").slug("test-org").industry("Healthcare").country("Test Country")
+				                                 .description("This is a test organization").contactPhone("+2347056453241").contactEmail("testorg@gmail.com")
+				                                 .timeZone("Africa/Lagos").websiteUrl("https://testorg.ng").logoUrl("https://testorg.ng/logo.png").build();
+		
+		orgResponse = organizationService.createNew(orgRequest);
+		TenantContext.setCurrentTenant(orgResponse.getPublicId());
+		
+		ProjectRequest projRequest = ProjectRequest.builder()
+				                             .organizationId(orgResponse.getPublicId()).name("Test Project").description("This is a test project")
+				                             .startDate(LocalDate.now().plusDays(1)).endDate(LocalDate.now().plusDays(30))
+				                             .category(ProjectCategory.SOFTWARE).memberIds(List.of()).build();
+		
+		projResponse = projectService.createNew(projRequest);
+	}
+	
 	@Nested
 	@DisplayName("Create New Task Tests")
 	class CreateNewTaskTests {
-		
-		OrganizationResponse orgResponse;
-		ProjectResponse projResponse;
-		
-		@BeforeEach
-		public void beforeEach() {
-			
-			OrganizationRequest orgRequest = OrganizationRequest.builder()
-				.name("Test Organization").slug("test-org").industry("Healthcare").country("Test Country")
-				.description("This is a test organization").contactPhone("+2347056453241").contactEmail("testorg@gmail.com")
-				.timeZone("Africa/Lagos").websiteUrl("https://testorg.ng").logoUrl("https://testorg.ng/logo.png").build();
-			
-			orgResponse = organizationService.createNew(orgRequest);
-			TenantContext.setCurrentTenant(orgResponse.getPublicId());
-			
-			ProjectRequest projRequest = ProjectRequest.builder()
-                 .organizationId(orgResponse.getPublicId()).name("Test Project").description("This is a test project")
-                 .startDate(LocalDate.now().plusDays(1)).endDate(LocalDate.now().plusDays(30))
-                 .category(ProjectCategory.SOFTWARE).memberIds(List.of()).build();
-			
-			projResponse = projectService.createNew(projRequest);
-		}
 		
 		@Test
 		@DisplayName("should create task successfully with valid input and persist task in database")
@@ -171,5 +178,186 @@ public class TaskIntegrationTest {
 
 		}
 	}
+	
+	@Nested
+	@DisplayName("Update Task Tests")
+	class UpdateTaskTests {
+		
+		TaskResponse taskResponse;
+		
+		@BeforeEach
+		public void setUp() {
+			TaskRequest taskRequest = TaskRequest.builder().title("Task A").organizationId(orgResponse.getPublicId())
+				.projectId(projResponse.getPublicId()).description("Do something important").category(TaskCategory.BUG)
+				.startDate(LocalDate.now().plusDays(2)).dueDate(LocalDate.now().plusDays(5))
+				.priority(TaskPriority.LOW).build();
+
+			taskResponse = taskService.createNew(taskRequest);
+		}
+		
+		@Test
+		@DisplayName("should update task successfully with valid input")
+		public void shouldUpdateTaskSuccessfullyWithValidInput() {
+			
+			TaskUpdateRequest updateRequest = new TaskUpdateRequest(
+				"Updated Task A", "Updated description", LocalDate.now().plusDays(10),
+				LocalDate.now().plusDays(1), TaskCategory.FEATURE, TaskPriority.HIGH
+			);
+			
+			
+			TaskResponse updatedTask = taskService.update(taskResponse.getPublicId(), updateRequest);
+			
+			assertNotNull(updatedTask);
+			
+			assertNotEquals(taskResponse.getTitle(), updatedTask.getTitle());
+			assertEquals("Updated Task A", updatedTask.getTitle());
+			
+			assertNotEquals(taskResponse.getDescription(), updatedTask.getDescription());
+			assertEquals("Updated description", updatedTask.getDescription());
+			
+			assertNotEquals(taskResponse.getPriority(), updatedTask.getPriority());
+			assertEquals(TaskPriority.HIGH, updatedTask.getPriority());
+			
+			assertNotEquals(taskResponse.getCategory(), updatedTask.getCategory());
+			assertEquals(TaskCategory.FEATURE, updatedTask.getCategory());
+			
+			assertNotEquals(taskResponse.getStartDate(), updatedTask.getStartDate());
+			assertEquals(LocalDate.now().plusDays(1), updatedTask.getStartDate());
+			
+			assertNotEquals(taskResponse.getDueDate(), updatedTask.getDueDate());
+			assertEquals(LocalDate.now().plusDays(10), updatedTask.getDueDate());
+		}
+		
+		@Test
+		@DisplayName("should throw EntityNotFoundException if task does not exist")
+		public void shouldFailIfTaskDoesNotExist() {
+			
+			String randomTaskId = UUID.randomUUID().toString();
+			
+			TaskUpdateRequest updateRequest = new TaskUpdateRequest(
+					"Updated Task A", "Updated description", LocalDate.now().plusDays(10),
+					LocalDate.now().plusDays(1), TaskCategory.FEATURE, TaskPriority.HIGH
+			);
+			
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> taskService.update(randomTaskId, updateRequest));
+			assertEquals("Task not found", ex.getMessage());
+		}
+	}
+	
+	@Nested
+	@DisplayName("Assign Member to Task Tests")
+	class AssignMemberTests {
+		
+		TaskResponse taskResponse;
+		MemberResponse memberResponse;
+		
+		@BeforeEach
+		void setUp() {
+			TaskRequest taskRequest = TaskRequest.builder()
+					                          .title("Task A").organizationId(orgResponse.getPublicId())
+					                          .projectId(projResponse.getPublicId()).description("Do something important")
+					                          .category(TaskCategory.BUG).startDate(LocalDate.now())
+					                          .dueDate(LocalDate.now().plusDays(5)).priority(TaskPriority.LOW)
+					                          .build();
+			taskResponse = taskService.createNew(taskRequest);
+			
+			Member member = Member.builder()
+	                .firstName("Jane").lastName("Doe").email("jane.doe@test.com").password("").role(Role.ORGANIZATION_MEMBER)
+	                .organization(organizationRepository.findByIdScoped(orgResponse.getPublicId()).get()).build();
+			
+			memberResponse = modelMapper.map(userRepository.save(member), MemberResponse.class);
+		}
+		
+		@Test
+		@DisplayName("should assign member to task successfully")
+		void shouldAssignMemberToTaskSuccessfully() {
+			TaskResponse updated = taskService.assignMember(taskResponse.getPublicId(), memberResponse.getPublicId());
+			
+			assertNotNull(updated.getAssignee());
+			assertEquals(memberResponse.getPublicId(), updated.getAssignee().getPublicId());
+			assertEquals(memberResponse.getEmail(), updated.getAssignee().getEmail());
+		}
+		
+		@Test
+		@DisplayName("should throw EntityNotFoundException if task does not exist")
+		void shouldFailIfTaskDoesNotExist() {
+			String randomTaskId = UUID.randomUUID().toString();
+			
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> taskService.assignMember(randomTaskId, memberResponse.getPublicId()));
+			
+			assertEquals("Task not found", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("should throw EntityNotFoundException if member does not exist")
+		void shouldFailIfMemberDoesNotExist() {
+			String randomMemberId = UUID.randomUUID().toString();
+			
+			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+					() -> taskService.assignMember(taskResponse.getPublicId(), randomMemberId));
+			
+			assertEquals("Member not found", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("should throw InvalidRequestException if task is already completed")
+		void shouldFailIfTaskIsCompleted() {
+			// simulate task marked as completed
+			Task task = taskRepository.findByIdScoped(taskResponse.getPublicId()).get();
+			task.setStatus(TaskStatus.DONE);
+			taskRepository.save(task);
+			
+			InvalidRequestException ex = assertThrows(InvalidRequestException.class,
+					() -> taskService.assignMember(task.getPublicId(), memberResponse.getPublicId()));
+			
+			assertEquals("Task is already completed, you can't assign a member to an already completed task", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("should throw InvalidRequestException if task is archived")
+		void shouldFailIfTaskIsArchived() {
+			Task task = taskRepository.findByIdScoped(taskResponse.getPublicId()).get();
+			task.setStatus(TaskStatus.ARCHIVED);
+			taskRepository.save(task);
+			
+			InvalidRequestException ex = assertThrows(InvalidRequestException.class,
+					() -> taskService.assignMember(task.getPublicId(), memberResponse.getPublicId()));
+			
+			assertEquals("Task is archived, you can't assign a member to an archived task", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("should throw InvalidRequestException if member is already assigned")
+		void shouldFailIfMemberAlreadyAssigned() {
+			taskService.assignMember(taskResponse.getPublicId(), memberResponse.getPublicId());
+			
+			InvalidRequestException ex = assertThrows(InvalidRequestException.class,
+					() -> taskService.assignMember(taskResponse.getPublicId(), memberResponse.getPublicId()));
+			
+			assertEquals("Member is already assigned to this task", ex.getMessage());
+		}
+		
+		@Test
+		@DisplayName("should reassign member if a different member is assigned to task")
+		void shouldReassignMemberToTaskSuccessfully() {
+			// Member 1:
+			taskService.assignMember(taskResponse.getPublicId(), memberResponse.getPublicId());
+			
+			// Member 2:
+			Member member = Member.builder()
+				.firstName("John").lastName("Smith").email("john.smith@test.com")
+				.organization(organizationRepository.findByIdScoped(orgResponse.getPublicId()).get()).build();
+			
+			Member secondMember = userRepository.save(member);
+			
+			TaskResponse updated = taskService.assignMember(taskResponse.getPublicId(), secondMember.getPublicId());
+			
+			assertNotNull(updated.getAssignee());
+			assertEquals(secondMember.getPublicId(), updated.getAssignee().getPublicId());
+		}
+	}
+	
 }
 
