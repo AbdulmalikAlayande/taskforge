@@ -16,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class NotificationBundle {
 	
+	private String id;
 	private String title;
 	private String userId;
 	private String emailTo;
