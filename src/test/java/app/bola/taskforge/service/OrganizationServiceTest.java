@@ -5,7 +5,7 @@ import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.exception.TaskForgeException;
-import app.bola.taskforge.messaging.notification.MailSender;
+import app.bola.taskforge.notification.MailSender;
 import app.bola.taskforge.repository.InvitationRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.repository.OrganizationRepository;

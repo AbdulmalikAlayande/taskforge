@@ -25,6 +25,9 @@ public class Member extends BaseEntity {
 	private String firstName;
 	private boolean active;
 	
+	@OneToOne
+	private NotificationPreference notificationPreference;
+	
 	@ManyToOne
 	private Organization organization;
 	

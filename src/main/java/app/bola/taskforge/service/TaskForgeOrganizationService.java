@@ -9,7 +9,7 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.TaskForgeException;
-import app.bola.taskforge.messaging.notification.MailSender;
+import app.bola.taskforge.notification.MailSender;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import app.bola.taskforge.service.dto.InvitationRequest;
@@ -20,12 +20,10 @@ import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 

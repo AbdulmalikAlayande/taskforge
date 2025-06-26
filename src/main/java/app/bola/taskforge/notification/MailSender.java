@@ -1,4 +1,4 @@
-package app.bola.taskforge.messaging.notification;
+package app.bola.taskforge.notification;
 
 import app.bola.taskforge.domain.enums.NotificationType;
 import lombok.AllArgsConstructor;
@@ -54,8 +54,8 @@ public class MailSender {
 			else {
 				return ResponseEntity.ok(app.bola.taskforge.domain.entity.Notification.builder()
 						                         .title(Objects.requireNonNull(response.getBody()).getSubject())
-						                         .message(Objects.requireNonNull(response.getBody()).getTextContent())
-						                         .type(NotificationType.EMAIL)
+						                         .body(Objects.requireNonNull(response.getBody()).getTextContent())
+						                         .type(NotificationType.MEMBER_INVITED)
 						                         .build());
 			}
 		}
