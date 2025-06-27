@@ -25,7 +25,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/taskforge");
+		registry.addEndpoint("/taskforge")
+				.addInterceptors(loggingHandshakeInterceptor)
+				.setAllowedOrigins("https://taskforge.tech", "http://localhost:3000");
+		
 		registry.addEndpoint("/taskforge")
 				.setAllowedOrigins("*")
 				.addInterceptors(loggingHandshakeInterceptor)

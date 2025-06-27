@@ -45,6 +45,10 @@ public class WebSocketChannelHandler implements ChannelHandler{
 	
 	@Override
 	public CompletableFuture<DeliveryResult> deliverAsync(NotificationBundle bundle) {
-		return ChannelHandler.super.deliverAsync(bundle);
+		return CompletableFuture.supplyAsync(() -> deliver(bundle))
+			.exceptionally(ex -> {
+				log.error("Async delivery failed for bundle: {}", bundle.getId(), ex);
+				return DeliveryResult.failure(bundle.getId(), ChannelType.WEBSOCKET, ex.getMessage());
+			});
 	}
 }

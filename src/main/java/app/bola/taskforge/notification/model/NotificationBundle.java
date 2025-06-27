@@ -1,9 +1,6 @@
 package app.bola.taskforge.notification.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,13 +11,13 @@ import java.util.Set;
 @Setter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class NotificationBundle {
 	
 	private String id;
 	private String title;
 	private String userId;
 	private String emailTo;
-	private String channel;
 	private String message;
 	private String htmlMessage;
 	private Instant scheduledAt;

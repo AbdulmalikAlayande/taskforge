@@ -1,5 +1,8 @@
 package app.bola.taskforge.notification.model;
 
+import lombok.Getter;
+
+@Getter
 public enum ChannelType {
 	
 	WEBSOCKET("websocket"),
@@ -11,11 +14,7 @@ public enum ChannelType {
 	ChannelType(String type) {
 		this.type = type;
 	}
-
-	public String getType() {
-		return type;
-	}
-
+	
 	public static ChannelType fromString(String type) {
 		for (ChannelType channelType : ChannelType.values()) {
 			if (channelType.type.equalsIgnoreCase(type)) {

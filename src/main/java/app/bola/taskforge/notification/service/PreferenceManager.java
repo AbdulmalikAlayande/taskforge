@@ -1,14 +1,21 @@
 package app.bola.taskforge.notification.service;
 
-import app.bola.taskforge.domain.entity.Member;
+import app.bola.taskforge.domain.entity.NotificationPreference;
+import app.bola.taskforge.repository.NotificationPreferenceRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class PreferenceManager {
 	
-	public List<Member> filterPreferences(List<Member> notificationCandidates) {
-		return null;
+	private final NotificationPreferenceRepository preferenceRepository;
+	
+	
+	public NotificationPreference getPreference(String userId) {
+		Optional<NotificationPreference> optionalPreference = preferenceRepository.findByUserId(userId);
+		return optionalPreference.orElse(null);
 	}
 }

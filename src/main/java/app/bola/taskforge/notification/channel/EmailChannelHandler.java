@@ -24,18 +24,18 @@ import java.util.concurrent.CompletableFuture;
 public class EmailChannelHandler implements ChannelHandler{
 	
 	private static final String API_KEY = "api-key";
-	final RestTemplate restTemplate;
-	final String mailApiKey;
-	final String mailClientProviderUrl;
 	private HttpHeaders httpHeaders;
+	final RestTemplate restTemplate;
 	
-	EmailChannelHandler(RestTemplate restTemplate, @Value("${app.brevo.api-key}") String mailApiKey,
-	                    @Value("${app.brevo.api-url}")  String mailClientProviderUrl) {
-		
+	@Value("${app.brevo.api-key}")
+	private String mailApiKey;
+	
+	@Value("${app.brevo.api-url}")
+	private String mailClientProviderUrl;
+	
+	
+	EmailChannelHandler(RestTemplate restTemplate) {
 		this.restTemplate = restTemplate;
-		this.mailApiKey = mailApiKey;
-		this.mailClientProviderUrl = mailClientProviderUrl;
-		
 		buildHttpHeaders();
 	}
 	
