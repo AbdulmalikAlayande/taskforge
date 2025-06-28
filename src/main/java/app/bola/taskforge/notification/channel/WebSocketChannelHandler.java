@@ -3,8 +3,9 @@ package app.bola.taskforge.notification.channel;
 import app.bola.taskforge.notification.model.ChannelType;
 import app.bola.taskforge.notification.model.DeliveryResult;
 import app.bola.taskforge.notification.model.NotificationBundle;
-import lombok.RequiredArgsConstructor;
+import app.bola.taskforge.notification.template.NotificationTemplateRenderer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +13,16 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class WebSocketChannelHandler implements ChannelHandler{
 	
 	final SimpMessagingTemplate messagingTemplate;
+	final NotificationTemplateRenderer templateRenderer;
+	
+	public WebSocketChannelHandler(SimpMessagingTemplate messagingTemplate,
+	                               @Qualifier("pushNotificationTemplateRenderer") NotificationTemplateRenderer templateRenderer) {
+		this.messagingTemplate = messagingTemplate;
+		this.templateRenderer = templateRenderer;
+	}
 	
 	@Override
 	public ChannelType getChannelType() {

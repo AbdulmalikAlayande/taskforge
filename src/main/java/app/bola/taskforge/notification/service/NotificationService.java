@@ -51,8 +51,13 @@ public class NotificationService {
 				       .userId(userId)
                        .sourceEntityId(event.getTaskId())
 				       .sourceEntityType(event.getSourceEntityType())
+				       .eventData(generateTaskEventData(event))
 				       .priority(NotificationPriority.HIGH)
 				       .build();
+	}
+	
+	private Map<String, Object> generateTaskEventData(TaskEvent event) {
+		return null;
 	}
 	
 	private String generateDebounceKey(String userId, String taskId, String eventType) {

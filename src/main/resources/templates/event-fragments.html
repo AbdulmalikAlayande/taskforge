@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Task Assignment Fragment -->
+<div th:fragment="task-assigned">
+    <h2>New Task Assigned</h2>
+    <p>Hi <span th:text="${userName}">User</span>,</p>
+    <p>You've been assigned: <strong th:text="${taskName}">Task</strong></p>
+    <div class="task-details">
+        <p>Due: <span th:text="${dueDate}">Date</span></p>
+        <p>Priority: <span th:text="${priority}">High</span></p>
+    </div>
+    <a th:href="${taskUrl}" class="cta-button">View Task</a>
+</div>
+
+<!-- Task Update Fragment -->
+<div th:fragment="task-updated">
+    <h2>Task Updated</h2>
+    <p>Hi <span th:text="${userName}">User</span>,</p>
+    <p>Task "<span th:text="${taskName}">Task</span>" has been updated.</p>
+    <div th:if="${changes}" class="changes">
+        <h3>Changes:</h3>
+        <ul>
+            <li th:each="change : ${changes}" th:text="${change}">Change</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Deadline Reminder Fragment -->
+<div th:fragment="deadline-reminder">
+    <h2 style="color: #e74c3c;">⏰ Deadline Approaching</h2>
+    <p>Hi <span th:text="${userName}">User</span>,</p>
+    <p>Your task "<span th:text="${taskName}">Task</span>" is due in
+        <span th:text="${timeRemaining}">2 hours</span>!</p>
+</div>
+
+</html>

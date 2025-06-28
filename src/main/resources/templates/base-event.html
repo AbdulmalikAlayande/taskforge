@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${emailTitle}">TaskForge</title>
+</head>
+<body>
+    <header class="header">
+        <img src="logo.png" alt="task forge logo"/>
+    </header>
+
+    <div class="content">
+        <!-- Dynamic content goes here -->
+        <div th:replace="${contentFragment}"></div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 TaskForge. All rights reserved.</p>
+    </footer>
+</body>
+</html>

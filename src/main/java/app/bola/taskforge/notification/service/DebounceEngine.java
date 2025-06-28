@@ -4,10 +4,10 @@ import app.bola.taskforge.domain.entity.NotificationPreference;
 import app.bola.taskforge.notification.model.ChannelType;
 import app.bola.taskforge.notification.model.NotificationBundle;
 import app.bola.taskforge.notification.model.NotificationCandidate;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DebounceEngine {
 	
 	final ChannelRouter channelRouter;
@@ -29,6 +28,13 @@ public class DebounceEngine {
 	private Duration debounceWindow;
 	private static final Set<String> scheduledKeys = ConcurrentHashMap.newKeySet();
 	
+	public DebounceEngine(ChannelRouter channelRouter, RedisTemplate<String, Object> redisTemplate,
+	                      ScheduledExecutorService scheduledExecutorService){
+		this.channelRouter = channelRouter;
+		this.redisTemplate = redisTemplate;
+		this.scheduledExecutorService = scheduledExecutorService;
+		this.redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(NotificationCandidate.class));
+	}
 	
 	public void submit(Map<NotificationCandidate, NotificationPreference> preferenceMap) {
 		preferenceMap.forEach((candidate, preference) -> {

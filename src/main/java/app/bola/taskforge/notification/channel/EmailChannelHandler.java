@@ -3,12 +3,13 @@ package app.bola.taskforge.notification.channel;
 import app.bola.taskforge.notification.model.ChannelType;
 import app.bola.taskforge.notification.model.DeliveryResult;
 import app.bola.taskforge.notification.model.NotificationBundle;
-import app.bola.taskforge.notification.template.NotificationTemplateRender;
+import app.bola.taskforge.notification.template.NotificationTemplateRenderer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	private static final String API_KEY = "api-key";
 	private HttpHeaders httpHeaders;
 	final RestTemplate restTemplate;
-	final NotificationTemplateRender templateRender;
+	final NotificationTemplateRenderer templateRender;
 	@Value("${app.brevo.api-key}")
 	private String mailApiKey;
 	
@@ -36,7 +37,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	private String mailClientProviderUrl;
 	
 	
-	public EmailChannelHandler(RestTemplate restTemplate, NotificationTemplateRender templateRender) {
+	public EmailChannelHandler(RestTemplate restTemplate, @Qualifier("emailNotificationTemplateRenderer") NotificationTemplateRenderer templateRender) {
 		
 		this.restTemplate = restTemplate;
 		this.templateRender = templateRender;
@@ -68,12 +69,13 @@ public class EmailChannelHandler implements ChannelHandler{
 	
 	@Override
 	public DeliveryResult deliver(NotificationBundle bundle) {
-		String emailContent = templateRender.render();
+		
+		String emailContent = templateRender.render(bundle.getTemplateName(), "email", bundle.getTemplateVariables());
 		try {
 			EmailRequestObject emailObject = EmailRequestObject.builder()
 				.subject(bundle.getTitle())
 				.textContent(bundle.getMessage())
-				.htmlContent(bundle.getHtmlMessage())
+				.htmlContent(emailContent)
 				.sender(new EmailRequestObject.Sender("noreply@taskforge.com", "TaskForge"))
 				.to(Collections.singletonList(new EmailRequestObject.Recipient(bundle.getEmailTo(), bundle.getUserId())))
 				.build();
