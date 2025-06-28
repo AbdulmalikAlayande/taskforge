@@ -1,11 +1,12 @@
 package app.bola.taskforge.repository;
 
 import app.bola.taskforge.domain.entity.NotificationPreference;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface NotificationPreferenceRepository extends TenantAwareRepository<NotificationPreference, String> {
+public interface NotificationPreferenceRepository extends JpaRepository<NotificationPreference, String> {
 	
 	@Query("""
     SELECT p FROM #{#entityName} p WHERE p.member.id = :userId

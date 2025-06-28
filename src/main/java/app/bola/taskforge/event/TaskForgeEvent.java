@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationEvent;
 @Setter
 public class TaskForgeEvent extends ApplicationEvent {
 	
-	private long timestamp;
 	private String metadata;
 	private String initiatorId;
 	private List<String> userIdList;

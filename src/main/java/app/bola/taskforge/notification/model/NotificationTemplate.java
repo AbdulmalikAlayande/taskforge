@@ -15,7 +15,6 @@ public class NotificationTemplate extends BaseEntity {
 	private String name;
 	private String channel;
 	private String subject;
-	private String version;
 	private String language;
 	@Lob
 	private String body;

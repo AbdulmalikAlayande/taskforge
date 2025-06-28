@@ -82,7 +82,6 @@ public class TaskForgeTaskService implements TaskService{
 		event.setProjectId(project.getId());
 		event.setOrganizationId(organizationId);
 		event.setDateTimeStamp(LocalDateTime.now());
-		event.setTimestamp(System.currentTimeMillis());
 		event.setEventType(TaskEvent.EventType.TASK_CREATED);
 		event.setUserIdList(project.getMembers().stream().map(Member::getPublicId).collect(Collectors.toList()));
 		event.setUserEmailList(project.getMembers().stream().map(Member::getEmail).filter(StringUtils::isNotBlank).toList());
