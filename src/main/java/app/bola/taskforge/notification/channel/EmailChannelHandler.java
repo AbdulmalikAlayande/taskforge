@@ -3,10 +3,12 @@ package app.bola.taskforge.notification.channel;
 import app.bola.taskforge.notification.model.ChannelType;
 import app.bola.taskforge.notification.model.DeliveryResult;
 import app.bola.taskforge.notification.model.NotificationBundle;
+import app.bola.taskforge.notification.template.NotificationTemplateRender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +28,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	private static final String API_KEY = "api-key";
 	private HttpHeaders httpHeaders;
 	final RestTemplate restTemplate;
-	
+	final NotificationTemplateRender templateRender;
 	@Value("${app.brevo.api-key}")
 	private String mailApiKey;
 	
@@ -34,8 +36,10 @@ public class EmailChannelHandler implements ChannelHandler{
 	private String mailClientProviderUrl;
 	
 	
-	EmailChannelHandler(RestTemplate restTemplate) {
+	public EmailChannelHandler(RestTemplate restTemplate, NotificationTemplateRender templateRender) {
+		
 		this.restTemplate = restTemplate;
+		this.templateRender = templateRender;
 		buildHttpHeaders();
 	}
 	
@@ -53,8 +57,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	
 	@Override
 	public boolean canHandle(NotificationBundle bundle) {
-		return bundle.getChannels().contains(ChannelType.EMAIL) &&
-				       bundle.getEmailTo() != null && !bundle.getEmailTo().isEmpty();
+		return bundle.getChannels().contains(ChannelType.EMAIL) && StringUtils.isNotBlank(bundle.getEmailTo());
 	}
 	
 	
@@ -65,6 +68,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	
 	@Override
 	public DeliveryResult deliver(NotificationBundle bundle) {
+		String emailContent = templateRender.render();
 		try {
 			EmailRequestObject emailObject = EmailRequestObject.builder()
 				.subject(bundle.getTitle())

@@ -1,10 +1,10 @@
 package app.bola.taskforge.notification.consumer;
 
 import app.bola.taskforge.event.TaskEvent;
+import app.bola.taskforge.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.pulsar.annotation.PulsarListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationEventConsumer {
 	
-	final ApplicationEventPublisher eventPublisher;
+	final NotificationService notificationService;
 	
-	@PulsarListener(
-		topics = {"${pulsar.topic.notification}"},
-		subscriptionName = "${pulsar.subscription.notification}"
-	)
+	@EventListener
 	public void consumeTaskEvent(TaskEvent event) {
-		eventPublisher.publishEvent(event);
+		notificationService.processTaskEvent(event);
 	}
 }

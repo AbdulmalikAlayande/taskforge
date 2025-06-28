@@ -1,6 +1,8 @@
 package app.bola.taskforge.event;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.*;
 import org.springframework.context.ApplicationEvent;
 
@@ -8,16 +10,16 @@ import org.springframework.context.ApplicationEvent;
 @Setter
 public class TaskForgeEvent extends ApplicationEvent {
 	
-	private String eventId;
-	private String userId;
-	private String userEmail;
-	private EventType eventType;
-	private LocalDateTime dateTimeStamp;
-	private String initiatorId;
-	private String organizationId;
+	private long timestamp;
 	private String metadata;
+	private String initiatorId;
+	private List<String> userIdList;
+	private List<String> userEmailList;
+	private String organizationId;
+	private LocalDateTime dateTimeStamp;
 	
 	public TaskForgeEvent(Object source) {
 		super(source);
 	}
+	
 }

@@ -6,6 +6,7 @@ import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
 import app.bola.taskforge.domain.entity.Task;
 import app.bola.taskforge.domain.enums.TaskStatus;
+import app.bola.taskforge.event.TaskEvent;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.repository.OrganizationRepository;
@@ -21,10 +22,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,6 +43,7 @@ public class TaskForgeTaskService implements TaskService{
 	private final OrganizationRepository organizationRepository;
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
+	private final ApplicationEventPublisher eventPublisher;
 	
 	
 	@Override
@@ -63,8 +67,29 @@ public class TaskForgeTaskService implements TaskService{
 		TaskResponse response = toResponse(savedTask);
 		response.setOrganizationId(organization.getPublicId());
 		response.setProjectId(project.getPublicId());
+		
+		TaskEvent event = buildTaskEvent(savedTask, project, organization.getId());
+		eventPublisher.publishEvent(event);
+		
 		return response;
 	}
+	
+	private static TaskEvent buildTaskEvent(Task savedTask, Project project, String organizationId) {
+		
+		TaskEvent event = new TaskEvent(savedTask);
+		
+		event.setTaskId(savedTask.getId());
+		event.setProjectId(project.getId());
+		event.setOrganizationId(organizationId);
+		event.setDateTimeStamp(LocalDateTime.now());
+		event.setTimestamp(System.currentTimeMillis());
+		event.setEventType(TaskEvent.EventType.TASK_CREATED);
+		event.setUserIdList(project.getMembers().stream().map(Member::getPublicId).collect(Collectors.toList()));
+		event.setUserEmailList(project.getMembers().stream().map(Member::getEmail).filter(StringUtils::isNotBlank).toList());
+		
+		return event;
+	}
+	
 	
 	private void validateTaskDateRange(@NotNull LocalDate startDate, @NotNull LocalDate dueDate) {
 		if (startDate == null || dueDate == null) {
@@ -181,6 +206,7 @@ public class TaskForgeTaskService implements TaskService{
 		Task task = taskRepository.findByIdScoped(publicId)
 				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 		taskRepository.deleteByIdScoped(publicId);
+		taskRepository.delete(task);
 		log.info("Task [{}] soft-deleted under tenant [{}]", publicId, TenantContext.getCurrentTenant());
 	}
 }
