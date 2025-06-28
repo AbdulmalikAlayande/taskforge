@@ -36,7 +36,8 @@ public class WebSocketChannelHandler implements ChannelHandler{
 	
 	@Override
 	public DeliveryResult deliver(NotificationBundle bundle) {
-		
+		String message = templateRenderer.render(bundle.getTemplateName(), "push", bundle.getTemplateVariables());
+		bundle.setMessage(message);
 		try {
 			String destination = "/user/" + bundle.getUserId() + "/notifications";
 			messagingTemplate.convertAndSendToUser(bundle.getUserId(), destination, bundle);

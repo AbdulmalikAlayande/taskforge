@@ -74,7 +74,6 @@ public class EmailChannelHandler implements ChannelHandler{
 		try {
 			EmailRequestObject emailObject = EmailRequestObject.builder()
 				.subject(bundle.getTitle())
-				.textContent(bundle.getMessage())
 				.htmlContent(emailContent)
 				.sender(new EmailRequestObject.Sender("noreply@taskforge.com", "TaskForge"))
 				.to(Collections.singletonList(new EmailRequestObject.Recipient(bundle.getEmailTo(), bundle.getUserId())))
@@ -101,7 +100,6 @@ public class EmailChannelHandler implements ChannelHandler{
 	private static class EmailRequestObject {
 		
 		private String subject;
-		private String textContent;
 		private String htmlContent;
 		private Sender sender;
 		private List<Recipient> to;

@@ -33,8 +33,9 @@ public class EmailNotificationTemplateRenderer implements NotificationTemplateRe
 		if (template == null) {
 			return render(templateName, variables);
 		}
+		variables.put("contentFragment", "email-fragments :: " + template.getName());
 		context.setVariables(variables);
-		return templateEngine.process(template.getName(), context);
+		return templateEngine.process("base-event", context);
 	}
 	
 	
