@@ -18,4 +18,6 @@ public class Mention extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Comment comment;
 	
+	@ManyToOne
+	private Organization organization;
 }
