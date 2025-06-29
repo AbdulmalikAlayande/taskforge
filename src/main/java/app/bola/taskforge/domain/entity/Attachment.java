@@ -2,6 +2,7 @@ package app.bola.taskforge.domain.entity;
 
 import app.bola.taskforge.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,7 +22,10 @@ public class Attachment extends BaseEntity {
 
     @ManyToOne
     private Task task;
-
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Comment comment;
+    
     @ManyToOne
     private Member uploadedBy;
     

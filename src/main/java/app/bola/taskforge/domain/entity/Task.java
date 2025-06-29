@@ -18,7 +18,6 @@ import java.util.Set;
  * An actionable unit of work to be done
  */
 
-
 @Getter
 @Setter
 @Entity
@@ -45,7 +44,7 @@ public class Task extends BaseEntity {
 	
 	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	private Set<Comment> comment = new HashSet<>();
+	private Set<Comment> comments = new HashSet<>();
 	
 	@Enumerated(value = EnumType.STRING)
 	private TaskStatus status;
