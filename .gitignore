@@ -6,6 +6,7 @@ target/
 
 src/main/resources/secret.properties
 /src/main/resources/secret.properties
+mini-readme.md
 
 ### STS ###
 .apt_generated
