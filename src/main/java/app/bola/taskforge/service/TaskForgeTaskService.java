@@ -13,6 +13,7 @@ import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.TaskRepository;
 import app.bola.taskforge.repository.UserRepository;
+import app.bola.taskforge.service.dto.CommentResponse;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
 import app.bola.taskforge.service.dto.TaskUpdateRequest;
@@ -181,6 +182,11 @@ public class TaskForgeTaskService implements TaskService{
 		return toResponse(updatedTask);	}
 	
 	@Override
+	public CommentResponse getCommentThread(String taskId) {
+		return null;
+	}
+	
+	@Override
 	public TaskResponse update(String publicId, @NonNull TaskRequest taskRequest) {
 		return update(publicId, modelMapper.map(taskRequest, TaskUpdateRequest.class));
 	}
@@ -201,7 +207,7 @@ public class TaskForgeTaskService implements TaskService{
 	}
 	
 	@Override
-	public void deleteById(String publicId) {
+	public void delete(String publicId) {
 		Task task = taskRepository.findByIdScoped(publicId)
 				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 		taskRepository.deleteByIdScoped(publicId);

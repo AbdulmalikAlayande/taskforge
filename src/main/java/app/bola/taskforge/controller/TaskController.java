@@ -52,7 +52,7 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	
 	@Override
 	public ResponseEntity<Void> delete(@PathVariable String publicId) {
-		taskService.deleteById(publicId);
+		taskService.delete(publicId);
 		return ResponseEntity.noContent().build();
 	}
 	

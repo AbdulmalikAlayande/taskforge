@@ -44,7 +44,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	
 	@Override
 	public ResponseEntity<Void> delete(@PathVariable String publicId) {
-		organizationService.deleteById(publicId);
+		organizationService.delete(publicId);
 		return ResponseEntity.noContent().build();
 	}
 	

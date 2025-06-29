@@ -20,6 +20,6 @@ public interface ProjectService extends BaseService<ProjectRequest, Project, Pro
 	Set<ProjectResponse> getAllByOrganizationId(String organizationId);
 	Set<ProjectResponse> findAll();
 	ProjectResponse findById(String publicId);
-	void deleteById(String publicId);
+	void delete(String publicId);
 //	Object getActivityLog(String projectId);
 }

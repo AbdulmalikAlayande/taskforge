@@ -419,7 +419,7 @@ public class TaskIntegrationTest {
 			Optional<Task> beforeDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
 			assertTrue(beforeDelete.isPresent());
 			
-			taskService.deleteById(createdTask.getPublicId());
+			taskService.delete(createdTask.getPublicId());
 			
 			Optional<Task> afterDelete = taskRepository.findByIdScoped(createdTask.getPublicId());
 			assertFalse(afterDelete.isPresent());
@@ -431,7 +431,7 @@ public class TaskIntegrationTest {
 			String randomId = UUID.randomUUID().toString();
 			
 			EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
-					() -> taskService.deleteById(randomId));
+					() -> taskService.delete(randomId));
 			
 			assertEquals("Task not found", ex.getMessage());
 		}

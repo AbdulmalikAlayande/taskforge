@@ -39,7 +39,7 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	
 	@Override
 	public ResponseEntity<Void> delete(@PathVariable String publicId) {
-		projectService.deleteById(publicId);
+		projectService.delete(publicId);
 		return ResponseEntity.noContent().build();
 	}
 	

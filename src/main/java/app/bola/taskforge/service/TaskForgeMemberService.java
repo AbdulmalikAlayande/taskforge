@@ -90,7 +90,7 @@ public class TaskForgeMemberService implements MemberService {
 	}
 	
 	@Override
-	public void deleteById(String publicId) {
+	public void delete(String publicId) {
 	
 	}
 	

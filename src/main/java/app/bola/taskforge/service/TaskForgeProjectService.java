@@ -197,7 +197,7 @@ public class TaskForgeProjectService implements ProjectService{
 	}
 	
 	@Override
-	public void deleteById(String publicId) {
+	public void delete(String publicId) {
 		Project project = projectRepository.findByIdScoped(publicId)
 				                  .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 		project.setDeleted(true);

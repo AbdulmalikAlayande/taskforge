@@ -74,7 +74,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	}
 	
 	@Override
-	public void deleteById(String publicId) {
+	public void delete(String publicId) {
 	
 	}
 	

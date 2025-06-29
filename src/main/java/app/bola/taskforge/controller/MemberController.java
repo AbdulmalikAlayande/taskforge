@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/members")
@@ -43,7 +42,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	
 	@DeleteMapping("/{publicId}")
 	public ResponseEntity<Void> delete(@PathVariable String publicId) {
-		memberService.deleteById(publicId);
+		memberService.delete(publicId);
 		return ResponseEntity.noContent().build();
 	}
 	
