@@ -2,6 +2,7 @@ package app.bola.taskforge.common.service;
 
 import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.exception.InvalidRequestException;
+import app.bola.taskforge.service.dto.MemberResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,11 @@ public interface BaseService<REQ, ENT extends BaseEntity, RES> {
 	
 	RES update(@NotBlank String publicId, @NonNull REQ req);
 	
+	RES findById(String publicId);
+	
+	Collection<RES> findAll();
+	
+	void deleteById(String publicId);
 	
 	default RES toResponse(ENT entity) {
 		return null;

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -77,7 +78,22 @@ public class TaskForgeMemberService implements MemberService {
 	public MemberResponse update(String publicId, @NonNull MemberRequest memberRequest) {
 		return null;
 	}
-
+	
+	@Override
+	public MemberResponse findById(String publicId) {
+		return null;
+	}
+	
+	@Override
+	public Set<MemberResponse> findAll() {
+		return Set.of();
+	}
+	
+	@Override
+	public void deleteById(String publicId) {
+	
+	}
+	
 	@Override
 	public MemberResponse toResponse(Member entity) {
 		return modelMapper.map(entity, MemberResponse.class);

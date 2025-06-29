@@ -41,15 +41,13 @@ public class TaskForgeProjectService implements ProjectService{
 	
 	@PostConstruct
 	public void init() {
-		modelMapper.typeMap(ProjectRequest.class, Project.class).addMappings(map -> {
-			map.using(context -> {
-				if (context.getSource() == null) {
-					return null;
-				}
-				ProjectRequest request = (ProjectRequest) context.getSource();
-				return new DateRange(request.getStartDate(), request.getEndDate());
-			}).map(source -> source, Project::setDateRange);
-		});
+		modelMapper.typeMap(ProjectRequest.class, Project.class).addMappings(map -> map.using(context -> {
+			if (context.getSource() == null) {
+				return null;
+			}
+			ProjectRequest request = (ProjectRequest) context.getSource();
+			return new DateRange(request.getStartDate(), request.getEndDate());
+		}).map(source -> source, Project::setDateRange));
 	}
 	
 	@Override

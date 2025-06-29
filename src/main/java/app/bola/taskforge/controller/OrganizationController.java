@@ -8,11 +8,13 @@ import app.bola.taskforge.service.dto.OrganizationRequest;
 import app.bola.taskforge.service.dto.OrganizationResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
 
 @RestController
 @AllArgsConstructor
@@ -24,6 +26,26 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@Override
 	public ResponseEntity<OrganizationResponse> createNew(OrganizationRequest request) {
 		return ResponseEntity.ok(organizationService.createNew(request));
+	}
+	
+	@Override
+	public ResponseEntity<OrganizationResponse> getById(@PathVariable String publicId) {
+		return ResponseEntity.ok(organizationService.findById(publicId));
+	}
+	
+	@Override
+	public ResponseEntity<Collection<OrganizationResponse>> getAll() {
+		return ResponseEntity.ok(organizationService.findAll());
+	}
+	
+	public ResponseEntity<OrganizationResponse> update(@PathVariable String publicId, @RequestBody OrganizationRequest request) {
+		return ResponseEntity.ok(organizationService.update(publicId, request));
+	}
+	
+	@Override
+	public ResponseEntity<Void> delete(@PathVariable String publicId) {
+		organizationService.deleteById(publicId);
+		return ResponseEntity.noContent().build();
 	}
 	
 	/**
@@ -38,5 +60,4 @@ public class OrganizationController implements BaseController<OrganizationReques
 	public ResponseEntity<InvitationResponse> inviteMember(@RequestBody InvitationRequest request) {
 		return ResponseEntity.ok(organizationService.inviteMember(request));
 	}
-	
 }

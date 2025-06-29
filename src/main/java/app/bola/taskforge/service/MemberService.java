@@ -6,6 +6,8 @@ import app.bola.taskforge.service.dto.InvitationResponse;
 import app.bola.taskforge.service.dto.MemberRequest;
 import app.bola.taskforge.service.dto.MemberResponse;
 
+import java.util.Set;
+
 public interface MemberService extends BaseService<MemberRequest, Member, MemberResponse> {
 	
 	/**
@@ -15,4 +17,7 @@ public interface MemberService extends BaseService<MemberRequest, Member, Member
 	 * @return the response containing details of the accepted invitation
 	 */
 	InvitationResponse acceptInvitation(String token);
+	
+	@Override
+	Set<MemberResponse> findAll();
 }

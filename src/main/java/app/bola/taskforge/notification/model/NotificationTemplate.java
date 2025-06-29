@@ -4,6 +4,8 @@ package app.bola.taskforge.notification.model;
 import app.bola.taskforge.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "channel"})})
 public class NotificationTemplate extends BaseEntity {
 	
 	@Lob
