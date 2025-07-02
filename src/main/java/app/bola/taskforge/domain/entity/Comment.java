@@ -41,9 +41,11 @@ public class Comment extends BaseEntity {
 	@OneToMany(mappedBy = "parentComment",  cascade = CascadeType.ALL)
 	private Set<Comment> replies = new HashSet<>();
 	
+	@Builder.Default
 	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
 	private List<Mention> mentions = new ArrayList<>();
 	
+	@Builder.Default
 	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
 	private List<Attachment> attachments = new ArrayList<>();
 }

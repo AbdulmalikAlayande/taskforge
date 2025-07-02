@@ -1,6 +1,7 @@
 package app.bola.taskforge.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,14 +21,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CommentRequest implements Serializable {
 
+	@NotBlank
 	String content;
-	boolean resolved;
-	boolean edited;
+	@NotBlank
 	String authorId;
+	@NotBlank
 	String taskId;
 	String projectId;
 	String parentCommentId;
-	String organizationId;
 	List<String> mentions;
 	List<MultipartFile> attachments;
 }
