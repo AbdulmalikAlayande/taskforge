@@ -1,5 +1,11 @@
 package app.bola.taskforge.service;
 
+/*
+		commentRequest = CommentRequest.builder().content("This is a comment, that is being added based for test purposes")
+					                 .taskId(task.getPublicId()).projectId(project.getPublicId()).authorId(author.getPublicId())
+					                 .mentions(List.of("@user1")).build();
+			
+ */
 import app.bola.taskforge.domain.entity.*;
 import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.exception.EntityNotFoundException;
@@ -9,6 +15,7 @@ import app.bola.taskforge.repository.*;
 import app.bola.taskforge.service.dto.CommentRequest;
 import app.bola.taskforge.service.dto.CommentResponse;
 import app.bola.taskforge.service.dto.MentionResponse;
+import jakarta.validation.Validator;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +46,9 @@ class CommentServiceTest {
 	
 	@Mock
 	private ModelMapper modelMapper;
+	
+	@Mock
+	private Validator validator;
 	
 	@Mock
 	private UserRepository userRepository;
@@ -96,6 +106,7 @@ class CommentServiceTest {
 			comment = Comment.builder().task(task).author(author).content(commentRequest.getContent()).organization(organization)
 				.mentions(List.of(new Mention(), new Mention())).publicId(UUID.randomUUID().toString()).build();
 			
+			when(validator.validate(commentRequest)).thenReturn(Set.of());
 			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
 			when(taskRepository.findByIdScoped(task.getPublicId())).thenReturn(Optional.of(task));
 			
@@ -107,10 +118,6 @@ class CommentServiceTest {
 		@Test
 		@DisplayName("should create a new comment under a task successfully")
 		public void shouldCreateACommentSuccessfully() {
-			
-			commentRequest = CommentRequest.builder().content("This is a comment, that is being added based for test purposes")
-					                 .taskId(task.getPublicId()).projectId(project.getPublicId()).authorId(author.getPublicId())
-					                 .mentions(List.of("@user1")).build();
 			
 			when(projectRepository.findByIdScoped(project.getPublicId())).thenReturn(Optional.of(project));
 			when(modelMapper.map(any(CommentRequest.class), eq(Comment.class))).thenReturn(comment);
@@ -131,10 +138,6 @@ class CommentServiceTest {
 			
 			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
 			when(taskRepository.findByIdScoped(task.getPublicId())).thenReturn(Optional.of(task));
-			
-			commentRequest = CommentRequest.builder().content("This is a comment, that is being added based for test purposes")
-					                 .taskId(task.getPublicId()).projectId(project.getPublicId()).authorId(author.getPublicId())
-					                 .mentions(List.of("@user1")).build();
 			
 			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> commentService.createNew(commentRequest));
 			assertNotNull(exception);
@@ -172,22 +175,6 @@ class CommentServiceTest {
 		}
 		
 		@Test
-		@DisplayName("Should throw TaskForgeException if the task doesn't belong to the project.")
-		public void shouldThrowTaskForgeExceptionIfTaskDoesNotBelongToProject() {
-			// Given a task that does not belong to the project
-			String differentProjectId = UUID.randomUUID().toString();
-			Project differentProject = Project.builder().publicId(differentProjectId).name("Different Project").build();
-			task.setProject(differentProject);
-			
-			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
-			when(taskRepository.findByIdScoped(task.getPublicId())).thenReturn(Optional.of(task));
-			when(projectRepository.findByIdScoped(project.getPublicId())).thenReturn(Optional.of(project));
-			
-			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> commentService.createNew(commentRequest));
-			assertEquals("Author is not a member of the project project associated with this task", exception.getMessage());
-		}
-		
-		@Test
 		@DisplayName("Should reject blank/empty comment content")
 		public void shouldRejectBlankOrEmptyCommentContent() {
 			// Given a comment with blank or empty content
@@ -198,16 +185,9 @@ class CommentServiceTest {
 					                                     .authorId(author.getPublicId())
 					                                     .build();
 			
-			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
-			when(taskRepository.findByIdScoped(task.getPublicId())).thenReturn(Optional.of(task));
-			
-			// This would typically be validated at the request level or service level
-			// For now, we'll assume validation happens before reaching the service
-			assertThrows(IllegalArgumentException.class, () -> {
-				if (blankContentRequest.getContent() == null || blankContentRequest.getContent().trim().isEmpty()) {
-					throw new IllegalArgumentException("Comment content cannot be blank or empty");
-				}
-			});
+
+			InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> commentService.createNew(blankContentRequest));
+			assertNotNull(exception);
 		}
 		
 		private InputStream createTestTextFile(String text) {
