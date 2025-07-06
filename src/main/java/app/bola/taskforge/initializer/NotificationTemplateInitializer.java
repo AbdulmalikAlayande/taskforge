@@ -124,7 +124,11 @@ public class NotificationTemplateInitializer implements CommandLineRunner {
 		allPushTemplates.addAll(initializeTaskPushNotificationTemplates());
 		allPushTemplates.addAll(initializeProjectPushNotificationTemplates());
 		
-		List<NotificationTemplate> savedTemplates = templateRepo.saveAll(allPushTemplates);
+		List<NotificationTemplate> savedTemplates = allPushTemplates.stream()
+                .filter(template -> !templateRepo.existsByName(template.getName()))
+				.map(templateRepo::save)
+                .toList();
+		
 		log.info("Saved {} push notification templates", savedTemplates.size());
 	}
 	

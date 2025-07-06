@@ -1,18 +1,17 @@
 package app.bola.taskforge.service.dto;
 
-import app.bola.taskforge.domain.entity.Member;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
-
-/**
- * Request DTO for {@link Member}
- */
 
 @Getter
 @SuperBuilder
@@ -20,17 +19,25 @@ import java.io.Serializable;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MemberRequest implements Serializable {
-
+public class CreateAdminRequest implements Serializable {
+	
 	@Email(message = "Invalid email format", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
 	@NotBlank
 	String email;
 	@NotBlank
 	String password;
 	@NotBlank
-	String firstname;
+	String firstName;
 	@NotBlank
-	String lastname;
-	@NotBlank
-	String organizationId;
+	String lastName;
+	
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				       .append("email", email)
+				       .append("password", password)
+				       .append("firstname", firstName)
+				       .append("lastname", lastName)
+				       .toString();
+	}
 }

@@ -120,8 +120,8 @@ class OrganizationServiceTest {
 					                            .publicId("org-12345")
 					                            .timeZone("Africa/Lagos")
 					                            .description("A healthcare organization focused on community health")
-					                            .contactEmail("alaabdulmalik03@gmail.com")
-					                            .contactPhone("+2348034567890")
+					                            .email("alaabdulmalik03@gmail.com")
+					                            .phone("+2348034567890")
 					                            .logoUrl("https://ereach.org/logo.png")
 					                            .websiteUrl("https://ereach.org")
 					                            .build();
@@ -136,8 +136,8 @@ class OrganizationServiceTest {
 							            .publicId("org-12345")
 							            .timeZone("Africa/Lagos")
 							            .description("A healthcare organization focused on community health")
-							            .contactEmail("alaabdulmalik03@gmail.com")
-							            .contactPhone("+2348034567890")
+							            .email("alaabdulmalik03@gmail.com")
+							            .phone("+2348034567890")
 							            .logoUrl("https://ereach.org/logo.png")
 							            .websiteUrl("https://ereach.org")
 							            .build()
@@ -162,8 +162,8 @@ class OrganizationServiceTest {
 					                              .slug("valid-slug")
 					                              .industry("Technology")
 					                              .country("Nigeria")
-					                              .contactEmail(null)
-					                              .contactPhone("")
+					                              .email(null)
+					                              .phone("")
 					                              .timeZone(null)
 					                              .build();
 			
@@ -188,8 +188,8 @@ class OrganizationServiceTest {
 					                              .slug("Invalid Slug!")
 					                              .industry("")
 					                              .country("")
-					                              .contactEmail("not-an-email")
-					                              .contactPhone("12345")
+					                              .email("not-an-email")
+					                              .phone("12345")
 					                              .timeZone("Invalid/Zone!")
 					                              .websiteUrl("invalid-url")
 					                              .logoUrl("invalid-url")
@@ -248,8 +248,8 @@ class OrganizationServiceTest {
 					                              .slug("unique-org")
 					                              .industry("Tech")
 					                              .country("Nigeria")
-					                              .contactEmail("test@email.com")
-					                              .contactPhone("+2348012345678")
+					                              .email("test@email.com")
+					                              .phone("+2348012345678")
 					                              .timeZone("Africa/Lagos")
 					                              .build();
 			
@@ -273,8 +273,8 @@ class OrganizationServiceTest {
 					                              .slug("duplicate-slug")
 					                              .industry("Tech")
 					                              .country("Nigeria")
-					                              .contactEmail("test@email.com")
-					                              .contactPhone("+2348012345678")
+					                              .email("test@email.com")
+					                              .phone("+2348012345678")
 					                              .timeZone("Africa/Lagos")
 					                              .build();
 			
@@ -307,8 +307,8 @@ class OrganizationServiceTest {
 					                              .slug("  org-slug  ")
 					                              .industry("Tech")
 					                              .country("Nigeria")
-					                              .contactEmail("test@email.com")
-					                              .contactPhone("+2348012345678")
+					                              .email("test@email.com")
+					                              .phone("+2348012345678")
 					                              .timeZone("Africa/Lagos")
 					                              .build();
 			
@@ -382,21 +382,21 @@ class OrganizationServiceTest {
 			
 			OrganizationRequest orgRequest = OrganizationRequest.builder()
 					.name("Swot Inc.").slug("swot-inc").industry("Technology").country("Nigeria")
-                    .contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+                    .email("swotinc@gmail.com").phone("+2348034567890")
 					.timeZone("Africa/Lagos").description("A tech company focused on innovation")
 					.websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
                     .build();
 			
 			OrganizationResponse orgResponse = OrganizationResponse.builder()
 	                                   .name("Swot Inc.").slug("swot-inc").industry("Technology")
-	                                   .country("Nigeria").contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+	                                   .country("Nigeria").email("swotinc@gmail.com").phone("+2348034567890")
 	                                   .timeZone("Africa/Lagos").description("A tech company focused on innovation")
 	                                   .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 	                                   .publicId("org-12345").build();
 			
 			Organization organization = Organization.builder()
 			                            .name("Swot Inc.").slug("swot-inc").industry("Technology").country("Nigeria")
-		                                .contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+		                                .email("swotinc@gmail.com").phone("+2348034567890")
 			                            .timeZone("Africa/Lagos").description("A tech company focused on innovation")
 			                            .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 			                            .publicId("org-12345").build();
@@ -437,20 +437,20 @@ class OrganizationServiceTest {
 			// Given: setup for an already invited member
 			OrganizationRequest orgRequest = OrganizationRequest.builder()
 					                                 .name("Swot Inc.").slug("swot-inc").industry("Technology").country("Nigeria")
-					                                 .contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+					                                 .email("swotinc@gmail.com").phone("+2348034567890")
 					                                 .timeZone("Africa/Lagos").description("A tech company focused on innovation")
 					                                 .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 					                                 .build();
 			
 			Organization organization = Organization.builder().name("Swot Inc.").slug("swot-inc").industry("Technology")
-					                            .country("Nigeria").contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+					                            .country("Nigeria").email("swotinc@gmail.com").phone("+2348034567890")
 					                            .timeZone("Africa/Lagos").description("A tech company focused on innovation")
 					                            .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 					                            .publicId("org-public-id-12345").build();
 			
 			OrganizationResponse orgResponse = OrganizationResponse.builder()
 					                                   .name("Swot Inc.").slug("swot-inc").industry("Technology")
-					                                   .country("Nigeria").contactEmail("swotinc@gmail.com").contactPhone("+2348034567890")
+					                                   .country("Nigeria").email("swotinc@gmail.com").phone("+2348034567890")
 					                                   .timeZone("Africa/Lagos").description("A tech company focused on innovation")
 					                                   .websiteUrl("https://swotinc.com").logoUrl("https://swotinc.com/logo.png")
 					                                   .publicId("org-public-id-12345").build();

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Order(1) // I want to make sure that this filter runs before any other filters that depend on the tenant context
 @Component
@@ -23,9 +24,11 @@ public class TenantFilter extends OncePerRequestFilter {
 	                                @NonNull FilterChain filterChain) throws ServletException, IOException {
 
 		String requestPath = request.getRequestURI();
-
-		// Skip tenant validation for organization creation endpoint
-		if ("/api/organizations/create-new".equals(requestPath)) {
+		
+		List<String> requireTenantUnawareEndpoints = List.of("/api/organizations/create-new", "/api/admin/create-new",
+				"/api/auth/oauth", "/api/auth/login", "/api/log/create-new");
+		
+		if (requireTenantUnawareEndpoints.contains(requestPath)) {
 			filterChain.doFilter(request, response);
 			return;
 		}

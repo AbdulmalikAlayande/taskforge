@@ -61,7 +61,7 @@ public class TaskServiceTest {
 		String organizationId = UUID.randomUUID().toString();
 		organization = Organization.builder()
 				               .publicId(organizationId).name("Mock Organization").slug("mock-org").description("A mock Org")
-				               .contactPhone("+2347023456789").contactEmail("mockorgemail@gmail.com").industry("Technology").build();
+				               .phone("+2347023456789").email("mockorgemail@gmail.com").industry("Technology").build();
 		
 		String projectId = UUID.randomUUID().toString();
 		project = Project.builder().name("Mock Project").publicId(projectId)

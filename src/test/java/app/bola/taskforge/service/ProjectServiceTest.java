@@ -53,56 +53,56 @@ class ProjectServiceTest {
 		
 		@Test
 		@DisplayName("""
-		Should successfully create a new project when all validations are passed,
-		organization exists and all members exist
-		""")
+				Should successfully create a new project when all validations are passed,
+				organization exists and all members exist
+				""")
 		public void shouldCreateNewProjectSuccessfully() {
 			//Given
 			ProjectRequest projectRequest = ProjectRequest.builder()
-					.name("New  Project")
-                    .description("This is a new project")
-                    .category(ProjectCategory.SOFTWARE)
-                    .startDate(LocalDate.now().plusDays(1))
-                    .endDate(LocalDate.now().plusDays(31))
-                    .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
-                    .organizationId("organization-id-12345")
-                    .build();
+					                                .name("New  Project")
+					                                .description("This is a new project")
+					                                .category(ProjectCategory.SOFTWARE)
+					                                .startDate(LocalDate.now().plusDays(1))
+					                                .endDate(LocalDate.now().plusDays(31))
+					                                .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
+					                                .organizationId("organization-id-12345")
+					                                .build();
 			
 			when(modelMapper.map(projectRequest, Project.class)).thenReturn(Project.builder()
-					.name("New  Project")
-					.description("This is a new project")
-					.category(ProjectCategory.valueOf("SOFTWARE"))
-					.dateRange(new DateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(30)))
-					.members(Set.of())
-					.build());
+					                                                                .name("New  Project")
+					                                                                .description("This is a new project")
+					                                                                .category(ProjectCategory.valueOf("SOFTWARE"))
+					                                                                .dateRange(new DateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(30)))
+					                                                                .members(Set.of())
+					                                                                .build());
 			
 			when(organizationRepository.findByIdScoped("organization-id-12345"))
-				.thenReturn(Optional.of(Organization.builder().id("organization-id-12345").name("Test Organization").build()));
+					.thenReturn(Optional.of(Organization.builder().id("organization-id-12345").name("Test Organization").build()));
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
-				.thenReturn(List.of(
-					Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
-				));
+					.thenReturn(List.of(
+							Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
+							Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+							Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					));
 			when(organizationRepository.findByIdScoped("organization-id-12345"))
-				.thenReturn(Optional.of(Organization.builder().id("organization-id-12345").name("Test Organization").build()));
+					.thenReturn(Optional.of(Organization.builder().id("organization-id-12345").name("Test Organization").build()));
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
-				.thenReturn(List.of(
-					Member.builder().publicId("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					Member.builder().publicId("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					Member.builder().publicId("member-id-3").email("").firstName("Jim").lastName("Beam").build()
-				));
+					.thenReturn(List.of(
+							Member.builder().publicId("member-id-1").email("").firstName("John").lastName("Doe").build(),
+							Member.builder().publicId("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+							Member.builder().publicId("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					));
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(ProjectResponse.builder()
-					.name("New  Project").description("This is a new project").category(ProjectCategory.SOFTWARE.name())
-					.startDate(LocalDate.now().plusDays(1)).endDate(LocalDate.now().plusDays(31))
-					.members(Set.of(
-						MemberResponse.builder().publicId("member-id-1").firstName("John").lastName("Doe").build(),
-						MemberResponse.builder().publicId("member-id-2").firstName("Jane").lastName("Doe").build(),
-						MemberResponse.builder().publicId("member-id-3").firstName("Jim").lastName("Beam").build()
-					))
-					.build());
+					                                                                                .name("New  Project").description("This is a new project").category(ProjectCategory.SOFTWARE.name())
+					                                                                                .startDate(LocalDate.now().plusDays(1)).endDate(LocalDate.now().plusDays(31))
+					                                                                                .members(Set.of(
+							                                                                                MemberResponse.builder().publicId("member-id-1").firstName("John").lastName("Doe").build(),
+							                                                                                MemberResponse.builder().publicId("member-id-2").firstName("Jane").lastName("Doe").build(),
+							                                                                                MemberResponse.builder().publicId("member-id-3").firstName("Jim").lastName("Beam").build()
+					                                                                                ))
+					                                                                                .build());
 			
 			//When
 			ProjectResponse projectResponse = projectService.createNew(projectRequest);
@@ -112,7 +112,7 @@ class ProjectServiceTest {
 			assertEquals("New  Project", projectResponse.getName());
 			assertEquals("This is a new project", projectResponse.getDescription());
 			assertThat(projectResponse).hasAllNullFieldsOrPropertiesExcept(
-				"name", "description", "category", "startDate", "endDate", "members", "organization", "archived", "publicId"
+					"name", "description", "category", "startDate", "endDate", "members", "organization", "archived", "publicId"
 			);
 		}
 		
@@ -121,17 +121,17 @@ class ProjectServiceTest {
 		public void shouldThrowEntityNotFoundExceptionWhenOrganizationDoesNotExist() {
 			//Given
 			ProjectRequest projectRequest = ProjectRequest.builder()
-					.name("New Project")
-					.description("This is a new project")
-					.category(ProjectCategory.SOFTWARE)
-					.startDate(LocalDate.now().plusDays(1))
-					.endDate(LocalDate.now().plusDays(31))
-					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
-					.organizationId("non-existent-organization-id")
-					.build();
+					                                .name("New Project")
+					                                .description("This is a new project")
+					                                .category(ProjectCategory.SOFTWARE)
+					                                .startDate(LocalDate.now().plusDays(1))
+					                                .endDate(LocalDate.now().plusDays(31))
+					                                .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
+					                                .organizationId("non-existent-organization-id")
+					                                .build();
 			
 			when(organizationRepository.findByIdScoped("non-existent-organization-id"))
-				.thenReturn(Optional.empty());
+					.thenReturn(Optional.empty());
 			
 			//When
 			EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> projectService.createNew(projectRequest));
@@ -144,29 +144,29 @@ class ProjectServiceTest {
 		public void shouldThrowInvalidRequestExceptionWhenProjectCategoryIsInvalid() {
 			//Given
 			ProjectRequest projectRequest = ProjectRequest.builder()
-					.name("New Project")
-					.description("This is a new project")
-					.category(ProjectCategory.valueOf("INVALID_CATEGORY")) // Invalid category
-					.startDate(LocalDate.now().plusDays(1))
-					.endDate(LocalDate.now().plusDays(31))
-					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
-					.organizationId("organization-id-12345")
-					.build();
+					                                .name("New Project")
+					                                .description("This is a new project")
+					                                .category(ProjectCategory.valueOf("INVALID_CATEGORY")) // Invalid category
+					                                .startDate(LocalDate.now().plusDays(1))
+					                                .endDate(LocalDate.now().plusDays(31))
+					                                .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
+					                                .organizationId("organization-id-12345")
+					                                .build();
 			
 			when(organizationRepository.findByIdScoped("organization-id-12345"))
 					.thenReturn(Optional.of(Organization.builder().publicId("organization-id-12345").name("Test Organization").build()));
 			
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
-				.thenReturn(List.of(
-					Member.builder().id("member-id-1").email("johndoe@gmail.com").firstName("John").lastName("Doe").build(),
-					Member.builder().id("member-id-2").email("janedoe@gmail.com").firstName("Jane").lastName("Doe").build(),
-					Member.builder().id("member-id-3").email("jimbeam@proton.mail").firstName("Jim").lastName("Beam").build()
-				));
+					.thenReturn(List.of(
+							Member.builder().id("member-id-1").email("johndoe@gmail.com").firstName("John").lastName("Doe").build(),
+							Member.builder().id("member-id-2").email("janedoe@gmail.com").firstName("Jane").lastName("Doe").build(),
+							Member.builder().id("member-id-3").email("jimbeam@proton.mail").firstName("Jim").lastName("Beam").build()
+					));
 			
 			when(modelMapper.map(projectRequest, Project.class)).thenReturn(
-				Project.builder().name("New Project").description("This is a new project").members(Set.of())
-					.dateRange(new DateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(31)))
-					.build()
+					Project.builder().name("New Project").description("This is a new project").members(Set.of())
+							.dateRange(new DateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(31)))
+							.build()
 			);
 			
 			TaskForgeException exception = assertThrows(TaskForgeException.class, () -> projectService.createNew(projectRequest));
@@ -179,17 +179,17 @@ class ProjectServiceTest {
 		public void shouldThrowIllegalArgumentExceptionWhenStartDateIsAfterEndDate() {
 			// Given
 			ProjectRequest projectRequest = ProjectRequest.builder()
-					.name("New Project")
-					.description("This is a new project")
-					.category(ProjectCategory.SOFTWARE)
-					.startDate(LocalDate.now().plusDays(31))
-					.endDate(LocalDate.now().plusDays(1))
-					.memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
-					.organizationId("organization-id-12345")
-					.build();
+					                                .name("New Project")
+					                                .description("This is a new project")
+					                                .category(ProjectCategory.SOFTWARE)
+					                                .startDate(LocalDate.now().plusDays(31))
+					                                .endDate(LocalDate.now().plusDays(1))
+					                                .memberIds(List.of("member-id-1", "member-id-2", "member-id-3"))
+					                                .organizationId("organization-id-12345")
+					                                .build();
 			
 			when(organizationRepository.findByIdScoped("organization-id-12345"))
-				.thenReturn(Optional.of(Organization.builder().publicId("organization-id-12345").name("Test Organization").build()));
+					.thenReturn(Optional.of(Organization.builder().publicId("organization-id-12345").name("Test Organization").build()));
 			
 			when(modelMapper.map(projectRequest, Project.class)).thenReturn(
 					Project.builder().name("New Project").description("This is a new project").members(Set.of())
@@ -197,11 +197,11 @@ class ProjectServiceTest {
 							.build()
 			);
 			when(userRepository.findAllByIdScoped(List.of("member-id-1", "member-id-2", "member-id-3")))
-				.thenReturn(List.of(
-					Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
-					Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
-					Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
-				));
+					.thenReturn(List.of(
+							Member.builder().id("member-id-1").email("").firstName("John").lastName("Doe").build(),
+							Member.builder().id("member-id-2").email("").firstName("Jane").lastName("Doe").build(),
+							Member.builder().id("member-id-3").email("").firstName("Jim").lastName("Beam").build()
+					));
 			
 			TaskForgeException exception = assertThrows(TaskForgeException.class, () -> projectService.createNew(projectRequest));
 			assertNotNull(exception);
@@ -222,20 +222,20 @@ class ProjectServiceTest {
 			
 			Member member = Member.builder().id(memberId).firstName("John").lastName("Doe").build();
 			Project project = Project.builder().publicId(projectId).name("Test Project").members(Set.of(
-				Member.builder().id("member-id-12345").email("").firstName("John").lastName("Doe").build(),
-				Member.builder().id("member-id-2345").email("").firstName("Jane").lastName("Doe").build(),
-				Member.builder().id("member-id-345").email("").firstName("Jim").lastName("Beam").build()
+					Member.builder().id("member-id-12345").email("").firstName("John").lastName("Doe").build(),
+					Member.builder().id("member-id-2345").email("").firstName("Jane").lastName("Doe").build(),
+					Member.builder().id("member-id-345").email("").firstName("Jim").lastName("Beam").build()
 			)).build();
 			
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(
-				ProjectResponse.builder().publicId(projectId).name("Test Project").build()
+					ProjectResponse.builder().publicId(projectId).name("Test Project").build()
 			);
 			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.of(project));
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(member));
 			when(projectService.addMember(projectId, memberId)).thenReturn(
-				ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
-					MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
-				)).build()
+					ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
+							MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
+					)).build()
 			);
 			
 			// When
@@ -256,7 +256,7 @@ class ProjectServiceTest {
 			String memberId = "member-id-12345";
 			
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(
-				Member.builder().id(memberId).firstName("John").lastName("Doe").build()
+					Member.builder().id(memberId).firstName("John").lastName("Doe").build()
 			));
 			
 			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.empty());
@@ -294,15 +294,15 @@ class ProjectServiceTest {
 			Member member = Member.builder().id(memberId).firstName("John").lastName("Doe").build();
 			
 			when(modelMapper.map(any(Project.class), eq(ProjectResponse.class))).thenReturn(
-				ProjectResponse.builder().publicId(projectId).name("Test Project").build()
+					ProjectResponse.builder().publicId(projectId).name("Test Project").build()
 			);
 			
 			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.of(project));
 			when(userRepository.findByIdScoped(memberId)).thenReturn(Optional.of(member));
 			when(projectService.addMember(projectId, memberId)).thenReturn(
-				ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
-					MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
-				)).build()
+					ProjectResponse.builder().publicId(projectId).name("Test Project").members(Set.of(
+							MemberResponse.builder().publicId(memberId).firstName("John").lastName("Doe").build()
+					)).build()
 			);
 			
 			// When
@@ -337,7 +337,7 @@ class ProjectServiceTest {
 			when(projectRepository.findByIdScoped(projectId)).thenReturn(Optional.of(project));
 			
 			when(projectService.addMember(projectId, memberId)).thenThrow(
-				new EntityNotFoundException("Member does not belong to the organization of the project")
+					new EntityNotFoundException("Member does not belong to the organization of the project")
 			);
 			
 			// When & Then
@@ -352,7 +352,7 @@ class ProjectServiceTest {
 		
 		@Test
 		@DisplayName("Should remove an existing member from a project successfully, when project and member exists")
-		public void shouldRemoveMemberFromAProjectSuccessfully(){
+		public void shouldRemoveMemberFromAProjectSuccessfully() {
 		
 		}
 		

@@ -23,4 +23,6 @@ public interface NotificationTemplateRepository extends JpaRepository<Notificati
 	 * @return the notification template if found, otherwise null
 	 */
 	Optional<NotificationTemplate> findByNameAndChannel(String name, String channel);
+	
+	boolean existsByName(String name);
 }

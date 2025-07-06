@@ -165,8 +165,8 @@ public class MemberServiceTest {
 		    MemberRequest request = MemberRequest.builder()
 		            .email("test@example.com")
 		            .password("password123")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    Member savedMember = Member.builder()
@@ -210,8 +210,8 @@ public class MemberServiceTest {
 		    // Test with null email
 		    MemberRequest requestWithNullEmail = MemberRequest.builder()
 		            .password("password123")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(requestWithNullEmail));
@@ -220,8 +220,8 @@ public class MemberServiceTest {
 		    MemberRequest requestWithEmptyEmail = MemberRequest.builder()
 		            .email("")
 		            .password("password123")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(requestWithEmptyEmail));
@@ -229,8 +229,8 @@ public class MemberServiceTest {
 		    // Test with null password
 		    MemberRequest requestWithNullPassword = MemberRequest.builder()
 		            .email("test@example.com")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(requestWithNullPassword));
@@ -239,8 +239,8 @@ public class MemberServiceTest {
 		    MemberRequest requestWithEmptyPassword = MemberRequest.builder()
 		            .email("test@example.com")
 		            .password("")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    assertThrows(InvalidRequestException.class, () -> memberService.createNew(requestWithEmptyPassword));
@@ -280,8 +280,8 @@ public class MemberServiceTest {
 		    MemberRequest invalidRequest = MemberRequest.builder()
 		            .email("")  // Empty email will fail validation
 		            .password("password123")
-		            .firstName("John")
-		            .lastName("Doe")
+		            .firstname("John")
+		            .lastname("Doe")
 		            .build();
 		
 		    // When & Then

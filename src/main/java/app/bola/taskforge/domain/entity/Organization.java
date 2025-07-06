@@ -27,8 +27,8 @@ public class Organization extends BaseEntity {
 	private String industry;
 	private String country;
 	private String timeZone;
-	private String contactEmail;
-	private String contactPhone;
+	private String email;
+	private String phone;
 	private String logoUrl;
 	private String websiteUrl;
 	
@@ -55,8 +55,8 @@ public class Organization extends BaseEntity {
 				       .append("country", country)
 				       .append("timeZone", timeZone)
 				       .append("slug", slug)
-				       .append("contactEmail", contactEmail)
-				       .append("contactPhone", contactPhone)
+				       .append("contactEmail", email)
+				       .append("contactPhone", phone)
 				       .append("logoUrl", logoUrl)
 				       .append("websiteUrl", websiteUrl)
 				       .append("members", members)

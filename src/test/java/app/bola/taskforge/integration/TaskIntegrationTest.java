@@ -61,7 +61,7 @@ public class TaskIntegrationTest {
 		
 		OrganizationRequest orgRequest = OrganizationRequest.builder()
 				                                 .name("Test Organization").slug("test-org").industry("Healthcare").country("Test Country")
-				                                 .description("This is a test organization").contactPhone("+2347056453241").contactEmail("testorg@gmail.com")
+				                                 .description("This is a test organization").phone("+2347056453241").email("testorg@gmail.com")
 				                                 .timeZone("Africa/Lagos").websiteUrl("https://testorg.ng").logoUrl("https://testorg.ng/logo.png").build();
 		
 		orgResponse = organizationService.createNew(orgRequest);

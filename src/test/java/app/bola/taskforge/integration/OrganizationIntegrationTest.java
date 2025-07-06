@@ -111,7 +111,7 @@ public class OrganizationIntegrationTest {
             assertEquals(request.getIndustry(), response.getIndustry());
             assertEquals(request.getCountry(), response.getCountry());
             assertEquals(request.getTimeZone(), response.getTimeZone());
-            assertEquals(request.getContactEmail(), response.getContactEmail());
+            assertEquals(request.getEmail(), response.getEmail());
 
             // Verify organization was saved to the database
             Optional<Organization> savedOrg = organizationRepository.findByIdScoped(response.getPublicId());
@@ -146,8 +146,8 @@ public class OrganizationIntegrationTest {
                     .industry("Technology")
                     .country("Nigeria")
                     .timeZone("Africa/Lagos")
-                    .contactEmail("invalid-email") // Invalid: not a proper email
-                    .contactPhone("123") // Invalid: too short
+                    .email("invalid-email") // Invalid: not a proper email
+                    .phone("123") // Invalid: too short
                     .build();
 
             // When & Then
@@ -204,8 +204,8 @@ public class OrganizationIntegrationTest {
         private MemberRequest buildMemberRequest() {
             return MemberRequest.builder()
                            .email("john.doe." + uniqueIdentifier + "@example.com")
-                           .firstName("John")
-                           .lastName("Doe")
+                           .firstname("John")
+                           .lastname("Doe")
                            .password("password123")
                            .organizationId(organizationResponse.getPublicId())
                            .build();
@@ -283,13 +283,13 @@ public class OrganizationIntegrationTest {
 	    public void shouldFailIfMemberIsAlreadyPartOfOrganization(){
 		    // Given
 		    OrganizationRequest secondOrgRequest = OrganizationRequest.builder()
-				                                           .contactEmail("secondorg@example.com")
+				                                           .email("secondorg@example.com")
 				                                           .name("Second Org")
 				                                           .slug("second-org")
 				                                           .description("A second test organization")
 				                                           .industry("OTHER")
 				                                           .timeZone("Africa/Lagos")
-				                                           .contactPhone("+0123456789")
+				                                           .phone("+0123456789")
 				                                           .country("Nigeria")
 				                                           .logoUrl("https://secondorg.org/logo.png")
 				                                           .websiteUrl("https://secondorg.org")
@@ -301,8 +301,8 @@ public class OrganizationIntegrationTest {
 		    
 		    MemberRequest secondOrgMemberRequest = MemberRequest.builder()
 				                                           .organizationId(secondOrgResponse.getPublicId())
-				                                           .firstName("Second")
-				                                           .lastName("Member")
+				                                           .firstname("Second")
+				                                           .lastname("Member")
 				                                           .email("secondmember@example.com")
 				                                           .password("password123")
 				                                           .build();
@@ -333,8 +333,8 @@ public class OrganizationIntegrationTest {
                 .industry("Technology")
                 .country("Nigeria")
                 .timeZone("Africa/Lagos")
-                .contactEmail("contact@testorg" + uniqueIdentifier + ".com")
-                .contactPhone("+2348012345678")
+                .email("contact@testorg" + uniqueIdentifier + ".com")
+                .phone("+2348012345678")
                 .description("A test organization")
                 .websiteUrl("https://testorg" + uniqueIdentifier + ".com")
                 .logoUrl("https://testorg" + uniqueIdentifier + ".com/logo.png")

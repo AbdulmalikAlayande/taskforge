@@ -49,7 +49,7 @@ class ProjectIntegrationTest {
 		testMemberIds = new ArrayList<>();
 		OrganizationRequest orgRequest = OrganizationRequest.builder()
 				                                 .name("Test Organization").slug("test-org-123").industry("Technology").country("Nigeria")
-				                                 .timeZone("Africa/Lagos").contactEmail("contact@testorg.com").contactPhone("+2348012345678")
+				                                 .timeZone("Africa/Lagos").email("contact@testorg.com").phone("+2348012345678")
 				                                 .description("A test organization").websiteUrl("https://testorg.com").logoUrl("https://testorg.com/logo.png")
 				                                 .build();
 		
@@ -71,8 +71,8 @@ class ProjectIntegrationTest {
 					MemberRequest.builder()
 							.password("password-" + index+System.currentTimeMillis())
 							.email(email)
-							.firstName("Test"+index)
-							.lastName("Member"+index)
+							.firstname("Test"+index)
+							.lastname("Member"+index)
 							.organizationId(testOrg.getPublicId())
 							.build()
 			);
@@ -214,7 +214,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			return memberService.createNew(MemberRequest.builder().email("testadminmember@gmail.com").password("test-admin-member@#123")
-				.firstName("Test Admin").lastName("Member").organizationId(testOrg.getPublicId()).build());
+				.firstname("Test Admin").lastname("Member").organizationId(testOrg.getPublicId()).build());
 		}
 		
 		@Test
@@ -310,7 +310,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			return memberService.createNew(MemberRequest.builder().email("testadminmember2@gmail.com").password("test-admin-member2@#123")
-				.firstName("Test Admin").lastName("Member2").organizationId(testOrg.getPublicId()).build());
+				.firstname("Test Admin").lastname("Member2").organizationId(testOrg.getPublicId()).build());
 		}
 		
 		@Test
@@ -376,7 +376,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			MemberResponse member = memberService.createNew(MemberRequest.builder().email("testadminmember3@gmail.com").password("test-admin-member3@#123")
-					                                                .firstName("Test Admin").lastName("Member3").organizationId(testOrg.getPublicId()).build());
+					                                                .firstname("Test Admin").lastname("Member3").organizationId(testOrg.getPublicId()).build());
 			
 			// When: I try to remove a member that is not in the project
 			// Then: The operation should complete without throwing an exception

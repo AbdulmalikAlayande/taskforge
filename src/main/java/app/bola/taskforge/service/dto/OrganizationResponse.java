@@ -30,8 +30,8 @@ public class OrganizationResponse {
 	String industry;
 	String country;
 	String timeZone;
-	String contactEmail;
-	String contactPhone;
+	String email;
+	String phone;
 	String publicId;
 	String description;
 	String logoUrl;
@@ -49,8 +49,8 @@ public class OrganizationResponse {
 				       .append("industry", industry)
 				       .append("country", country)
 				       .append("timeZone", timeZone)
-				       .append("contactEmail", contactEmail)
-				       .append("contactPhone", contactPhone)
+				       .append("contactEmail", email)
+				       .append("contactPhone", phone)
 				       .append("publicId", publicId)
 				       .append("description", description)
 				       .append("logoUrl", logoUrl)

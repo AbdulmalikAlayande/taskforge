@@ -42,8 +42,8 @@ public class OrganizationControllerTest {
 				                              .timeZone("Africa/Lagos")
 				                              .country("Nigeria")
 				                              .industry("Industrial")
-				                              .contactPhone("+2341234567890")
-				                              .contactEmail("email@gmail.com")
+				                              .phone("+2341234567890")
+				                              .email("email@gmail.com")
 				                              .logoUrl("https://example.com/logo.png")
 				                              .websiteUrl("https://example.com")
 				                              .build();
@@ -59,8 +59,8 @@ public class OrganizationControllerTest {
 					jsonPath("$.timeZone").value(request.getTimeZone()),
 					jsonPath("$.country").value(request.getCountry()),
 					jsonPath("$.industry").value(request.getIndustry()),
-					jsonPath("$.contactPhone").value(request.getContactPhone()),
-					jsonPath("$.contactEmail").value(request.getContactEmail()),
+					jsonPath("$.contactPhone").value(request.getPhone()),
+					jsonPath("$.contactEmail").value(request.getEmail()),
 					jsonPath("$.logoUrl").value(request.getLogoUrl()),
 					jsonPath("$.websiteUrl").value(request.getWebsiteUrl())
 				);
