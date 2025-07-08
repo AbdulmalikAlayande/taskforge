@@ -47,7 +47,7 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	}
 	
 	@PatchMapping("/{publicId}")
-	@PreAuthorize("hasRole('PROJECT_MANAGER') or @taskSecurity.isTaskOwner(#publicId, authentication.name)")
+	@PreAuthorize("hasRole('PROJECT_MANAGER') or @resourceSecurity.isTaskOwner(#publicId, authentication.name)")
 	public ResponseEntity<TaskResponse> partialUpdate(@PathVariable String publicId, @RequestBody TaskUpdateRequest request) {
 		return ResponseEntity.ok(taskService.update(publicId, request));
 	}

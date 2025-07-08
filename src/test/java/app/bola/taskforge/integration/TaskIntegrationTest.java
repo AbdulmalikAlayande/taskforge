@@ -264,7 +264,7 @@ public class TaskIntegrationTest {
 			taskResponse = taskService.createNew(taskRequest);
 			
 			Member member = Member.builder()
-	                .firstName("Jane").lastName("Doe").email("jane.doe@test.com").password("").role(Role.ORGANIZATION_MEMBER)
+	                .firstName("Jane").lastName("Doe").email("jane.doe@test.com").password("").roles(Set.of(Role.ORGANIZATION_MEMBER))
 	                .organization(organizationRepository.findByIdScoped(orgResponse.getPublicId()).get()).build();
 			
 			memberResponse = modelMapper.map(userRepository.save(member), MemberResponse.class);

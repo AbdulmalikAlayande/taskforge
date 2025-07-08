@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -175,7 +176,7 @@ public class MemberServiceTest {
 		            .firstName("John")
 		            .lastName("Doe")
 		            .active(true)
-		            .role(Role.ORGANIZATION_MEMBER)
+					.roles(Set.of(Role.ORGANIZATION_MEMBER))
 		            .build();
 		
 		    MemberResponse expectedResponse = MemberResponse.builder()

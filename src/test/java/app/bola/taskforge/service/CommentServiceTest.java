@@ -97,7 +97,7 @@ class CommentServiceTest {
 			
 			String authorId = UUID.randomUUID().toString();
 			author = Member.builder().publicId(authorId).organization(organization).firstName("Test").lastName("Author")
-                .role(Role.ORGANIZATION_ADMIN).build();
+                .roles(Set.of(Role.ORGANIZATION_ADMIN, Role.PROJECT_MANAGER)).build();
 			
 			commentRequest = CommentRequest.builder().content("This is a comment, that is being added based for test purposes")
 					                 .taskId(task.getPublicId()).projectId(project.getPublicId()).authorId(author.getPublicId())
@@ -133,7 +133,7 @@ class CommentServiceTest {
 		@DisplayName("Should throw InvalidRequestException if user is not part of the project and user is not an org admin.")
 		public void shouldThrowInvalidRequestExceptionIfUserNotPartOfProject() {
 			project.setMembers(Set.of());
-			author.setRole(Role.ORGANIZATION_MEMBER);
+			author.setRoles(Set.of(Role.ORGANIZATION_MEMBER));
 			task.setProject(project);
 			
 			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
@@ -164,7 +164,7 @@ class CommentServiceTest {
 		public void shouldThrowUnauthorizedExceptionIfUserLacksPermission() {
 			// Given a user without permission to comment (not in project and not org admin)
 			project.setMembers(Set.of());
-			author.setRole(Role.ORGANIZATION_MEMBER);
+			author.setRoles(Set.of(Role.ORGANIZATION_MEMBER));
 			task.setProject(project);
 			
 			when(userRepository.findByIdScoped(author.getPublicId())).thenReturn(Optional.of(author));
@@ -435,7 +435,7 @@ class CommentServiceTest {
 					                .firstName("Comment")
 					                .lastName("Author")
 					                .organization(organization)
-					                .role(Role.ORGANIZATION_MEMBER)
+					                .roles(Set.of(Role.ORGANIZATION_MEMBER))
 					                .build();
 			
 			differentUser = Member.builder()
@@ -443,7 +443,7 @@ class CommentServiceTest {
 					                .firstName("Different")
 					                .lastName("User")
 					                .organization(organization)
-					                .role(Role.ORGANIZATION_MEMBER)
+					                .roles(Set.of(Role.ORGANIZATION_MEMBER))
 					                .build();
 			
 			existingComment = Comment.builder()
@@ -616,7 +616,7 @@ class CommentServiceTest {
 					              .firstName("Reply")
 					              .lastName("Author")
 					              .organization(organization)
-					              .role(Role.ORGANIZATION_MEMBER)
+					              .roles(Set.of(Role.ORGANIZATION_MEMBER))
 					              .build();
 			
 			project.setMembers(Set.of(replyAuthor));

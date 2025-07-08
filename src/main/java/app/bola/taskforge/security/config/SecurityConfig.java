@@ -46,7 +46,7 @@ public class SecurityConfig {
 						var corsConfig = new CorsConfiguration();
 						corsConfig.setAllowedOrigins(List.of("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app"));
 						corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-						corsConfig.setAllowedHeaders(List.of("X-Tenant-ID", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type"));
+						corsConfig.setAllowedHeaders(List.of("X-Tenant-ID", "X-Refresh-Token", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type"));
 						corsConfig.setAllowCredentials(true);
 						return corsConfig;
 					}))

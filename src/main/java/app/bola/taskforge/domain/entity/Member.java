@@ -2,6 +2,7 @@ package app.bola.taskforge.domain.entity;
 
 import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.domain.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
@@ -20,7 +21,11 @@ public class Member extends BaseEntity {
 	
 	@Column(unique = true, nullable = false)
 	private String email;
+	
+	@JsonIgnore
+	@Column(nullable = false)
 	private String password;
+	
 	private String lastName;
 	private String firstName;
 	private boolean active;
@@ -31,10 +36,8 @@ public class Member extends BaseEntity {
 	@ManyToOne
 	private Organization organization;
 	
-	@Enumerated(value = EnumType.STRING)
-	private Role role;
-	
-	@OneToMany
+	@ElementCollection
+	@Enumerated(EnumType.STRING)
 	private Set<Role> roles;
 	
 	@ManyToMany

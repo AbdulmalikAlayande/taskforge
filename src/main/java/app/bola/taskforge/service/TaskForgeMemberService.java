@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.validation.Validator;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class TaskForgeMemberService implements MemberService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
 	private final Validator validator;
+	private final PasswordEncoder passwordEncoder;
 	private final OrganizationRepository organizationRepository;
 
 	@Override
@@ -51,6 +53,7 @@ public class TaskForgeMemberService implements MemberService {
 				.orElseThrow(() -> new EntityNotFoundException("Organization not found with ID: " + memberRequest.getOrganizationId()));
 
 		Member member = modelMapper.map(memberRequest, Member.class);
+		member.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
 		member.setActive(true);
 		member.setRoles(invitation.getRoles());
 		member.setOrganization(organization);
