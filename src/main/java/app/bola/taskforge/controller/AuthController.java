@@ -29,10 +29,12 @@ public class AuthController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+		log.info("Login Request:: {}", request);
 		return ResponseEntity.ok(new AuthResponse());
 	}
 	
 	@PostMapping("/refresh")
 	public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("X-Refresh-Token") String refreshToken) {
+		log.info("Refresh Token Request:: {}", refreshToken);
 		return ResponseEntity.ok(new AuthResponse());	}
 }
