@@ -33,7 +33,8 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	private final UserDetailsService userDetailsService;
 	private final List<String> UNPROTECTED_PATHS = List.of(
 			"/api/auth/login",
-			"/api/auth/register", 
+			"/api/auth/oauth",
+			"/api/admin/create-new",
 			"/api/health",
 			"/swagger-ui/**",
 			"/v3/api-docs/**"
