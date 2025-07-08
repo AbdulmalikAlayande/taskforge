@@ -3,7 +3,6 @@ package app.bola.taskforge.security.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
