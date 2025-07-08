@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class AdminService {
 		System.out.println("Creating new organization admin: " + request);
 		log.info("Creating new organization admin: {}", request);
 		Member admin = modelMapper.map(request, Member.class);
-		admin.setRole(Role.ORGANIZATION_ADMIN);
+		admin.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
 		admin.setActive(true);
 		
 		Member savedAdmin = userRepository.save(admin);

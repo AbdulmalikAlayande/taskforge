@@ -7,6 +7,7 @@ import app.bola.taskforge.service.dto.TaskResponse;
 import app.bola.taskforge.service.dto.TaskUpdateRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +47,7 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	}
 	
 	@PatchMapping("/{publicId}")
+	@PreAuthorize("hasRole('PROJECT_MANAGER') or @taskSecurity.isTaskOwner(#publicId, authentication.name)")
 	public ResponseEntity<TaskResponse> partialUpdate(@PathVariable String publicId, @RequestBody TaskUpdateRequest request) {
 		return ResponseEntity.ok(taskService.update(publicId, request));
 	}
@@ -57,6 +59,7 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	}
 	
 	@PostMapping("/{taskId}/assign/{memberId}")
+	@PreAuthorize("hasRole('PROJECT_MANAGER')")
 	public ResponseEntity<TaskResponse> assignMember(@PathVariable String taskId, @PathVariable String memberId) {
 		return ResponseEntity.ok(taskService.assignMember(taskId, memberId));
 	}

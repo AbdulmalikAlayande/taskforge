@@ -8,6 +8,7 @@ import app.bola.taskforge.service.dto.OrganizationRequest;
 import app.bola.taskforge.service.dto.OrganizationResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +57,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	 * @return ResponseEntity with the result of the invitation process
 	 */
 	@PostMapping("/invite-member")
-//	@PreAuthorize(value = "hasAnyRole('ROLE_ORGANIZATION_OWNER', 'ROLE_ORGANIZATION_ADMIN')")
+	@PreAuthorize("hasRole('ORGANIZATION_ADMIN')")
 	public ResponseEntity<InvitationResponse> inviteMember(@RequestBody InvitationRequest request) {
 		return ResponseEntity.ok(organizationService.inviteMember(request));
 	}

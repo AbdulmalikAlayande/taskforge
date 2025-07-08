@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * Response DTO for {@link Invitation} entity
@@ -27,7 +28,7 @@ public class InvitationResponse {
 	
 	String message;
 	String memberID;
-	Role role;
+	Set<Role> roles;
 	String email;
 	String publicId;
 	String invitationLink;
@@ -46,7 +47,7 @@ public class InvitationResponse {
 				       .append("invitationLink", invitationLink)
 				       .append("memberID", memberID)
 				       .append("memberEmail", email)
-				       .append("memberRole", role)
+				       .append("memberRole", roles.toString())
 				       .append("organizationId", organizationId)
 				       .append("organizationName", organizationName)
 				       .append("invitationStatus", status)

@@ -34,6 +34,9 @@ public class Member extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
 	
+	@OneToMany
+	private Set<Role> roles;
+	
 	@ManyToMany
 	@Builder.Default
 	private Set<Project> projects = new HashSet<>();

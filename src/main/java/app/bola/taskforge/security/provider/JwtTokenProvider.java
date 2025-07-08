@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -22,16 +23,40 @@ public class JwtTokenProvider {
 	@Value("${app.jwt.expiration}")
 	private String tokenExpiration;
 	
+	@Value("${app.jwt.access-token-secret}")
+	private String accessTokenSecret;
+	
+	@Value("${app.jwt.access-token-expiration}")
+	private String accessTokenExpiration;
+	
+	@Value("${app.jwt.refresh-token-secret}")
+	private String refreshTokenSecret;
+	
+	@Value("${app.jwt.refresh-token-expiration}")
+	private String refreshExpiration;
+	
+	public String generateRefreshToken(String email, Set<String> roles) {
+		return generateToken(
+			Map.of("email", email, "roles", roles), refreshTokenSecret, Long.parseLong(refreshExpiration)
+		);
+	}
+	
+	public String generateAccessToken(String email, Set<String> roles) {
+		return generateToken(
+			Map.of("email", email, "roles", roles), accessTokenSecret, Long.parseLong(accessTokenExpiration)
+		);
+	}
+	
 	/**
 	 * Generates a JWT token with the given claims.
 	 *
 	 * @param claims: the claims to include in the token
 	 * @return a JWT token as a String
 	 */
-	public String generateToken(final Map<String, String> claims, long tokenExpiration) {
+	public String generateToken(final Map<String, Object> claims, String tokenSecret, long tokenExpiration) {
 		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
 		return Jwts.builder()
-				       .subject(claims.get("subject"))
+				       .subject(claims.get("email") != null ? (String) claims.get("email") : (String) claims.get("subject"))
 				       .claims(claims)
 				       .issuedAt(Date.from(Instant.now()))
 				       .expiration(Date.from(Instant.now().plusMillis(tokenExpiration)))
@@ -47,7 +72,7 @@ public class JwtTokenProvider {
 	 * @return a JWT token as a String
 	 */
 	public String generateToken(final String name, String id) {
-		return generateToken(Map.of("subject", name, "id", id), Long.parseLong(tokenExpiration));
+		return generateToken(Map.of("subject", name, "id", id), this.tokenSecret, Long.parseLong(tokenExpiration));
 	}
 	
 	public String extractClaimFromToken(String token) {
@@ -58,6 +83,16 @@ public class JwtTokenProvider {
 				       .parseSignedClaims(token)
 				       .getPayload()
 				       .get("subject", String.class);
+	}
+	
+	public Object extractClaimFromToken(String token, String claimKey) {
+		SecretKey secretKey = Keys.hmacShaKeyFor(tokenSecret.getBytes());
+		return Jwts.parser()
+				       .verifyWith(secretKey)
+				       .build()
+				       .parseSignedClaims(token)
+				       .getPayload()
+				       .get(claimKey, Object.class);
 	}
 	
 	/**

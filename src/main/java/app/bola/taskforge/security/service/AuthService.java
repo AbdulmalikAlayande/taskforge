@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -29,7 +30,7 @@ public class AuthService {
 		}
 		Member member = modelMapper.map(request, Member.class);
 		member.setActive(true);
-		member.setRole(Role.ORGANIZATION_ADMIN);
+		member.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
 		Member savedMember = userRepository.save(member);
 		return toResponse(savedMember);
 	}

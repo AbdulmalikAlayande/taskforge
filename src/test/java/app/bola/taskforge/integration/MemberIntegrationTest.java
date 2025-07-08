@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,7 +92,7 @@ public class MemberIntegrationTest {
 		@DisplayName("Should throw invalid request exception if token is expired")
 		public void shouldFailIfTokenIsExpired() {
 			// Given
-			String token = jwtTokenProvider.generateToken(Map.of("subject", "email@gmail.com"), 2000);
+			String token = jwtTokenProvider.generateToken("email@gmail.com", String.valueOf(2000));
 			await().atMost(Duration.of(5, ChronoUnit.SECONDS))
 					.pollDelay(Duration.of(3, ChronoUnit.SECONDS))
 					.until(() -> {
@@ -112,7 +111,7 @@ public class MemberIntegrationTest {
 		@DisplayName("Should throw invalid request exception if token is malformed or invalid")
 		public void shouldFailIfTokenIsInvalid() {
 			// Given
-			String token = jwtTokenProvider.generateToken(Map.of("subject", "email@gmail.com"), 5000);
+			String token = jwtTokenProvider.generateToken("email@gmail.com", String.valueOf(2000));
 			
 			String invalidToken = token.substring(0, token.length() - 6) + "qW6RTy"; // Malformed token
 			// When & Then
@@ -123,7 +122,7 @@ public class MemberIntegrationTest {
 		@DisplayName("Should throw entity not found exception if invitation does not exist")
 		public void shouldFailIfInvitationDoesNotExist() {
 			// Given
-			String nonExistentInvitationToken = jwtTokenProvider.generateToken(Map.of("subject", "nonexistentemail@gmail.com"), 20000);
+			String nonExistentInvitationToken = jwtTokenProvider.generateToken("nonexistentemail@gmail.com", String.valueOf(20000));
 			
 			InvitationRequest invRequest = InvitationRequest.builder()
 					                               .invitedBy(testMember.getPublicId())

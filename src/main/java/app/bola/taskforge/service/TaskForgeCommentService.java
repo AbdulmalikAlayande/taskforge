@@ -65,14 +65,14 @@ public class TaskForgeCommentService implements CommentService{
 		Project project;
 		if (optionalProject.isPresent()) {
 			project = optionalProject.get();
-			if (!project.getMembers().contains(author) && !author.getRole().equals(Role.ORGANIZATION_ADMIN)) {
+			if (!project.getMembers().contains(author) && !author.getRoles().contains(Role.ORGANIZATION_ADMIN)) {
 				throw new InvalidRequestException("Author is not a member of the project associated with this task");
 			}
 		}
 		else {
 			project = projectRepository.findByIdScoped(projectId)
 				.orElseThrow(() -> new EntityNotFoundException("Project not found"));
-			if (!project.getMembers().contains(author) && !author.getRole().equals(Role.ORGANIZATION_ADMIN)) {
+			if (!project.getMembers().contains(author) && !author.getRoles().contains(Role.ORGANIZATION_ADMIN)) {
 				throw new InvalidRequestException("Author is not a member of the project project associated with this task");
 			}
 		}

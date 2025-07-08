@@ -24,10 +24,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -115,7 +112,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		String token = jwtTokenProvider.generateToken(request.getEmail(), organization.getPublicId());
 		
 		Invitation invitation = modelMapper.map(request, Invitation.class);
-		invitation.setRole(Role.valueOf(request.getRole().toUpperCase()));
+		invitation.setRoles(Set.of(Role.valueOf(request.getRole().toUpperCase())));
 		invitation.setOrganization(organization);
 		invitation.setInvitedBy(invitedBy);
 		invitation.setToken(token);

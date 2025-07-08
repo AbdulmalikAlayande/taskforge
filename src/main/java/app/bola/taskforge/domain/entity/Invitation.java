@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,7 +21,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Invitation extends BaseEntity {
 	
-	private Role role;
+	@OneToMany
+	private Set<Role> roles;
 	
 	@Lob
 	@Column(columnDefinition = "TEXT", length = 100000)
