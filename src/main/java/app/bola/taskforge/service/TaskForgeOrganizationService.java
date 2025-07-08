@@ -121,13 +121,12 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		
 		invitationRepository.save(invitation);
 		
-//		ResponseEntity<?> mailResponse = mailSender.sendEmail(
-//				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
-//				"Invitation to join TaskForge",
-//				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
-//		);
-//
-//		String body = mailResponse != null ? String.valueOf(mailResponse.getBody()) : "Email sent successfully";
+		mailSender.sendEmail(
+			List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
+			"Invitation to join TaskForge",
+			"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
+		);
+
 		InvitationResponse response = modelMapper.map(invitation, InvitationResponse.class);
 		response.setMessage("invited");
 		response.setOrganizationId(organization.getPublicId());
