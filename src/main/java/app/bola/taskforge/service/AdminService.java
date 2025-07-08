@@ -3,9 +3,6 @@ package app.bola.taskforge.service;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.repository.UserRepository;
-import app.bola.taskforge.security.dto.AuthResponse;
-import app.bola.taskforge.security.dto.LoginRequest;
-import app.bola.taskforge.security.service.AuthService;
 import app.bola.taskforge.service.dto.CreateAdminRequest;
 import app.bola.taskforge.service.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +19,6 @@ public class AdminService {
 	
 	final ModelMapper modelMapper;
 	private final UserRepository userRepository;
-	private final AuthService authService;
 	
 	/**
 	 * Creates a new organization admin.
@@ -39,7 +35,6 @@ public class AdminService {
 		
 		Member savedAdmin = userRepository.save(admin);
 		
-		AuthResponse response = authService.login(new LoginRequest(admin.getEmail(), admin.getPassword()));
 		return toResponse(savedAdmin);
 	}
 	
