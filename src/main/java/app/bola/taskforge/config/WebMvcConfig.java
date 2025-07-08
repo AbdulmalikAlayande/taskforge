@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @Configuration
 @AllArgsConstructor
 public class  WebMvcConfig implements WebMvcConfigurer {
@@ -27,8 +26,10 @@ public class  WebMvcConfig implements WebMvcConfigurer {
 				.allowedOrigins("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app", "https://taskforge.vercel.app")
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
 				.allowCredentials(true)
-				.allowedHeaders("X-Tenant-ID", "X-Refresh-Token", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type")
-				.exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers")
+				.allowedHeaders("*")
+				.exposedHeaders("*")
+//				.allowedHeaders("X-Tenant-ID", "X-Refresh-Token", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type")
+//				.exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers")
 				.maxAge(3600);
 		
 	}

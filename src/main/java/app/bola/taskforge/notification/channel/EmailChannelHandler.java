@@ -5,8 +5,8 @@ import app.bola.taskforge.notification.model.DeliveryResult;
 import app.bola.taskforge.notification.model.NotificationBundle;
 import app.bola.taskforge.notification.template.NotificationTemplateRenderer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -72,13 +72,11 @@ public class EmailChannelHandler implements ChannelHandler{
 		
 		String emailContent = templateRender.render(bundle.getTemplateName(), "email", bundle.getTemplateVariables());
 		try {
-			EmailRequestObject emailObject = EmailRequestObject.builder()
-				.subject(bundle.getTitle())
-				.htmlContent(emailContent)
-				.sender(new EmailRequestObject.Sender("noreply@taskforge.com", "TaskForge"))
-				.to(Collections.singletonList(new EmailRequestObject.Recipient(bundle.getEmailTo(), bundle.getUserId())))
-				.build();
-			
+			EmailRequestObject emailObject = new EmailRequestObject();
+			emailObject.setSubject(bundle.getTitle());
+			emailObject.setHtmlContent(emailContent);
+			emailObject.setSender(new EmailRequestObject.Sender("noreply@taskforge.com", "TaskForge"));
+			emailObject.setTo(Collections.singletonList(new EmailRequestObject.Recipient(bundle.getEmailTo(), bundle.getUserId())));
 			HttpEntity<EmailRequestObject> httpEntity = new HttpEntity<>(emailObject, httpHeaders);
 			
 			ResponseEntity<EmailResponseObject> response =
@@ -96,7 +94,8 @@ public class EmailChannelHandler implements ChannelHandler{
 		}
 	}
 	
-	@Builder
+	@Getter
+	@Setter
 	private static class EmailRequestObject {
 		
 		private String subject;
@@ -120,7 +119,7 @@ public class EmailChannelHandler implements ChannelHandler{
 	}
 	
 	@Getter
-	@Builder
+	@Setter
 	private static class EmailResponseObject {
 		private String messageId;
 		private String code;

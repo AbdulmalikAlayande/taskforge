@@ -8,7 +8,6 @@ import app.bola.taskforge.security.handler.TaskForgeAuthenticationFailureHandler
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -95,7 +94,7 @@ public class TaskForgeAuthenticationFilter extends UsernamePasswordAuthenticatio
 	}
 	
 	@Override
-	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
 		(new TaskForgeAuthenticationFailureHandler(objectMapper)).onAuthenticationFailure(request, response, failed);
 	}
 }

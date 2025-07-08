@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ResourceSecurity {
 	
-	
 	public boolean isTaskOwner(String taskId, String authenticationName) {
 		return true;
 	}

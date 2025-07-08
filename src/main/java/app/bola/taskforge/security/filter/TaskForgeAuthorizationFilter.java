@@ -1,6 +1,5 @@
 package app.bola.taskforge.security.filter;
 
-
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +30,7 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	public static final String BEARER_ = "Bearer ";
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserDetailsService userDetailsService;
-	private final List<String> UNPROTECTED_PATHS = List.of(
+	public final List<String> UNPROTECTED_PATHS = List.of(
 			"/api/auth/login",
 			"/api/auth/oauth",
 			"/api/admin/create-new",

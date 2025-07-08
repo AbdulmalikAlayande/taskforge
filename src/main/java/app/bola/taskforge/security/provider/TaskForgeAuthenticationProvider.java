@@ -9,15 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @AllArgsConstructor
 public class TaskForgeAuthenticationProvider implements AuthenticationProvider {
 	
 	final UserDetailsService userDetailsService;
-	final PasswordEncoder passwordEncoder;
+	final BCryptPasswordEncoder passwordEncoder;
 	
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {

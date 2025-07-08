@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+
 @Configuration
 public class BeanConfig {
 	
@@ -20,7 +21,7 @@ public class BeanConfig {
 				.setMethodAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PUBLIC)
 				.setSkipNullEnabled(true)
 				.setSourceNamingConvention(org.modelmapper.convention.NamingConventions.JAVABEANS_ACCESSOR)
-				.setDestinationNamingConvention(org.modelmapper.convention.NamingConventions.JAVABEANS_ACCESSOR);;
+				.setDestinationNamingConvention(org.modelmapper.convention.NamingConventions.JAVABEANS_ACCESSOR);
 		return modelMapper;
 	}
 	

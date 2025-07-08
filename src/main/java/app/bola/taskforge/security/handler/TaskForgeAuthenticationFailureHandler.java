@@ -2,7 +2,6 @@ package app.bola.taskforge.security.handler;
 
 import app.bola.taskforge.security.dto.AuthenticationFailedResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
