@@ -21,7 +21,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class Invitation extends BaseEntity {
 	
-	@OneToMany
+	@ElementCollection
+	@Enumerated(EnumType.STRING)
 	private Set<Role> roles;
 	
 	@Lob

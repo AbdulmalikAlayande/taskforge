@@ -1,5 +1,7 @@
 package app.bola.taskforge.security.config;
 
+import app.bola.taskforge.security.filter.TaskForgeAuthenticationFilter;
+import app.bola.taskforge.security.filter.TaskForgeAuthorizationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -31,9 +34,9 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(12);
 	}
-	
+
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, TaskForgeAuthenticationFilter authenticationFilter, TaskForgeAuthorizationFilter authorizationFilter) throws Exception {
 		return http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer
 						.ignoringRequestMatchers("/api/log/create-new", "/api/auth/**")
 						.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -81,6 +84,8 @@ public class SecurityConfig {
 							response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 						})
 					)
+					.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+					.addFilterAfter(authorizationFilter, TaskForgeAuthenticationFilter.class)
 					.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 					.build();
 	}
