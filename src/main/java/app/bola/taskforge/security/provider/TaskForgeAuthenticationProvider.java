@@ -2,6 +2,7 @@ package app.bola.taskforge.security.provider;
 
 import app.bola.taskforge.exception.AuthenticationFailedException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class TaskForgeAuthenticationProvider implements AuthenticationProvider {
@@ -31,6 +33,7 @@ public class TaskForgeAuthenticationProvider implements AuthenticationProvider {
 		if (userDetails == null) {
 			throw new AuthenticationFailedException("Invalid Credentials");
 		}
+		
 		if (!passwordEncoder.matches(password, userDetails.getPassword())) {
 			throw new BadCredentialsException("Invalid Password");
 		}

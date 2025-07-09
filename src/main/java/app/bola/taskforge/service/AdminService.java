@@ -8,6 +8,7 @@ import app.bola.taskforge.service.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -17,8 +18,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AdminService {
 	
-	final ModelMapper modelMapper;
+	private final ModelMapper modelMapper;
 	private final UserRepository userRepository;
+	private final BCryptPasswordEncoder passwordEncoder;
 	
 	/**
 	 * Creates a new organization admin.
@@ -29,6 +31,7 @@ public class AdminService {
 	public MemberResponse createOrgAdmin(CreateAdminRequest request) {
 		log.info("Creating new organization admin: {}", request);
 		Member admin = modelMapper.map(request, Member.class);
+		admin.setPassword(passwordEncoder.encode(request.getPassword()));
 		admin.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
 		admin.setActive(true);
 		
