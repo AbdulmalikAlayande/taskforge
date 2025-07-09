@@ -27,7 +27,6 @@ public class AdminService {
 	 * @return the response containing created admin details
 	 */
 	public MemberResponse createOrgAdmin(CreateAdminRequest request) {
-		System.out.println("Creating new organization admin: " + request);
 		log.info("Creating new organization admin: {}", request);
 		Member admin = modelMapper.map(request, Member.class);
 		admin.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
