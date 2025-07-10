@@ -9,6 +9,8 @@ delete from member_projects;
 delete from project_members;
 delete from member_roles;
 delete from member;
+delete from notification_preference;
+delete from organization
 
 --
 -- drop table if exists attachment;
