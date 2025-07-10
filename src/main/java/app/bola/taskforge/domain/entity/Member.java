@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
 	@ManyToOne
 	private Organization organization;
 	
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@Enumerated(EnumType.STRING)
 	private Set<Role> roles;
 	
@@ -53,10 +53,11 @@ public class Member extends BaseEntity {
 				       .append("createdAt", getCreatedAt())
 				       .append("email", email)
 				       .append("password", password)
+				       .append("roles", roles)
 				       .append("lastName", lastName)
 				       .append("firstName", firstName)
 				       .append("active", active)
-				       .append("organization", organization)
+				       .append(" organization", organization)
 				       .toString();
 	}
 }

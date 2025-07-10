@@ -19,7 +19,7 @@ import java.util.Collection;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/api/organizations")
+@RequestMapping(value = "/api/organization")
 public class OrganizationController implements BaseController<OrganizationRequest, OrganizationResponse> {
 	
 	final OrganizationService organizationService;

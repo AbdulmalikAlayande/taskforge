@@ -45,6 +45,7 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 	                                @NonNull FilterChain filterChain) throws ServletException, IOException {
 		
+		System.out.println("Auth Header:: "+request.getHeader("Authorization"));
 		if (UNPROTECTED_PATHS.contains(request.getRequestURI())) {
 			filterChain.doFilter(request, response);
 			return;
@@ -55,10 +56,12 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 		
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null && authHeader.startsWith(BEARER_)) {
+
 			token = authHeader.substring(BEARER_.length());
 			if (StringUtils.isNotBlank(token)) {
 				try {
 					authenticationSuccessful = authorizeToken(token, request);
+					logger.info(authenticationSuccessful ? "1. Authentication successful" : "2. Authentication failed");
 				} catch (Exception exception) {
 					logger.debug("Bearer token authentication failed: {}", exception.getMessage());
 				}
@@ -86,6 +89,7 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 			return;
 		}
 		
+		logger.info("Authentication successful?:: {}", authenticationSuccessful);
 		filterChain.doFilter(request, response);
 	}
 	
@@ -94,16 +98,18 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 			if (jwtTokenProvider.isValidToken(token) && !jwtTokenProvider.isExpiredToken(token)) {
 				String email = (String) jwtTokenProvider.extractClaimFromToken(token, "email");
 				UserDetails user = userDetailsService.loadUserByUsername(email);
-				
+				logger.info("User details loaded for user: {}", user);
 				UsernamePasswordAuthenticationToken authToken =
 						new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-				
+				logger.info("Auth Token:: {}", authToken);
+				logger.info("Auth Token created for user: {}", authToken.getName());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
+				logger.info("Security context set for user: {}", email);
 				return true;
 			}
 		} catch (Exception exception) {
-			logger.debug("Token authorization failed: {}", exception.getMessage());
+			logger.error("Token authorization failed: {}", exception.getMessage());
 		}
 		return false;
 	}

@@ -2,6 +2,7 @@ package app.bola.taskforge.security.config;
 
 import app.bola.taskforge.security.filter.TaskForgeAuthenticationFilter;
 import app.bola.taskforge.security.filter.TaskForgeAuthorizationFilter;
+import app.bola.taskforge.security.filter.TenantFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -49,55 +50,56 @@ public class SecurityConfig {
 		return new CorsFilter(source);
 	}
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http, TaskForgeAuthenticationFilter authenticationFilter, TaskForgeAuthorizationFilter authorizationFilter) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, TaskForgeAuthenticationFilter authenticationFilter, TaskForgeAuthorizationFilter authorizationFilter, TenantFilter tenantFilter) throws Exception {
 		return http.cors(Customizer.withDefaults())
-			        .csrf(AbstractHttpConfigurer::disable)
-					.headers(headers -> headers
+			       .csrf(AbstractHttpConfigurer::disable)
+			       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			       .addFilterBefore(authorizationFilter, TaskForgeAuthenticationFilter.class)
+			       .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+				   .addFilterAfter(tenantFilter, TaskForgeAuthenticationFilter.class)
+			       .headers(headers -> headers
 						.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
-	                    .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
-					)
-					.authorizeHttpRequests(auth -> auth
+						.httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
+				   )
+			       .authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/admin/create-new").permitAll()
-						.requestMatchers("/api/organizations/create-new").hasRole("ORGANIZATION_ADMIN")
+						.requestMatchers("/api/organization/create-new").hasRole("ORGANIZATION_ADMIN")
 						.requestMatchers("/api/project/**", "/api/task/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
 						.requestMatchers("/api/members/**", "/api/comment/**").authenticated()
-					)
-					.exceptionHandling(exceptionHandling -> exceptionHandling
-						.authenticationEntryPoint((request, response, _) -> {
-							response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-							response.setContentType("application/json");
-
-							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-							response.setHeader("Access-Control-Allow-Credentials", "true");
-							response.setHeader("Vary", "Origin");
-							
-							Map<String, Object> errorDetails = new HashMap<>();
-							errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
-							errorDetails.put("error", "UNAUTHORIZED");
-							errorDetails.put("status", 401);
-							errorDetails.put("path", request.getRequestURI());
-							
-							response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+			       )
+			       .exceptionHandling(exceptionHandling -> exceptionHandling
+                   .authenticationEntryPoint((request, response, _) -> {
+						response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+						response.setContentType("application/json");
+						
+						response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+						response.setHeader("Access-Control-Allow-Credentials", "true");
+						response.setHeader("Vary", "Origin");
+						
+						Map<String, Object> errorDetails = new HashMap<>();
+						errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
+						errorDetails.put("error", "UNAUTHORIZED");
+						errorDetails.put("status", 401);
+						errorDetails.put("path", request.getRequestURI());
+						
+						response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+				   })
+					.accessDeniedHandler((request, response, _) -> {
+						response.setContentType("application/json");
+						response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+						
+						response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+						response.setHeader("Access-Control-Allow-Credentials", "true");
+						response.setHeader("Vary", "Origin");
+						
+						Map<String, Object> errorResponse = new HashMap<>();
+						errorResponse.put("responseCode", "403");
+						errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
+						errorResponse.put("status", false);
+						
+						response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 						})
-						.accessDeniedHandler((request, response, _) -> {
-							response.setContentType("application/json");
-							response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-
-							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-							response.setHeader("Access-Control-Allow-Credentials", "true");
-							response.setHeader("Vary", "Origin");
-							
-							Map<String, Object> errorResponse = new HashMap<>();
-							errorResponse.put("responseCode", "403");
-							errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
-							errorResponse.put("status", false);
-							
-							response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-						})
 					)
-					.addFilterBefore(authorizationFilter, TaskForgeAuthenticationFilter.class)
-					.addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-					.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 					.build();
 	}
 

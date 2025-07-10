@@ -1,11 +1,10 @@
-package app.bola.taskforge.filter;
+package app.bola.taskforge.security.filter;
 
 import app.bola.taskforge.domain.context.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,11 +12,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-@Order(1) // I want to make sure that this filter runs before any other filters that depend on the tenant context
 @Component
 public class TenantFilter extends OncePerRequestFilter {
-
-
+	
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,
 	                                @NonNull HttpServletResponse response,
@@ -25,7 +22,7 @@ public class TenantFilter extends OncePerRequestFilter {
 
 		String requestPath = request.getRequestURI();
 		
-		List<String> requireTenantUnawareEndpoints = List.of("/api/organizations/create-new", "/api/admin/create-new",
+		List<String> requireTenantUnawareEndpoints = List.of("/api/organization/create-new", "/api/admin/create-new",
 				"/api/auth/oauth", "/api/auth/login", "/api/log/create-new");
 		
 		if (requireTenantUnawareEndpoints.contains(requestPath)) {

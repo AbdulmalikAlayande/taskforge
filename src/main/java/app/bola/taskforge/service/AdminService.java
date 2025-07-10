@@ -36,7 +36,6 @@ public class AdminService {
 		admin.setActive(true);
 		
 		Member savedAdmin = userRepository.save(admin);
-		
 		return toResponse(savedAdmin);
 	}
 	

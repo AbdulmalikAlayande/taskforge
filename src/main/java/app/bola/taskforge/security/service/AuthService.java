@@ -58,6 +58,8 @@ public class AuthService {
 										  .map(GrantedAuthority::getAuthority)
 										  .collect(Collectors.toSet());
 		
+		log.info("User {} is authenticated?: {}", loginRequest.getEmail(), authentication.isAuthenticated());
+		
 		String accessToken = jwtTokenProvider.generateAccessToken(loginRequest.getEmail(), roles);
 		String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getEmail(), roles);
 		

@@ -50,11 +50,11 @@ public class OrganizationRequest {
 	@NotBlank(message = "Contact email is required")
 	private String email;
 	
-	@Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Contact phone must be a valid international number")
+//	@Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Contact phone must be a valid international number")
 	private String phone;
 	
 	@NotBlank(message = "Time zone is required")
-	@Pattern(regexp = "^[A-Za-z/_]+$", message = "Time zone format is invalid (e.g., Africa/Lagos)")
+//	@Pattern(regexp = "^[A-Za-z/_]+$", message = "Time zone format is invalid (e.g., Africa/Lagos)")
 	private String timeZone;
 	
 	@Size(max = 255)
