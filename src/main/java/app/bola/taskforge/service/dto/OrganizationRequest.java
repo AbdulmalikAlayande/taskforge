@@ -27,6 +27,11 @@ import org.hibernate.validator.constraints.URL;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationRequest {
 	
+	private String ownerId;
+	
+	@Email(message = "owner email must be valid")
+	private String ownerEmail;
+	
 	@NotBlank(message = "Name is required")
 	@Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
 	private String name;

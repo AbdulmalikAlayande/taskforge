@@ -7,6 +7,8 @@ import app.bola.taskforge.service.dto.InvitationResponse;
 import app.bola.taskforge.service.dto.OrganizationRequest;
 import app.bola.taskforge.service.dto.OrganizationResponse;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +24,12 @@ import java.util.Collection;
 @RequestMapping(value = "/api/organization")
 public class OrganizationController implements BaseController<OrganizationRequest, OrganizationResponse> {
 	
+	private static final Logger log = LoggerFactory.getLogger(OrganizationController.class);
 	final OrganizationService organizationService;
 	
 	@Override
 	public ResponseEntity<OrganizationResponse> createNew(OrganizationRequest request) {
+		log.info("Organization Request:: {}", request);
 		return ResponseEntity.ok(organizationService.createNew(request));
 	}
 	

@@ -64,13 +64,16 @@ public class AuthService {
 		String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getEmail(), roles);
 		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+		String userId = userRepository.findByEmail(loginRequest.getEmail())
+				.orElseThrow(() -> new RuntimeException("User not found with email: " + loginRequest.getEmail()))
+				.getPublicId();
 		return AuthResponse.builder()
-				.accessToken(accessToken)
-				.refreshToken(refreshToken)
-				.email(loginRequest.getEmail())
-				.roles(roles)
-				.build();
+				           .userId(userId)
+				           .accessToken(accessToken)
+					       .refreshToken(refreshToken)
+					       .email(loginRequest.getEmail())
+				           .roles(roles)
+				           .build();
 	}
 	
 	public AuthResponse generateRefreshToken(String refreshToken) {
