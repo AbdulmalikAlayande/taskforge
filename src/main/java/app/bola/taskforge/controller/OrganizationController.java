@@ -2,26 +2,19 @@ package app.bola.taskforge.controller;
 
 import app.bola.taskforge.common.controller.BaseController;
 import app.bola.taskforge.service.OrganizationService;
-import app.bola.taskforge.service.dto.InvitationRequest;
-import app.bola.taskforge.service.dto.InvitationResponse;
-import app.bola.taskforge.service.dto.OrganizationRequest;
-import app.bola.taskforge.service.dto.OrganizationResponse;
+import app.bola.taskforge.service.dto.*;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/api/organization")
+@RequestMapping(value = "api/organization")
 public class OrganizationController implements BaseController<OrganizationRequest, OrganizationResponse> {
 	
 	private static final Logger log = LoggerFactory.getLogger(OrganizationController.class);
@@ -60,9 +53,15 @@ public class OrganizationController implements BaseController<OrganizationReques
 	 * @param request the invitation request containing details of the member to be invited
 	 * @return ResponseEntity with the result of the invitation process
 	 */
-	@PostMapping("/invite-member")
+	@PostMapping("invite-member")
 	@PreAuthorize("hasRole('ORGANIZATION_ADMIN')")
 	public ResponseEntity<InvitationResponse> inviteMember(@RequestBody InvitationRequest request) {
 		return ResponseEntity.ok(organizationService.inviteMember(request));
+	}
+	
+	@GetMapping("{public-id}/members")
+	public ResponseEntity<Collection<MemberResponse>> getMembers(@PathVariable("public-id") String publicId) {
+		log.info("Fetching members for organization with publicId: {}", publicId);
+		return ResponseEntity.ok(organizationService.getMembers(publicId));
 	}
 }

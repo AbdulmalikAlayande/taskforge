@@ -8,7 +8,10 @@ public enum ProjectStatus {
 	PAUSED,
 	COMPLETED,
 	ABANDONED,
-	ARCHIVED;
+	ARCHIVED,
+	BACKLOG,
+	IN_PROGRESS,
+	CANCELLED;
 	
 	/**
 	 * Converts a string to a ProjectStatus enum.

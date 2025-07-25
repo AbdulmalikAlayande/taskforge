@@ -12,10 +12,7 @@ import app.bola.taskforge.exception.TaskForgeException;
 import app.bola.taskforge.notification.MailSender;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
-import app.bola.taskforge.service.dto.InvitationRequest;
-import app.bola.taskforge.service.dto.InvitationResponse;
-import app.bola.taskforge.service.dto.OrganizationRequest;
-import app.bola.taskforge.service.dto.OrganizationResponse;
+import app.bola.taskforge.service.dto.*;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -133,6 +131,21 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		response.setOrganizationName(organization.getName());
 		response.setInvitationLink("https://taskforge.com/accept?token=%s".formatted(token));
 		return response;
+	}
+	
+	@Override
+	public Set<MemberResponse> getMembers(String publicId) {
+		Set<Member> members = organizationRepository.findByIdScoped(publicId)
+													.orElseThrow(() -> new EntityNotFoundException("Organization not found with public ID: " + publicId))
+													.getMembers();
+		
+		if (members == null || members.isEmpty()) {
+			members = new HashSet<>(userRepository.findAllByOrganization_PublicId(publicId));
+		}
+		
+		return members.stream()
+				.map(member -> modelMapper.map(member, MemberResponse.class))
+				.collect(Collectors.toSet());
 	}
 	
 }
