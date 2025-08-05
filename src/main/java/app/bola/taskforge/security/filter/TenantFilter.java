@@ -15,6 +15,7 @@ import java.util.List;
 @Component
 public class TenantFilter extends OncePerRequestFilter {
 	
+	private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(TenantFilter.class);
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,
 	                                @NonNull HttpServletResponse response,
@@ -29,10 +30,17 @@ public class TenantFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
+		
+		
 		String tenantId = request.getHeader("X-Tenant-ID");
 
 		if (tenantId != null && !tenantId.isEmpty()) {
+			/*
+			 * fixme: Here is a big black bug: 
+			 *  so I am just going to set the current tenant ID based on what's coming from the frontend?
+			 *  Nah!!! what if the tenant ID is not correct? so we just set it like that?
+			 *  Das a stoopid bug
+			 */
 			TenantContext.setCurrentTenant(tenantId);
 		} else {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing X-Tenant-ID header");
@@ -40,6 +48,7 @@ public class TenantFilter extends OncePerRequestFilter {
 		}
 
 		try {
+			logger.info("Current Tenant set to: {}", TenantContext.getCurrentTenant());
 			filterChain.doFilter(request, response);
 		} finally {
 			TenantContext.clear();

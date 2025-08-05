@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -28,6 +27,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	
 	@Override
 	public ResponseEntity<OrganizationResponse> getById(@PathVariable String publicId) {
+		log.info("Organization Fetch ID:: {}", publicId);
 		return ResponseEntity.ok(organizationService.findById(publicId));
 	}
 	
@@ -54,8 +54,8 @@ public class OrganizationController implements BaseController<OrganizationReques
 	 * @return ResponseEntity with the result of the invitation process
 	 */
 	@PostMapping("invite-member")
-	@PreAuthorize("hasRole('ORGANIZATION_ADMIN')")
 	public ResponseEntity<InvitationResponse> inviteMember(@RequestBody InvitationRequest request) {
+		log.info("Invitation Request:: {}", request);
 		return ResponseEntity.ok(organizationService.inviteMember(request));
 	}
 	

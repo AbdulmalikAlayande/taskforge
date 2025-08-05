@@ -13,6 +13,7 @@ import app.bola.taskforge.notification.MailSender;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import app.bola.taskforge.service.dto.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,14 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	
 	@Override
 	public OrganizationResponse findById(String publicId) {
-		return null;
+		log.info("Attempting find by ID: {}", publicId);
+		Organization organization = organizationRepository.findByIdScoped(publicId)
+			.orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+		log.info("Organization:: {}", organization);
+		
+		OrganizationResponse organizationResponse = modelMapper.map(organization, OrganizationResponse.class);
+		log.info("Organization Response:: {}", organizationResponse);
+		return organizationResponse;
 	}
 	
 	@Override
@@ -79,6 +87,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	}
 	
 	@Override
+	@Transactional
 	public InvitationResponse inviteMember(InvitationRequest request) {
 		performValidation(validator, request);
 		

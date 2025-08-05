@@ -10,8 +10,9 @@ delete from project_members;
 delete from member_roles;
 delete from member;
 delete from notification_preference;
-delete from organization
+delete from organization;
 
+drop table if exists audit_log;
 --
 -- drop table if exists attachment;
 -- drop table if exists mention;

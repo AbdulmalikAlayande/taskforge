@@ -43,8 +43,7 @@ public class TaskForgeAuthenticationFilter extends UsernamePasswordAuthenticatio
 	
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-		System.out.println("We are in the attemptAuthentication method of TaskForgeAuthenticationFilter");
-		try {
+	try {
 			
 			LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 			String email = loginRequest.getEmail();

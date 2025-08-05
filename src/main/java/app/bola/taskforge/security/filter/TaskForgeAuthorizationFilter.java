@@ -45,17 +45,6 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 	                                @NonNull FilterChain filterChain) throws ServletException, IOException {
 		
-		System.out.println("Remote Address:: "+request.getRemoteAddr());
-		System.out.println("Remote Host:: "+request.getRemoteHost());
-		System.out.println("Remote Port:: "+request.getRemotePort());
-		System.out.println("Remote User:: "+request.getRemoteUser());
-		System.out.println("Server Port:: "+request.getServerPort());
-		System.out.println("Server Name:: "+request.getServerName());
-		System.out.println("Request Method:: "+request.getMethod());
-		System.out.println("Local Address:: "+request.getLocalAddr());
-		System.out.println("Local Name:: "+request.getLocalName());
-		System.out.println("Local Port:: "+request.getLocalPort());
-		
 		if (UNPROTECTED_PATHS.contains(request.getRequestURI())) {
 			filterChain.doFilter(request, response);
 			return;

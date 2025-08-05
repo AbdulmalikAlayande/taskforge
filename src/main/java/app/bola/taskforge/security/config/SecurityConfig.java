@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity
+//@EnableMethodSecurity
 public class SecurityConfig {
 	
 	private final ObjectMapper objectMapper;
@@ -49,6 +49,7 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 		return new CorsFilter(source);
 	}
+	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, TaskForgeAuthenticationFilter authenticationFilter, TaskForgeAuthorizationFilter authorizationFilter, TenantFilter tenantFilter) throws Exception {
 		return http.cors(Customizer.withDefaults())
@@ -62,45 +63,44 @@ public class SecurityConfig {
 						.httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
 				   )
 			       .authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api/admin/create-new").permitAll()
-						.requestMatchers("/api/organization/create-new").hasRole("ORGANIZATION_ADMIN")
+						.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**",  "/api/organization/**").permitAll()
+						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
 						.requestMatchers("/api/project/**", "/api/task/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
 						.requestMatchers("/api/members/**", "/api/comment/**").authenticated()
 			       )
 			       .exceptionHandling(exceptionHandling -> exceptionHandling
-                   .authenticationEntryPoint((request, response, _) -> {
-						response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-						response.setContentType("application/json");
-						
-						response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-						response.setHeader("Access-Control-Allow-Credentials", "true");
-						response.setHeader("Vary", "Origin");
-						
-						Map<String, Object> errorDetails = new HashMap<>();
-						errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
-						errorDetails.put("error", "UNAUTHORIZED");
-						errorDetails.put("status", 401);
-						errorDetails.put("path", request.getRequestURI());
-						
-						response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
-				   })
-					.accessDeniedHandler((request, response, _) -> {
-						response.setContentType("application/json");
-						response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-						
-						response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-						response.setHeader("Access-Control-Allow-Credentials", "true");
-						response.setHeader("Vary", "Origin");
-						
-						Map<String, Object> errorResponse = new HashMap<>();
-						errorResponse.put("responseCode", "403");
-						errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
-						errorResponse.put("status", false);
-						
-						response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+	                   .authenticationEntryPoint((request, response, _) -> {
+							response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+							response.setContentType("application/json");
+	
+							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+							response.setHeader("Access-Control-Allow-Credentials", "true");
+							response.setHeader("Vary", "Origin");
+	
+							Map<String, Object> errorDetails = new HashMap<>();
+							errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
+							errorDetails.put("error", "UNAUTHORIZED");
+							errorDetails.put("status", 401);
+							errorDetails.put("path", request.getRequestURI());
+	
+							response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+					   })
+						.accessDeniedHandler((request, response, _) -> {
+							response.setContentType("application/json");
+							response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+	
+							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+							response.setHeader("Access-Control-Allow-Credentials", "true");
+							response.setHeader("Vary", "Origin");
+	
+							Map<String, Object> errorResponse = new HashMap<>();
+							errorResponse.put("responseCode", 403);
+							errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
+							errorResponse.put("status", false);
+	
+							response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 						})
-					)
-					.build();
+			       ).build();
 	}
 
 }

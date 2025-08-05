@@ -43,7 +43,6 @@ public class TaskForgeUserDetailsService implements UserDetailsService {
 			.stream()
 			.map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())).toList();
 		
-		log.info("Authorities created: {}", authorities);
 		return new User(member.getEmail(), member.getPassword(), authorities);
 	}
 }
