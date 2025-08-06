@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: taskforge
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taskforge_db
+          property: connectionString
+      - key: DB_USER
+        fromDatabase:
+          name: taskforge_db
+          property: username
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: taskforge_db
+          property: password
+
+databases:
+    - name: taskforge_db
+      plan: free

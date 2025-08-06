@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:21-jdk-jammy as builder
+FROM eclipse-temurin:24-jdk AS builder  
 WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
@@ -8,7 +8,7 @@ COPY src ./src
 RUN ./mvnw package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:24-jre
 WORKDIR /app
 COPY --from=builder /app/target/taskforge-*.jar ./app.jar
 EXPOSE 8080
