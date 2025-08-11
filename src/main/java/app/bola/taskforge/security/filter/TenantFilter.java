@@ -23,8 +23,11 @@ public class TenantFilter extends OncePerRequestFilter {
 
 		String requestPath = request.getRequestURI();
 		
-		List<String> requireTenantUnawareEndpoints = List.of("/api/organization/create-new", "/api/admin/create-new",
-				"/api/auth/oauth", "/api/auth/login", "/api/log/create-new");
+		List<String> requireTenantUnawareEndpoints = List.of(
+			"/api/organization/create-new", "/api/admin/create-new",
+			"/api/auth/oauth", "/api/auth/login", "/api/log/create-new",
+			"/swagger-ui.html", "/swagger-ui/**", "/api-docs/**"
+		);
 		
 		if (requireTenantUnawareEndpoints.contains(requestPath)) {
 			filterChain.doFilter(request, response);

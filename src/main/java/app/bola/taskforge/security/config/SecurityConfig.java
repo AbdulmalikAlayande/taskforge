@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 @RequiredArgsConstructor
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 	
 	private final ObjectMapper objectMapper;
@@ -63,7 +63,8 @@ public class SecurityConfig {
 						.httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
 				   )
 			       .authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**",  "/api/organization/**").permitAll()
+						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**" ).permitAll()
+						.requestMatchers("/api/auth/**", "/api/organization/**").permitAll()
 						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
 						.requestMatchers("/api/project/**", "/api/task/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
 						.requestMatchers("/api/members/**", "/api/comment/**").authenticated()

@@ -36,7 +36,9 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 			"/api/admin/create-new",
 			"/api/health",
 			"/swagger-ui/**",
-			"/v3/api-docs/**"
+			"/api-docs",
+			"/swagger-ui.html",
+			"/api-docs/**"
 	);
 	
 	
