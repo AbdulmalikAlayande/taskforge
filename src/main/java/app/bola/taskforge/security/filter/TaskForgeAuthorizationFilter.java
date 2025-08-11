@@ -31,27 +31,42 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserDetailsService userDetailsService;
 	public final List<String> UNPROTECTED_PATHS = List.of(
+			"/api-docs/**",
+			"/favicon.ico",
+			"/swagger-ui/**",
+			"/swagger-ui.html",
+			"/swagger-ui/index.css",
+			"/webjars/**",
+			"/swagger-resources/**",
 			"/api/auth/login",
 			"/api/auth/oauth",
 			"/api/admin/create-new",
 			"/api/health",
-			"/swagger-ui/**",
+			"/swagger-ui/index.html",
 			"/api-docs",
-			"/swagger-ui.html",
-			"/api-docs/**"
+			"/swagger-ui.html"
 	);
 	
-	
+	private boolean shouldBypassAuth(String uri) {
+		return uri.startsWith("/api-docs") ||
+				       uri.startsWith("/swagger-ui") ||
+				       uri.startsWith("/webjars") ||
+				       uri.startsWith("/swagger-resources") ||
+				       UNPROTECTED_PATHS.contains(uri);
+	}
 	
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 	                                @NonNull FilterChain filterChain) throws ServletException, IOException {
 		
-		if (UNPROTECTED_PATHS.contains(request.getRequestURI())) {
+		String requestURI = request.getRequestURI();
+		if (shouldBypassAuth(requestURI)) {
+			logger.info("Bypassing authentication for URI: {}", requestURI);
 			filterChain.doFilter(request, response);
 			return;
 		}
-		
+		logger.info("Request URI: {}", requestURI);
+
 		String token;
 		boolean authenticationSuccessful = false;
 		

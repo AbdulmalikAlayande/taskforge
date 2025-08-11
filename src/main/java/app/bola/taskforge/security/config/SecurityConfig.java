@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,7 +44,7 @@ public class SecurityConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.setAllowedOrigins(List.of("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app"));
+		config.setAllowedOrigins(List.of("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app", "http://localhost:8080/"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("Access-Control-Allow-Headers", "Access-Control-Allow-Credentials", "X-Tenant-ID", "X-Refresh-Token", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type"));
 		source.registerCorsConfiguration("/**", config);
@@ -59,10 +60,12 @@ public class SecurityConfig {
 			       .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
 				   .addFilterAfter(tenantFilter, TaskForgeAuthenticationFilter.class)
 			       .headers(headers -> headers
-						.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))
-						.httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
-				   )
-			       .authorizeHttpRequests(auth -> auth
+	                   .contentSecurityPolicy(csp -> csp
+							.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'none'")
+	                   )
+                       .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+	                   .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
+			       ).authorizeHttpRequests(auth -> auth
 						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**" ).permitAll()
 						.requestMatchers("/api/auth/**", "/api/organization/**").permitAll()
 						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
@@ -73,35 +76,36 @@ public class SecurityConfig {
 	                   .authenticationEntryPoint((request, response, _) -> {
 							response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 							response.setContentType("application/json");
-	
+
 							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 							response.setHeader("Access-Control-Allow-Credentials", "true");
 							response.setHeader("Vary", "Origin");
-	
+
 							Map<String, Object> errorDetails = new HashMap<>();
 							errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
 							errorDetails.put("error", "UNAUTHORIZED");
 							errorDetails.put("status", 401);
 							errorDetails.put("path", request.getRequestURI());
-	
+
 							response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
 					   })
 						.accessDeniedHandler((request, response, _) -> {
 							response.setContentType("application/json");
 							response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-	
+
 							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 							response.setHeader("Access-Control-Allow-Credentials", "true");
 							response.setHeader("Vary", "Origin");
-	
+
 							Map<String, Object> errorResponse = new HashMap<>();
 							errorResponse.put("responseCode", 403);
 							errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
 							errorResponse.put("status", false);
-	
+
 							response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 						})
-			       ).build();
+			       )
+			       .build();
 	}
 
 }

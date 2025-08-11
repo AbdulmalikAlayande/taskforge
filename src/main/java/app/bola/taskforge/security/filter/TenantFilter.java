@@ -15,7 +15,22 @@ import java.util.List;
 @Component
 public class TenantFilter extends OncePerRequestFilter {
 	
+	private final List<String> REQUIRE_TENANT_UNAWARE_ENDPOINTS = List.of(
+		"/api/organization/create-new", "/api/admin/create-new", "/swagger-ui",
+		"/api/auth/oauth", "/api/auth/login", "/api/log/create-new",
+		"/swagger-ui/index.html", "/swagger-ui.html", "/api-docs" ,
+		"/swagger-ui/index.css", "/favicon.ico"
+	);
+	
 	private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(TenantFilter.class);
+	
+	private boolean isTenantUnAware(String uri) {
+		return uri.startsWith("/api-docs") ||
+				       uri.startsWith("/swagger-ui") ||
+				       uri.startsWith("/webjars") ||
+				       uri.startsWith("/swagger-resources") ||
+				       REQUIRE_TENANT_UNAWARE_ENDPOINTS.contains(uri);
+	}
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,
 	                                @NonNull HttpServletResponse response,
@@ -23,17 +38,12 @@ public class TenantFilter extends OncePerRequestFilter {
 
 		String requestPath = request.getRequestURI();
 		
-		List<String> requireTenantUnawareEndpoints = List.of(
-			"/api/organization/create-new", "/api/admin/create-new",
-			"/api/auth/oauth", "/api/auth/login", "/api/log/create-new",
-			"/swagger-ui.html", "/swagger-ui/**", "/api-docs/**"
-		);
-		
-		if (requireTenantUnawareEndpoints.contains(requestPath)) {
+		if (isTenantUnAware(requestPath)) {
+			logger.info("Skipping TenantFilter for endpoint: {}", requestPath);
 			filterChain.doFilter(request, response);
 			return;
 		}
-		
+		logger.info("Processing TenantFilter for endpoint: {}", requestPath);
 		
 		String tenantId = request.getHeader("X-Tenant-ID");
 
