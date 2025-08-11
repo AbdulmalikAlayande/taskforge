@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Collection;
 @RequestMapping("/api/members")
 @AllArgsConstructor
 @Tag(name = "Member Management", description = "APIs for managing organization members")
+@SecurityRequirement(name = "bearerAuth")
 public class MemberController implements BaseController<MemberRequest, MemberResponse> {
 	
 	private final MemberService memberService;
@@ -32,7 +35,9 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
 	})
 	public ResponseEntity<MemberResponse> createNew(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Member details", required = true)
@@ -46,6 +51,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member found",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Member not found", content = @Content)
 	})
 	public ResponseEntity<MemberResponse> getById(
@@ -56,8 +62,11 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	
 	@GetMapping
 	@Operation(summary = "Get all members", description = "Retrieves all members the user has access to")
-	@ApiResponse(responseCode = "200", description = "List of members",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class)))
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "List of members",
+				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+	})
 	public ResponseEntity<Collection<MemberResponse>> getAll() {
 		return ResponseEntity.ok(memberService.findAll());
 	}
@@ -67,6 +76,8 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Member not found", content = @Content)
 	})
 	public ResponseEntity<MemberResponse> update(
@@ -80,6 +91,8 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	@Operation(summary = "Delete member", description = "Deletes a member by their public ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Member deleted successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Member not found", content = @Content)
 	})
 	public ResponseEntity<Void> delete(
@@ -90,7 +103,12 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	}
 	
 	@PostMapping("/accept-invitation")
-	@Operation(summary = "Accept invitation", description = "Accepts an invitation to join an organization")
+	@Operation(
+		summary = "Accept invitation",
+		description = "Accepts an invitation to join an organization",
+		security = {} // No security required for this endpoint
+	)
+	@SecurityRequirements // Explicitly indicate no security for this endpoint
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Invitation accepted successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = InvitationResponse.class))),

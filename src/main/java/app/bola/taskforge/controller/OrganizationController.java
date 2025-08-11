@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequestMapping(value = "api/organization")
 @Tag(name = "Organization Management", description = "APIs for managing organizations")
+@SecurityRequirement(name = "bearerAuth")
 public class OrganizationController implements BaseController<OrganizationRequest, OrganizationResponse> {
 	
 	private static final Logger log = LoggerFactory.getLogger(OrganizationController.class);
@@ -34,6 +36,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 		@ApiResponse(responseCode = "200", description = "Organization created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationResponse.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "403", description = "Unauthorized to create an organization", content = @Content)
 	})
 	public ResponseEntity<OrganizationResponse> createNew(
@@ -49,6 +52,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Organization found",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
 	})
 	public ResponseEntity<OrganizationResponse> getById(
@@ -61,8 +65,11 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@Override
 	@GetMapping("all")
 	@Operation(summary = "Get all organizations", description = "Retrieves all organizations the user has access to")
-	@ApiResponse(responseCode = "200", description = "List of organizations",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationResponse.class)))
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "List of organizations",
+				content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+	})
 	public ResponseEntity<Collection<OrganizationResponse>> getAll() {
 		return ResponseEntity.ok(organizationService.findAll());
 	}
@@ -72,6 +79,8 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Organization updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizationResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
 	})
 	public ResponseEntity<OrganizationResponse> update(
@@ -86,6 +95,8 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@Operation(summary = "Delete organization", description = "Deletes an organization by its public ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Organization deleted successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
 	})
 	public ResponseEntity<Void> delete(
@@ -101,6 +112,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Invitation sent successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = InvitationResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "403", description = "Unauthorized to send invitations", content = @Content)
 	})
 	public ResponseEntity<InvitationResponse> inviteMember(
@@ -116,6 +128,7 @@ public class OrganizationController implements BaseController<OrganizationReques
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "List of members",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
 	})
 	public ResponseEntity<Collection<MemberResponse>> getMembers(

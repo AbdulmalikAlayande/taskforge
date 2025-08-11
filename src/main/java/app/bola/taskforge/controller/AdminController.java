@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 @AllArgsConstructor
 @Tag(name = "Admin Management", description = "APIs for admin operations")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 	
 	final AdminService adminService;
@@ -35,6 +37,7 @@ public class AdminController {
 		@ApiResponse(responseCode = "200", description = "Admin created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access", content = @Content)
 	})
 	@PostMapping("/create-new")

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/api/comment")
 @Tag(name = "Comments", description = "APIs for managing comments on tasks and projects")
+@SecurityRequirement(name = "bearerAuth")
 public class CommentController implements BaseController<CommentRequest, CommentResponse> {
 	
 	private final CommentService commentService;
@@ -32,7 +34,9 @@ public class CommentController implements BaseController<CommentRequest, Comment
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Comment created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponse.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
 	})
 	public ResponseEntity<CommentResponse> createNew(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Comment details", required = true)
@@ -45,6 +49,8 @@ public class CommentController implements BaseController<CommentRequest, Comment
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Comment updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Comment not found", content = @Content)
 	})
 	public ResponseEntity<CommentResponse> edit(
@@ -59,6 +65,7 @@ public class CommentController implements BaseController<CommentRequest, Comment
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Reply created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Parent comment not found", content = @Content)
 	})
 	public ResponseEntity<CommentResponse> replyToComment(
@@ -73,6 +80,7 @@ public class CommentController implements BaseController<CommentRequest, Comment
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "302", description = "Replies found",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Comment not found", content = @Content)
 	})
 	public ResponseEntity<Set<CommentResponse>> getReplies(

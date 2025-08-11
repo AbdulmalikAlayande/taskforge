@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.Set;
 @AllArgsConstructor
 @RequestMapping("api/project")
 @Tag(name = "Project Management", description = "APIs for managing projects")
+@SecurityRequirement(name = "bearerAuth")
 public class ProjectController implements BaseController<ProjectRequest, ProjectResponse> {
 	
 	private final ProjectService projectService;
@@ -32,7 +34,9 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Project created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> createNew(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Project details", required = true)
@@ -46,6 +50,7 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Project found",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> getById(
@@ -57,8 +62,11 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@Override
 	@GetMapping("all")
 	@Operation(summary = "Get all projects", description = "Retrieves all projects the user has access to")
-	@ApiResponse(responseCode = "200", description = "List of projects",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class)))
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "List of projects",
+				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+	})
 	public ResponseEntity<Collection<ProjectResponse>> getAll() {
 		return ResponseEntity.ok(projectService.findAll());
 	}
@@ -68,6 +76,8 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Project updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> update(
@@ -82,6 +92,8 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@Operation(summary = "Delete project", description = "Deletes a project by its public ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Project deleted successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
 	})
 	public ResponseEntity<Void> delete(
@@ -96,6 +108,8 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member added successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project or member not found", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> addMember(
@@ -109,6 +123,8 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member removed successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project or member not found", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> removeMember(
@@ -122,6 +138,8 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Status updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
 	})
 	public ResponseEntity<ProjectResponse> changeStatus(
@@ -135,6 +153,7 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "List of projects",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
 	})
 	public ResponseEntity<Set<ProjectResponse>> getProjectsByOrganization(

@@ -11,18 +11,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -31,6 +25,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequestMapping("api/task")
 @Tag(name = "Task Management", description = "APIs for managing tasks")
+@SecurityRequirement(name = "bearerAuth")
 public class TaskController implements BaseController<TaskRequest, TaskResponse> {
 	
 	
@@ -42,12 +37,14 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Task created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
 	})
 	public ResponseEntity<TaskResponse> createNew(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Task details", required = true)
 			@RequestBody TaskRequest taskRequest) {
-		return BaseController.super.createNew(taskRequest);
+		return ResponseEntity.ok(taskService.createNew(taskRequest));
 	}
 	
 	@Override
@@ -56,6 +53,7 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Task found",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Task not found", content = @Content)
 	})
 	public ResponseEntity<TaskResponse> getById(
@@ -67,8 +65,11 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	@Override
 	@GetMapping("all")
 	@Operation(summary = "Get all tasks", description = "Retrieves all tasks the user has access to")
-	@ApiResponse(responseCode = "200", description = "List of tasks",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class)))
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "List of tasks",
+				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+	})
 	public ResponseEntity<Collection<TaskResponse>> getAll() {
 		return ResponseEntity.ok(taskService.findAll());
 	}
@@ -78,6 +79,8 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Task updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Task not found", content = @Content)
 	})
 	public ResponseEntity<TaskResponse> update(
@@ -89,11 +92,14 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	
 	@PatchMapping("/{publicId}")
 	@PreAuthorize("hasRole('PROJECT_MANAGER') or @resourceSecurity.isTaskOwner(#publicId, authentication.name)")
-	@Operation(summary = "Partially update task",
-			description = "Updates specific fields of an existing task. Requires PROJECT_MANAGER role or task ownership.")
+	@Operation(
+		summary = "Partially update task",
+		description = "Updates specific fields of an existing task. Requires PROJECT_MANAGER role or task ownership."
+	)
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Task updated successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "403", description = "Not authorized to update this task", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Task not found", content = @Content)
 	})
@@ -109,6 +115,8 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	@Operation(summary = "Delete task", description = "Deletes a task by its public ID")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Task deleted successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Task not found", content = @Content)
 	})
 	public ResponseEntity<Void> delete(
@@ -120,11 +128,14 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 	
 	@PostMapping("/{taskId}/assign/{memberId}")
 	@PreAuthorize("hasRole('PROJECT_MANAGER')")
-	@Operation(summary = "Assign member to task",
-			description = "Assigns a member to a task. Requires PROJECT_MANAGER role.")
+	@Operation(
+		summary = "Assign member to task",
+		description = "Assigns a member to a task. Requires PROJECT_MANAGER role."
+	)
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member assigned successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
 		@ApiResponse(responseCode = "403", description = "Not authorized to assign members", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Task or member not found", content = @Content)
 	})

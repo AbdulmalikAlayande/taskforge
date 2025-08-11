@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/log")
 @AllArgsConstructor
 @Tag(name = "Audit Logs", description = "APIs for managing system audit logs")
+@SecurityRequirement(name = "bearerAuth")
 public class AuditLogController {
 	
 	@PostMapping("/create-new")
@@ -24,7 +26,9 @@ public class AuditLogController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Log entry created successfully",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
-		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+		@ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
 	})
 	public ResponseEntity<String> createNew(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Log entry details", required = true)
