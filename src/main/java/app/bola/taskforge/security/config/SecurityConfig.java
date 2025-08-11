@@ -63,7 +63,6 @@ public class SecurityConfig {
 	                   .contentSecurityPolicy(csp -> csp
 							.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'none'")
 	                   )
-                       .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
 	                   .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
 			       ).authorizeHttpRequests(auth -> auth
 						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**" ).permitAll()
