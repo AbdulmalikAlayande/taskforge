@@ -66,7 +66,7 @@ public class SecurityConfig {
 	                   .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
 			       ).authorizeHttpRequests(auth -> auth
 						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**" ).permitAll()
-						.requestMatchers("/api/auth/**", "/api/organization/**").permitAll()
+						.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new").permitAll()
 						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
 						.requestMatchers("/api/project/**", "/api/task/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
 						.requestMatchers("/api/members/**", "/api/comment/**").authenticated()
