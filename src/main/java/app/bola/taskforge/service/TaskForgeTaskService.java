@@ -207,6 +207,11 @@ public class TaskForgeTaskService implements TaskService{
 	}
 	
 	@Override
+	public Set<TaskResponse> getProjectSpecificTasks(String projectId) {
+		return Set.of();
+	}
+	
+	@Override
 	public void delete(String publicId) {
 		Task task = taskRepository.findByIdScoped(publicId)
 				            .orElseThrow(() -> new EntityNotFoundException("Task not found"));

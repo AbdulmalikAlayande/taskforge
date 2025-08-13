@@ -15,4 +15,6 @@ public interface TaskService extends BaseService<TaskRequest, Task, TaskResponse
 	TaskResponse update(String taskId, TaskUpdateRequest updateRequest);
 	CommentResponse getCommentThread(String taskId);
 	Set<TaskResponse> findAll();
+	
+	Set<TaskResponse> getProjectSpecificTasks(String projectId);
 }

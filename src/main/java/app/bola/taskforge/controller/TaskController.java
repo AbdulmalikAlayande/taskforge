@@ -19,11 +19,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("api/task")
+@RequestMapping("api/tasks")
 @Tag(name = "Task Management", description = "APIs for managing tasks")
 @SecurityRequirement(name = "bearerAuth")
 public class TaskController implements BaseController<TaskRequest, TaskResponse> {
@@ -143,5 +144,10 @@ public class TaskController implements BaseController<TaskRequest, TaskResponse>
 			@Parameter(description = "ID of the task", required = true) @PathVariable String taskId,
 			@Parameter(description = "ID of the member to assign", required = true) @PathVariable String memberId) {
 		return ResponseEntity.ok(taskService.assignMember(taskId, memberId));
+	}
+	
+	@GetMapping()
+	public ResponseEntity<Set<TaskResponse>> getProjectSpecificTasks(@RequestParam("projectid") String projectId) {
+		return ResponseEntity.ok(taskService.getProjectSpecificTasks(projectId));
 	}
 }

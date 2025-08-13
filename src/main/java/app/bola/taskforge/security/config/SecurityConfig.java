@@ -44,7 +44,7 @@ public class SecurityConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.setAllowedOrigins(List.of("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app", "http://localhost:8080/"));
+		config.setAllowedOrigins(List.of("http://localhost:3000", "https://taskforge.app", "https://www.taskforge.app", "http://localhost:8080/", "https://task-forge-theta.vercel.app"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("Access-Control-Allow-Headers", "Access-Control-Allow-Credentials", "X-Tenant-ID", "X-Refresh-Token", "Authorization", "Content-Type", "Accept", "X-Requested-With", "Requestor-Type"));
 		source.registerCorsConfiguration("/**", config);
@@ -68,8 +68,8 @@ public class SecurityConfig {
 						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**" ).permitAll()
 						.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new").permitAll()
 						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
-						.requestMatchers("/api/project/**", "/api/task/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
-						.requestMatchers("/api/members/**", "/api/comment/**").authenticated()
+						.requestMatchers("/api/project/**", "/api/tasks/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
+						.requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
 			       )
 			       .exceptionHandling(exceptionHandling -> exceptionHandling
 	                   .authenticationEntryPoint((request, response, _) -> {

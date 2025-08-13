@@ -23,7 +23,7 @@ public class  WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(@NonNull CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://taskforge.app", "https://www.taskforge.app", "https://taskforge.vercel.app")
+				.allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://taskforge.app", "https://www.taskforge.app", "https://taskforge.vercel.app", "https://task-forge-theta.vercel.app")
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
 				.allowCredentials(true)
 				.allowedHeaders("*")

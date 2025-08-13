@@ -21,7 +21,7 @@ import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/comment")
+@RequestMapping("/api/comments")
 @Tag(name = "Comments", description = "APIs for managing comments on tasks and projects")
 @SecurityRequirement(name = "bearerAuth")
 public class CommentController implements BaseController<CommentRequest, CommentResponse> {
