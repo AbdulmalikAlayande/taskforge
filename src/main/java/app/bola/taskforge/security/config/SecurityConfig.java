@@ -56,9 +56,10 @@ public class SecurityConfig {
 		return http.cors(Customizer.withDefaults())
 			       .csrf(AbstractHttpConfigurer::disable)
 			       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			       .addFilterBefore(authorizationFilter, TaskForgeAuthenticationFilter.class)
+			    //    .addFilterBefore(authorizationFilter, TaskForgeAuthenticationFilter.class)
 			       .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-				   .addFilterAfter(tenantFilter, TaskForgeAuthenticationFilter.class)
+				   .addFilterAfter(authorizationFilter, TaskForgeAuthenticationFilter.class)
+				   .addFilterAfter(tenantFilter, TaskForgeAuthorizationFilter.class)
 			       .headers(headers -> headers
 	                   .contentSecurityPolicy(csp -> csp
 							.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'none'")

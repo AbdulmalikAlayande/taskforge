@@ -52,6 +52,7 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 				       uri.startsWith("/swagger-ui") ||
 				       uri.startsWith("/webjars") ||
 				       uri.startsWith("/swagger-resources") ||
+				       uri.startsWith("/api/auth") ||
 				       UNPROTECTED_PATHS.contains(uri);
 	}
 	
