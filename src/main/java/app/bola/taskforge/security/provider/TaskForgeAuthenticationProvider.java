@@ -24,13 +24,15 @@ public class TaskForgeAuthenticationProvider implements AuthenticationProvider {
 	
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		System.out.println("Authentication Provider auth initiated.");
 		
 		String email = authentication.getPrincipal().toString();
 		String password = authentication.getCredentials().toString();
-		
+		System.out.printf("Authentication Details: [%s] | [%s]\n", email, password);
 		UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-		
+		System.out.println("User Details"+userDetails);
 		if (userDetails == null) {
+			System.out.println("User Details is null");
 			throw new AuthenticationFailedException("Invalid Credentials");
 		}
 		

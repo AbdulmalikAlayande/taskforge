@@ -16,9 +16,12 @@ public class TaskForgeAuthenticationManager implements AuthenticationManager {
 	
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		System.out.println("Checking If Auth Provider Supports Authentication Type.");
 		if (authenticationProvider.supports(authentication.getClass())) {
+			System.out.println("Auth Provider Supported.");
 			return authenticationProvider.authenticate(authentication);
 		}
+		System.out.println("Auth Provider Not Supported.");
 		throw new AuthenticationFailedException("Authentication type not supported");
 	}
 	
