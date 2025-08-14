@@ -1,0 +1,14 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    - cron: "*/2 * * * *"   # every 2 minutes
+  workflow_dispatch:        # allow manual runs too
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl Render app
+        run: |
+          curl -I https://taskforge-f4v0.onrender.com/swagger-ui/index.html || echo "App might be sleeping, need to wake up"
