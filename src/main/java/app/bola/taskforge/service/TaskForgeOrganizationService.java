@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -47,11 +48,23 @@ public class TaskForgeOrganizationService implements OrganizationService {
 			log.error("Organization with name {} already exists", organizationRequest.getName());
 			throw new TaskForgeException("Organization with this name already exists");
 		}
-		
 		Organization organization = modelMapper.map(organizationRequest, Organization.class);
+		Member admin = getCurrentAdmin();
+		organization.getMembers().add(admin);
 		Organization savedEntity = organizationRepository.save(organization);
 		
+		if (admin.getOrganization() == null) {
+			log.warn("Linking organization to admin");
+			admin.setOrganization(savedEntity);
+			userRepository.save(admin);
+		}
 		return toResponse(savedEntity);
+	}
+	
+	private Member getCurrentAdmin() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		return userRepository.findByEmail(username)
+				       .orElseThrow(() -> new RuntimeException("Admin not found"));
 	}
 	
 	@Override

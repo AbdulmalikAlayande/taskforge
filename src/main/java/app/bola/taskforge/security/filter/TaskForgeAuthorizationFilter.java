@@ -31,6 +31,7 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserDetailsService userDetailsService;
 	public final List<String> UNPROTECTED_PATHS = List.of(
+			"/api/health",
 			"/api-docs/**",
 			"/favicon.ico",
 			"/swagger-ui/**",

@@ -7,6 +7,7 @@ delete from invitation_roles;
 delete from invitation;
 delete from member_projects;
 delete from project_members;
+delete from project;
 delete from member_roles;
 delete from member;
 delete from notification_preference;

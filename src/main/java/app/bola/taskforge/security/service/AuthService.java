@@ -70,15 +70,17 @@ public class AuthService {
 				            .orElseThrow(() -> new RuntimeException("User not found with email: " + loginRequest.getEmail()));
 		
 		String userId = user.getPublicId();
-		return AuthResponse.builder()
-				           .userId(userId)
-				           .accessToken(accessToken)
-					       .refreshToken(refreshToken)
-				           .tenantId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
-				           .organizationId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
-				           .email(loginRequest.getEmail())
-				           .roles(roles)
-				           .build();
+		AuthResponse authResponse = AuthResponse.builder()
+				                     .userId(userId)
+				                     .accessToken(accessToken)
+				                     .refreshToken(refreshToken)
+				                     .tenantId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
+				                     .organizationId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
+				                     .email(loginRequest.getEmail())
+				                     .roles(roles)
+				                     .build();
+		log.info("Login successful for user: {}; Auth Response: {}", loginRequest.getEmail(), authResponse);
+		return authResponse;
 	}
 	
 	public AuthResponse generateRefreshToken(String refreshToken) {
