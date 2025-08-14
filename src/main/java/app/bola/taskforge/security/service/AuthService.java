@@ -1,5 +1,6 @@
 package app.bola.taskforge.security.service;
 
+import app.bola.taskforge.domain.context.TenantContext;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.repository.UserRepository;
@@ -65,14 +66,17 @@ public class AuthService {
 		String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getEmail(), roles);
 		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String userId = userRepository.findByEmail(loginRequest.getEmail())
-				.orElseThrow(() -> new RuntimeException("User not found with email: " + loginRequest.getEmail()))
-				.getPublicId();
+		Member user = userRepository.findByEmail(loginRequest.getEmail())
+				            .orElseThrow(() -> new RuntimeException("User not found with email: " + loginRequest.getEmail()));
+		
+		String userId = user.getPublicId();
 		return AuthResponse.builder()
 				           .userId(userId)
 				           .accessToken(accessToken)
 					       .refreshToken(refreshToken)
-					       .email(loginRequest.getEmail())
+				           .tenantId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
+				           .organizationId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
+				           .email(loginRequest.getEmail())
 				           .roles(roles)
 				           .build();
 	}

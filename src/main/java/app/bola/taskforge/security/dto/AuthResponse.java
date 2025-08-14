@@ -19,6 +19,8 @@ public class AuthResponse implements Serializable {
 	String email;
 	String accessToken;
 	String refreshToken;
+	String tenantId;
+	String organizationId;
 	Set<String> roles;
 	@Builder.Default
 	String tokenType = "Bearer";
