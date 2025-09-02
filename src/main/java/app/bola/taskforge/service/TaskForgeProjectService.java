@@ -12,7 +12,6 @@ import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -39,21 +38,10 @@ public class TaskForgeProjectService implements ProjectService{
 	private final ProjectRepository projectRepository;
 	private final Validator validator;
 	
-	@PostConstruct
-	public void init() {
-		modelMapper.typeMap(ProjectRequest.class, Project.class).addMappings(map -> map.using(context -> {
-			if (context.getSource() == null) {
-				return null;
-			}
-			ProjectRequest request = (ProjectRequest) context.getSource();
-			return new DateRange(request.getStartDate(), request.getEndDate());
-		}).map(source -> source, Project::setDateRange));
-	}
-	
+
 	@Override
 	public ProjectResponse createNew(@NonNull ProjectRequest projectRequest) {
 		performValidation(validator, projectRequest);
-		
 		Organization organization = organizationRepository.findByIdScoped(projectRequest.getOrganizationId())
 				                            .orElseThrow(() -> new EntityNotFoundException("Organization not found with id: " + projectRequest.getOrganizationId()));
 		
@@ -76,7 +64,8 @@ public class TaskForgeProjectService implements ProjectService{
 		project.setOrganization(organization);
 		project.setStatus(ProjectStatus.ACTIVE);
 		project.setMembers(new HashSet<>(members));
-		
+		project.setDateRange(new DateRange(projectRequest.getStartDate(), projectRequest.getEndDate()));
+				
 		Project savedProject = projectRepository.save(project);
 		return toResponse(savedProject);
 	}
@@ -212,6 +201,9 @@ public class TaskForgeProjectService implements ProjectService{
 	
 	@Override
 	public ProjectResponse toResponse(Project entity) {
-		return modelMapper.map(entity, ProjectResponse.class);
+		ProjectResponse response = modelMapper.map(entity, ProjectResponse.class);
+		response.setStartDate(entity.getDateRange().getStartDate());
+		response.setEndDate(entity.getDateRange().getEndDate());
+		return response;
 	}
 }

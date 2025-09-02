@@ -77,10 +77,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		log.info("Attempting find by ID: {}", publicId);
 		Organization organization = organizationRepository.findByIdScoped(publicId)
 			.orElseThrow(() -> new EntityNotFoundException("Organization not found"));
-		log.info("Organization:: {}", organization);
-		
-		OrganizationResponse organizationResponse = modelMapper.map(organization, OrganizationResponse.class);
-		log.info("Organization Response:: {}", organizationResponse);
+		OrganizationResponse organizationResponse = toResponse(organization);
 		return organizationResponse;
 	}
 	
@@ -96,8 +93,21 @@ public class TaskForgeOrganizationService implements OrganizationService {
 	
 	@Override
 	public OrganizationResponse toResponse(Organization organization) {
-		return modelMapper.map(organization, OrganizationResponse.class);
-	}
+			if (organization.getProjects() != null && !organization.getProjects().isEmpty()) {
+				Set<ProjectResponse> projectResponses = organization.getProjects().stream().map(project -> {
+					ProjectResponse projectResponse = modelMapper.map(project, ProjectResponse.class);
+					if (project.getDateRange() != null) {
+						projectResponse.setStartDate(project.getDateRange().getStartDate());
+						projectResponse.setEndDate(project.getDateRange().getEndDate());
+					}
+					return projectResponse;
+				}).collect(Collectors.toSet());
+				OrganizationResponse response = modelMapper.map(organization, OrganizationResponse.class);
+				response.setProjects(projectResponses);
+				return response;
+			}
+			return modelMapper.map(organization, OrganizationResponse.class);
+		}
 	
 	@Override
 	@Transactional

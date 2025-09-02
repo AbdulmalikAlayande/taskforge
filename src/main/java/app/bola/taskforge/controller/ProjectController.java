@@ -15,10 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/project")

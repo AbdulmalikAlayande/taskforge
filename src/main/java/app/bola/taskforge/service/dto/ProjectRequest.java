@@ -2,6 +2,7 @@ package app.bola.taskforge.service.dto;
 
 
 import app.bola.taskforge.domain.enums.ProjectCategory;
+import app.bola.taskforge.domain.enums.ProjectPriority;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -35,4 +36,22 @@ public class ProjectRequest implements Serializable {
 	List<String> memberIds;
 	@NotNull
 	ProjectCategory category;
+	@NotNull
+	ProjectPriority priority;
+
+
+	@Override
+	public String toString() {
+		return new java.util.StringJoiner(", ", ProjectRequest.class.getSimpleName() + "[", "]")
+				.add("status='" + status + "'")
+				.add("name='" + name + "'")
+				.add("description='" + description + "'")
+				.add("endDate=" + endDate)
+				.add("startDate=" + startDate)
+				.add("organizationId='" + organizationId + "'")
+				.add("memberIds=" + memberIds)
+				.add("category=" + category)
+				.add("priority=" + priority)
+				.toString();
+	}
 }

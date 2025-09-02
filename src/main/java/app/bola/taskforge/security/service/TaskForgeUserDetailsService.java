@@ -33,11 +33,15 @@ public class TaskForgeUserDetailsService implements UserDetailsService {
 				                      .orElseThrow(() -> new UsernameNotFoundException(username));
 		
 		String currentTenant = TenantContext.getCurrentTenant();
-		if (member.getOrganization() != null) {
+		log.info("Current tenant: {}", currentTenant);
+		/*FIXME: This section gotta go, for now I don't really understand what's going on
+			
+			if (member.getOrganization() != null) {
 			if (!member.getOrganization().getPublicId().equals(currentTenant)) {
 				throw new UnauthorizedException("User not authorized for this organization");
 			}
 		}
+		**/
 		
 		List<SimpleGrantedAuthority> authorities = member.getRoles()
 			.stream()

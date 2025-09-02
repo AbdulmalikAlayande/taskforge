@@ -3,6 +3,7 @@ package app.bola.taskforge.domain.entity;
 import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.domain.enums.ProjectCategory;
 import app.bola.taskforge.domain.enums.ProjectStatus;
+import app.bola.taskforge.domain.enums.ProjectPriority;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -32,7 +33,10 @@ public class Project extends BaseEntity {
 	
 	@Enumerated(value = EnumType.STRING)
 	private ProjectStatus status;
-	
+
+	@Enumerated(value = EnumType.STRING)
+	private ProjectPriority priority;
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@Builder.Default
 	private Set<Member> members = new HashSet<>();

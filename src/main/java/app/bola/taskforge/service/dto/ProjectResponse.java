@@ -1,5 +1,6 @@
 package app.bola.taskforge.service.dto;
 
+import app.bola.taskforge.domain.enums.ProjectPriority;
 import app.bola.taskforge.domain.enums.ProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +23,7 @@ public class ProjectResponse implements Serializable {
 	
 	String name;
 	ProjectStatus status;
+	ProjectPriority priority;
 	String category;
 	String publicId;
 	boolean archived;

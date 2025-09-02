@@ -25,5 +25,35 @@ public class AuthResponse implements Serializable {
 	@Builder.Default
 	String tokenType = "Bearer";
 	LocalDateTime expiresIn;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof AuthResponse)) return false;
+		AuthResponse that = (AuthResponse) obj;
+		return userId.equals(that.userId) &&
+				email.equals(that.email) &&
+				accessToken.equals(that.accessToken) &&
+				refreshToken.equals(that.refreshToken) &&
+				tenantId.equals(that.tenantId) &&
+				organizationId.equals(that.organizationId) &&
+				roles.equals(that.roles) &&
+				tokenType.equals(that.tokenType) &&
+				expiresIn.equals(that.expiresIn);
+	}
 	
+	@Override
+	public String toString() {
+		return "AuthResponse{" +
+				"userId='" + userId + '\'' +
+				", email='" + email + '\'' +
+				", accessToken='" + accessToken + '\'' +
+				", refreshToken='" + refreshToken + '\'' +
+				", tenantId='" + tenantId + '\'' +
+				", organizationId='" + organizationId + '\'' +
+				", roles=" + roles +
+				", tokenType='" + tokenType + '\'' +
+				", expiresIn=" + expiresIn +
+				'}';
+	}
 }
