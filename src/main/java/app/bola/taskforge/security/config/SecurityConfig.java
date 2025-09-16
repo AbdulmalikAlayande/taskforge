@@ -23,11 +23,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
+import app.bola.taskforge.security.handler.TaskForgeAuthenticationEntryPoint;
+import app.bola.taskforge.security.handler.TaskForgeAccessDeniedHandler;
 
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 	private final ObjectMapper objectMapper;
-	private final app.bola.taskforge.security.handler.TaskForgeAuthenticationEntryPoint authenticationEntryPoint;
-	private final app.bola.taskforge.security.handler.TaskForgeAccessDeniedHandler accessDeniedHandler;
+	private final TaskForgeAuthenticationEntryPoint authenticationEntryPoint;
+	private final TaskForgeAccessDeniedHandler accessDeniedHandler;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
