@@ -22,23 +22,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-@EnableMethodSecurity
 public class SecurityConfig {
-	
 	private final ObjectMapper objectMapper;
-	
+	private final app.bola.taskforge.security.handler.TaskForgeAuthenticationEntryPoint authenticationEntryPoint;
+	private final app.bola.taskforge.security.handler.TaskForgeAccessDeniedHandler accessDeniedHandler;
+
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(12);
 	}
-	
+
 	@Bean
 	public CorsFilter corsFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -50,7 +43,7 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", config);
 		return new CorsFilter(source);
 	}
-	
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, TaskForgeAuthenticationFilter authenticationFilter, TaskForgeAuthorizationFilter authorizationFilter, TenantFilter tenantFilter) throws Exception {
 		return http.cors(Customizer.withDefaults())
@@ -58,53 +51,24 @@ public class SecurityConfig {
 			       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			       .addFilterBefore(authorizationFilter, TaskForgeAuthenticationFilter.class)
 			       .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-				   .addFilterAfter(tenantFilter, TaskForgeAuthenticationFilter.class)
+			       .addFilterAfter(tenantFilter, TaskForgeAuthenticationFilter.class)
 			       .headers(headers -> headers
-	                   .contentSecurityPolicy(csp -> csp
+	                   	.contentSecurityPolicy(csp -> csp
 							.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'none'")
-	                   )
+	                   	)
 	                   .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(63072000))
-			       ).authorizeHttpRequests(auth -> auth
-						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**", "/api/health" ).permitAll()
-						.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new").permitAll()
-						.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
-						.requestMatchers("/api/project/**", "/api/tasks/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
-						.requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
-			       )
-			       .exceptionHandling(exceptionHandling -> exceptionHandling
-	                   .authenticationEntryPoint((request, response, _) -> {
-							response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-							response.setContentType("application/json");
-
-							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-							response.setHeader("Access-Control-Allow-Credentials", "true");
-							response.setHeader("Vary", "Origin");
-
-							Map<String, Object> errorDetails = new HashMap<>();
-							errorDetails.put("message", "Unauthorized: Authentication is required to access this resource.");
-							errorDetails.put("error", "UNAUTHORIZED");
-							errorDetails.put("status", 401);
-							errorDetails.put("path", request.getRequestURI());
-
-							response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
-					   })
-						.accessDeniedHandler((request, response, _) -> {
-							response.setContentType("application/json");
-							response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-
-							response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-							response.setHeader("Access-Control-Allow-Credentials", "true");
-							response.setHeader("Vary", "Origin");
-
-							Map<String, Object> errorResponse = new HashMap<>();
-							errorResponse.put("responseCode", 403);
-							errorResponse.put("responseMessage", "Access Denied: You do not have the required permissions to access this resource.");
-							errorResponse.put("status", false);
-
-							response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-						})
-			       )
-			       .build();
+	               )
+			   	.authorizeHttpRequests(auth -> auth
+					.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**", "/api/health" ).permitAll()
+					.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new").permitAll()
+					.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
+					.requestMatchers("/api/project/**", "/api/tasks/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
+					.requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
+			   	)
+			   	.exceptionHandling(exceptionHandling -> exceptionHandling
+				   .authenticationEntryPoint(authenticationEntryPoint)
+				   .accessDeniedHandler(accessDeniedHandler)
+				)
+				.build();
 	}
-
 }
