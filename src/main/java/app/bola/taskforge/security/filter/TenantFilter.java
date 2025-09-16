@@ -31,6 +31,7 @@ public class TenantFilter extends OncePerRequestFilter {
 				       uri.startsWith("/swagger-resources") ||
 				       REQUIRE_TENANT_UNAWARE_ENDPOINTS.contains(uri);
 	}
+	
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,
 	                                @NonNull HttpServletResponse response,

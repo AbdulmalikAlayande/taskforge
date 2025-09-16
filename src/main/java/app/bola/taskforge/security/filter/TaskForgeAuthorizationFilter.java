@@ -45,7 +45,8 @@ public class TaskForgeAuthorizationFilter extends OncePerRequestFilter {
 			"/api/health",
 			"/swagger-ui/index.html",
 			"/api-docs",
-			"/swagger-ui.html"
+			"/swagger-ui.html",
+			"/api/members/create-new"
 	);
 	
 	private boolean shouldBypassAuth(String uri) {

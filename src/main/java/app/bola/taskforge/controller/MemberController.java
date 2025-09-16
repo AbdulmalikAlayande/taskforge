@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/members")
 @AllArgsConstructor
@@ -117,7 +119,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	public ResponseEntity<InvitationResponse> acceptInvitation(
 			@Parameter(description = "Invitation token", required = true)
 			@RequestParam String token) {
-				log.info("Invitation Acceptance Token: {}", token);
+		log.info("Invitation Acceptance Token: {}", token);
 		return ResponseEntity.ok(memberService.acceptInvitation(token));
 	}
 }
