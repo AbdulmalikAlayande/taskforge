@@ -22,6 +22,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.List;
+
 public class SecurityConfig {
 	private final ObjectMapper objectMapper;
 	private final app.bola.taskforge.security.handler.TaskForgeAuthenticationEntryPoint authenticationEntryPoint;
