@@ -26,7 +26,7 @@ public class NotificationService {
 		
 		try {
 			List<NotificationPreference> preferences = event.getUserIdList().stream()
-				                                            .map(preferenceManager::getPreference)
+															.map(userId -> preferenceManager.getPreference(userId))
 				                                            .filter(NotificationPreference::isAllowNotification)
 				                                            .toList();
 			

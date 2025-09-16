@@ -5,6 +5,8 @@ import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.entity.Project;
 import app.bola.taskforge.domain.enums.ProjectStatus;
+import app.bola.taskforge.event.publisher.EventPublisher;
+import app.bola.taskforge.event.ProjectEvent;
 import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.repository.OrganizationRepository;
@@ -37,6 +39,7 @@ public class TaskForgeProjectService implements ProjectService{
 	private final UserRepository userRepository;
 	private final ProjectRepository projectRepository;
 	private final Validator validator;
+	private final EventPublisher eventPublisher;
 	
 
 	@Override
@@ -67,7 +70,7 @@ public class TaskForgeProjectService implements ProjectService{
 		project.setDateRange(new DateRange(projectRequest.getStartDate(), projectRequest.getEndDate()));
 				
 		Project savedProject = projectRepository.save(project);
-		
+		eventPublisher.publishEvent(new ProjectEvent(savedProject, savedProject.getPublicId(), "create"));
 		return toResponse(savedProject);
 	}
 	

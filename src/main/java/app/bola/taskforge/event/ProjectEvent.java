@@ -16,18 +16,43 @@ public class ProjectEvent extends TaskForgeEvent {
         super(source);
     }
 
+    public ProjectEvent(Object source, String projectId, String eventType){
+        this(source);
+        this.projectId = projectId;
+        this.eventType = EventType.fromEvent(eventType);
+    }
     public enum EventType {
 
-        PROJECT_CREATED,
-		PROJECT_COMPLETED,
+        PROJECT_CREATED("create"),
+        PROJECT_COMPLETED("complete");
+
+        private final String event;
+
+        EventType(String event) {
+            this.event = event;
+        }
+
+        public String getEvent() {
+            return event;
+        }
+
+        public static EventType fromEvent(String event) {
+            for (EventType type : values()) {
+                if (type.getEvent().equalsIgnoreCase(event)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Unknown event: " + event);
+        }
     }
+
 
     @Override
     public String toString() {
         return new StringBuilder().append("Project [")
                                 .append(sourceEntityType.toUpperCase()+", ")
                                 .append(eventType)
-                                .append("]");
+                                .append("]").toString();
 
     }
     

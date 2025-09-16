@@ -117,6 +117,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	public ResponseEntity<InvitationResponse> acceptInvitation(
 			@Parameter(description = "Invitation token", required = true)
 			@RequestParam String token) {
+				log.info("Invitation Acceptance Token: {}", token);
 		return ResponseEntity.ok(memberService.acceptInvitation(token));
 	}
 }

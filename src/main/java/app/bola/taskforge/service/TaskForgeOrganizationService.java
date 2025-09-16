@@ -150,18 +150,22 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
 		
 		invitationRepository.save(invitation);
-		
-		mailSender.sendEmail(
-			List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
-			"Invitation to join TaskForge",
-			"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
-		);
+		try{
+			mailSender.sendEmail(
+				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
+				"Invitation to join TaskForge",
+				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
+			);
+		}catch (Exception exception) {
+			log.error("Failed to send email:: {}", exception);
+		}
 
 		InvitationResponse response = modelMapper.map(invitation, InvitationResponse.class);
 		response.setMessage("invited");
 		response.setOrganizationId(organization.getPublicId());
 		response.setOrganizationName(organization.getName());
 		response.setInvitationLink("https://taskforge.com/accept?token=%s".formatted(token));
+		log.info("Invitation Token: {}", token);
 		return response;
 	}
 	
