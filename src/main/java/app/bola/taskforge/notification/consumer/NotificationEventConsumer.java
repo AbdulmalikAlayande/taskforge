@@ -1,6 +1,7 @@
 package app.bola.taskforge.notification.consumer;
 
 import app.bola.taskforge.event.TaskEvent;
+import app.bola.taskforge.event.ProjectEvent;
 import app.bola.taskforge.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,5 +18,10 @@ public class NotificationEventConsumer {
 	@EventListener
 	public void consumeTaskEvent(TaskEvent event) {
 		notificationService.processTaskEvent(event);
+	}
+
+	@EventListener
+	public void consumeProjectEvent(ProjectEvent event){
+		notificationService.processProjectEvent(event);
 	}
 }

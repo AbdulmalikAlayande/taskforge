@@ -1,6 +1,7 @@
 package app.bola.taskforge.notification.service;
 
 import app.bola.taskforge.domain.entity.NotificationPreference;
+import app.bola.taskforge.event.ProjectEvent;
 import app.bola.taskforge.event.TaskEvent;
 import app.bola.taskforge.notification.model.NotificationCandidate;
 import app.bola.taskforge.notification.model.NotificationPriority;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -19,7 +21,7 @@ public class NotificationService {
 
 	final DebounceEngine debounceEngine;
 	final PreferenceManager preferenceManager;
-	
+ 	
 	public void processTaskEvent(TaskEvent event) {
 		
 		try {
@@ -62,5 +64,9 @@ public class NotificationService {
 	
 	private String generateDebounceKey(String userId, String taskId, String eventType) {
 		return String.format("%s:%s:%s", userId, taskId, eventType);
+	}
+
+	public void processProjectEvent(ProjectEvent event){
+		IntStream.range(0, 2).forEach(num -> log.info("{} Processing Event: {}", num, event));
 	}
 }

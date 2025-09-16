@@ -67,6 +67,7 @@ public class TaskForgeProjectService implements ProjectService{
 		project.setDateRange(new DateRange(projectRequest.getStartDate(), projectRequest.getEndDate()));
 				
 		Project savedProject = projectRepository.save(project);
+		
 		return toResponse(savedProject);
 	}
 	
