@@ -24,7 +24,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberResponse implements Serializable {
 	
-	Set<Role> role;
+	Set<Role> roles;
 	String email;
 	boolean active;
 	boolean deleted;

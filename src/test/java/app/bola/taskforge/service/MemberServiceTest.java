@@ -184,7 +184,7 @@ public class MemberServiceTest {
 		            .firstName("John")
 		            .lastName("Doe")
 		            .active(true)
-		            .role(Role.ORGANIZATION_MEMBER)
+		            .roles(Set.of(Role.ORGANIZATION_MEMBER))
 		            .build();
 		
 		    when(userRepository.save(any(Member.class))).thenReturn(savedMember);
@@ -199,7 +199,7 @@ public class MemberServiceTest {
 		    assertEquals("John", response.getFirstName());
 		    assertEquals("Doe", response.getLastName());
 		    assertTrue(response.isActive());
-		    assertEquals(Role.ORGANIZATION_MEMBER, response.getRole());
+		    assertEquals(Role.ORGANIZATION_MEMBER, response.getRoles());
 		
 		    verify(userRepository).save(any(Member.class));
 		    verify(modelMapper).map(savedMember, MemberResponse.class);
