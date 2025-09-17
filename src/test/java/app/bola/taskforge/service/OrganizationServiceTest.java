@@ -419,7 +419,7 @@ class OrganizationServiceTest {
 			InvitationRequest request = InvitationRequest.builder()
 					.organizationId(organizationResponse.getPublicId())
 					.email("alaabdulmalik03@gmail.com")
-                    .name("Alayande Abdulmalik")
+                    .inviteeName("Alayande Abdulmalik")
 					.invitedBy("member-id-123")
                     .role("ORGANIZATION_MEMBER")
                     .build();
@@ -468,7 +468,7 @@ class OrganizationServiceTest {
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId(organizationResponse.getPublicId())
 					                            .email("alaabdulmalik03@gmail.com")
-					                            .name("Alayande Abdulmalik")
+					                            .inviteeName("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -487,7 +487,7 @@ class OrganizationServiceTest {
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId("non-existent-org-id")
 					                            .email("alaabdulmalik03@gmail.com")
-					                            .name("Alayande Abdulmalik")
+					                            .inviteeName("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -510,7 +510,7 @@ class OrganizationServiceTest {
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId("org-12345")
 					                            .email("invalid-email-format")
-					                            .name("Alayande Abdulmalik")
+					                            .inviteeName("Alayande Abdulmalik")
 					                            .invitedBy("member-id-123")
 					                            .role("ORGANIZATION_MEMBER")
 					                            .build();
@@ -534,7 +534,7 @@ class OrganizationServiceTest {
 			InvitationRequest request = InvitationRequest.builder()
 					                            .organizationId(null) // missing
 					                            .email("")     // missing
-					                            .name(null)    // missing
+					                            .inviteeName(null)    // missing
 					                            .invitedBy("")        // missing
 					                            .role(null)           // missing
 					                            .build();

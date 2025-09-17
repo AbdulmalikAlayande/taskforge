@@ -49,7 +49,7 @@ public class MemberIntegrationTest {
 		TenantContext.setCurrentTenant(orgResponse.getPublicId());
 		
 		InvitationRequest initInvRequest = InvitationRequest.builder()
-			.organizationId(orgResponse.getPublicId()).name("Test Admin").email("testadminuser1@gmail.com")
+			.organizationId(orgResponse.getPublicId()).inviteeName("Test Admin").email("testadminuser1@gmail.com")
             .role("ORGANIZATION_ADMIN").invitedBy("").build();
 		
 		InvitationResponse invitationResponse = organizationService.inviteMember(initInvRequest);
@@ -76,7 +76,7 @@ public class MemberIntegrationTest {
 			//Given
 			InvitationRequest invRequest = InvitationRequest.builder()
 					                               .invitedBy(testMember.getPublicId()).email("newuseremail@gmail.com").role("ORGANIZATION_MEMBER")
-					                               .name("New User").organizationId(orgResponse.getPublicId()).build();
+					                               .inviteeName("New User").organizationId(orgResponse.getPublicId()).build();
 			
 			InvitationResponse invResponse = organizationService.inviteMember(invRequest);
 			
@@ -128,7 +128,7 @@ public class MemberIntegrationTest {
 					                               .invitedBy(testMember.getPublicId())
 					                               .email("existentuser@gmail.com")
 					                               .role("ORGANIZATION_MEMBER")
-					                               .name("Existent User")
+					                               .inviteeName("Existent User")
 					                               .organizationId(orgResponse.getPublicId())
 					                               .build();
 			
@@ -148,7 +148,7 @@ public class MemberIntegrationTest {
 					                               .invitedBy(testMember.getPublicId())
 					                               .email("alreadyaccepted@example.com")
 					                               .role("ORGANIZATION_MEMBER")
-					                               .name("Already Accepted")
+					                               .inviteeName("Already Accepted")
 					                               .organizationId(orgResponse.getPublicId())
 					                               .build();
 			
@@ -172,7 +172,7 @@ public class MemberIntegrationTest {
 		@BeforeEach
 		public void setup() {
 			InvitationRequest request = InvitationRequest.builder()
-				.organizationId(orgResponse.getPublicId()).name("New Member").email("newmember@example.com")
+				.organizationId(orgResponse.getPublicId()).inviteeName("New Member").email("newmember@example.com")
                 .role("ORGANIZATION_MEMBER").invitedBy(testMember.getPublicId()).build();
 			
 			invitationResponse = organizationService.inviteMember(request);

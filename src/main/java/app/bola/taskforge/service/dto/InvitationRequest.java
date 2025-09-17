@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class InvitationRequest implements Serializable {
 	
 	@NotBlank
-	String name;
+	String inviteeName;
 	
 	String invitedBy;
 	

@@ -21,6 +21,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class Invitation extends BaseEntity {
 	
+	String inviteeName;
+	
 	@ElementCollection
 	@Enumerated(EnumType.STRING)
 	private Set<Role> roles;
@@ -28,8 +30,13 @@ public class Invitation extends BaseEntity {
 	@Lob
 	@Column(columnDefinition = "TEXT", length = 100000)
 	private String token;
+	
 	private String email;
 	private LocalDateTime expiresAt;
+	
+	@Lob
+	@Column(columnDefinition = "TEXT", length = 100000)
+	private String invitationLink;
 	
 	@ManyToOne
 	private Member invitedBy;

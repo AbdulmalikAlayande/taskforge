@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8" />
-		<title>Welcome to [[${organizationName}]]!</title>
+		<title>Welcome to TaskForge!</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	</head>
 	<body style="margin: 0; padding: 0; background-color: #f4f4f4">
@@ -33,7 +33,7 @@
 								<img
 									th:src="@{${organizationLogoUrl}}"
 									src="https://via.placeholder.com/120x40?text=Logo"
-									alt="[[${organizationName}]] Logo"
+									alt="TaskForge Logo"
 									width="120"
 									height="40"
 									style="display: block; border-radius: 4px"
@@ -50,7 +50,7 @@
 								"
 							>
 								<h2 style="margin: 0 0 12px 0; font-size: 28px; color: #2a7ae2">
-									Welcome, <span th:text="${userFirstName}">User</span>!
+									Welcome, <span th:text="${username}">User</span>!
 								</h2>
 								<p
 									style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6"
@@ -158,11 +158,8 @@
 								"
 							>
 								<p style="margin: 0">
-									&copy; [[${year}]] [[${organizationName}]]. All rights
-									reserved.<br />
-									<span th:text="${organizationAddress}"
-										>123 Main St, City, Country</span
-									>
+									&copy; 2025 TaskForge. All rights reserved.<br />
+									<span>123 TaskForge St, Productivity City, Workland</span>
 								</p>
 							</td>
 						</tr>

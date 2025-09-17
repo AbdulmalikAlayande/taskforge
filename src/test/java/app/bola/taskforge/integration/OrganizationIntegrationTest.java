@@ -186,7 +186,7 @@ public class OrganizationIntegrationTest {
             InvitationRequest request = InvitationRequest.builder()
                     .organizationId(testOrganization.getPublicId())
                     .email("new.member." + uniqueIdentifier + "@example.com")
-                    .name("New Member")
+                    .inviteeName("New Member")
                     .invitedBy(memberResponse.getPublicId())
                     .role("ORGANIZATION_MEMBER")
                     .build();
@@ -218,7 +218,7 @@ public class OrganizationIntegrationTest {
             InvitationRequest request = InvitationRequest.builder()
                     .organizationId("non-existent-org-id")
                     .email("new.member." + uniqueIdentifier + "@example.com")
-                    .name("New Member")
+                    .inviteeName("New Member")
                     .invitedBy(testMember.getPublicId())
                     .role("ORGANIZATION_MEMBER")
                     .build();
@@ -238,7 +238,7 @@ public class OrganizationIntegrationTest {
             InvitationRequest request = InvitationRequest.builder()
                     .organizationId(testOrganization.getPublicId())
                     .email("invalid-email") // Invalid email
-                    .name("New Member")
+                    .inviteeName("New Member")
                     .invitedBy(testMember.getPublicId())
                     .role("INVALID_ROLE") // Invalid role
                     .build();
@@ -261,7 +261,7 @@ public class OrganizationIntegrationTest {
             InvitationRequest request = InvitationRequest.builder()
                     .organizationId(testOrganization.getPublicId())
                     .email(email)
-                    .name("Already Invited")
+                    .inviteeName("Already Invited")
                     .invitedBy(memberResponse.getPublicId())
                     .role("ORGANIZATION_MEMBER")
                     .build();
@@ -313,7 +313,7 @@ public class OrganizationIntegrationTest {
 				                                   .invitedBy(secondOrgMember.getPublicId())
 				                                   .email(testMember.getEmail())
 				                                   .role("ORGANIZATION_MEMBER")
-				                                   .name("Test Member")
+				                                   .inviteeName("Test Member")
 				                                   .organizationId(secondOrgResponse.getPublicId())
 				                                   .build();
 		    

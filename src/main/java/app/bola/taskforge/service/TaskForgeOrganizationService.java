@@ -58,6 +58,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 			admin.setOrganization(savedEntity);
 			userRepository.save(admin);
 		}
+		mailSender.sendWelcomeEmail(admin.getFirstName(), admin.getEmail(), organization.getName());
 		return toResponse(savedEntity);
 	}
 	
@@ -77,8 +78,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		log.info("Attempting find by ID: {}", publicId);
 		Organization organization = organizationRepository.findByIdScoped(publicId)
 			.orElseThrow(() -> new EntityNotFoundException("Organization not found"));
-		OrganizationResponse organizationResponse = toResponse(organization);
-		return organizationResponse;
+		return toResponse(organization);
 	}
 	
 	@Override
@@ -148,23 +148,15 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		invitation.setToken(token);
 		invitation.setStatus(InvitationStatus.PENDING);
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
+		invitation.setInvitationLink(String.format("https://taskforge.com/accept?token=%s", token));
 		
 		invitationRepository.save(invitation);
-		try{
-			mailSender.sendEmail(
-				List.of(new MailSender.Notification.Recipient(request.getEmail(), request.getName())),
-				"Invitation to join TaskForge",
-				"You have to join %s on TaskForge. Click this link to join https://taskforge.com/accept?token=%s".formatted(organization.getName(), token)
-			);
-		}catch (Exception exception) {
-			log.error("Failed to send email:: {}", exception);
-		}
+		mailSender.sendInvitationMail(invitation, organization.getName());
 
 		InvitationResponse response = modelMapper.map(invitation, InvitationResponse.class);
 		response.setMessage("invited");
 		response.setOrganizationId(organization.getPublicId());
 		response.setOrganizationName(organization.getName());
-		response.setInvitationLink("https://taskforge.com/accept?token=%s".formatted(token));
 		log.info("Invitation Token: {}", token);
 		return response;
 	}

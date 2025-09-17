@@ -60,7 +60,7 @@ class ProjectIntegrationTest {
 			String email = "email" + index + System.currentTimeMillis() + "@gmail.com";
 			InvitationResponse invitationResponse = organizationService.inviteMember(
 					InvitationRequest.builder()
-							.email(email).name("Test"+index).role("ORGANIZATION_ADMIN")
+							.email(email).inviteeName("Test"+index).role("ORGANIZATION_ADMIN")
 							.organizationId(testOrg.getPublicId()).build()
 			);
 			
@@ -208,7 +208,7 @@ class ProjectIntegrationTest {
 		}
 		
 		private MemberResponse processMemberData() {
-			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().name("Test Admin Member")
+			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().inviteeName("Test Admin Member")
 				.organizationId(testOrg.getPublicId()).role("ORGANIZATION_ADMIN").email("testadminmember@gmail.com").build());
 			
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
@@ -304,7 +304,7 @@ class ProjectIntegrationTest {
 		}
 		
 		private MemberResponse processMemberData() {
-			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().name("Test Admin Member")
+			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().inviteeName("Test Admin Member")
 				.organizationId(testOrg.getPublicId()).role("ORGANIZATION_ADMIN").email("testadminmember2@gmail.com").build());
 			
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
@@ -370,7 +370,7 @@ class ProjectIntegrationTest {
 		public void shouldNotFailWhenMemberNotInProject() {
 			
 			// Given: A valid project and a member that is not in the project
-			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().name("Test Admin Member3")
+			InvitationResponse invResponse = organizationService.inviteMember(InvitationRequest.builder().inviteeName("Test Admin Member3")
 				.organizationId(testOrg.getPublicId()).role("ORGANIZATION_ADMIN").email("testadminmember3@gmail.com").build());
 			
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
