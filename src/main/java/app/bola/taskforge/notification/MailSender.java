@@ -61,9 +61,11 @@ public class MailSender {
 		return sendEmail("Welcome to TaskForge", htmlContent, List.of(new Notification.Recipient(email, username)));
 	}
 	
-	public void sendInvitationMail(Invitation invitation, String organizationName){
+	public ResponseEntity<?> sendInvitationMail(Invitation invitation, String organizationName){
+		String inviteeName = StringUtils.isNotBlank(invitation.getInviteeName()) ?
+				                     invitation.getInviteeName() : invitation.getEmail().split("@")[0];
 		Map<String, Object> contextVariables = Map.of(
-			"inviteeName", StringUtils.isNotBlank(invitation.getInviteeName()) ? invitation.getInviteeName() : invitation.getEmail().split("@")[0],
+			"inviteeName", inviteeName,
 			"inviterName", invitation.getInvitedBy().getFirstName()+" "+invitation.getInvitedBy().getLastName(),
 			"inviteeEmail", invitation.getEmail(),
 			"invitationLink", invitation.getInvitationLink(),
@@ -71,7 +73,8 @@ public class MailSender {
 		);
 		context.setVariables(contextVariables);
 		String htmlContent = templateEngine.process("member-invitation", context);
-		
+		return sendEmail(String.format("Invitation to join %s on TaskForge", organizationName), htmlContent,
+				List.of(new Notification.Recipient(invitation.getEmail(), inviteeName)));
 	}
 	
 	public ResponseEntity<?> sendEmail(String subject, String content, List<Notification.Recipient> recipients) {
