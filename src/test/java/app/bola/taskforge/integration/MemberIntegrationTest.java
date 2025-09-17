@@ -58,7 +58,7 @@ public class MemberIntegrationTest {
 		memberService.acceptInvitation(token);
 		
 		MemberRequest memberRequest = MemberRequest.builder()
-              .organizationId(orgResponse.getPublicId()).firstname("Test Admin").lastname("Member")
+              .organizationId(orgResponse.getPublicId()).firstName("Test Admin").lastName("Member")
               .email("testadminuser1@gmail.com").password("test#admin$password123#").build();
 
 		testMember = memberService.createNew(memberRequest);
@@ -191,8 +191,8 @@ public class MemberIntegrationTest {
 	        // Given
 	        MemberRequest memberRequest = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("New")
-	            .lastname("Member")
+	            .firstName("New")
+	            .lastName("Member")
 	            .email("newmember@example.com")
 	            .password("password123")
 	            .build();
@@ -214,8 +214,8 @@ public class MemberIntegrationTest {
 	    public void shouldFailIfRequiredFieldsAreMissingOrFailsValidationContract() {
 	        MemberRequest requestWithMissingEmail = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("Test")
-	            .lastname("Member")
+	            .firstName("Test")
+	            .lastName("Member")
 	            .password("password123")
 	            .build();
 	
@@ -224,8 +224,8 @@ public class MemberIntegrationTest {
 	        // Test with empty email
 	        MemberRequest requestWithEmptyEmail = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("Test")
-	            .lastname("Member")
+	            .firstName("Test")
+	            .lastName("Member")
 	            .email("")
 	            .password("password123")
 	            .build();
@@ -235,8 +235,8 @@ public class MemberIntegrationTest {
 	        // Test with invalid email format
 	        MemberRequest requestWithInvalidEmail = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("Test")
-	            .lastname("Member")
+	            .firstName("Test")
+	            .lastName("Member")
 	            .email("invalid-email")
 	            .password("password123")
 	            .build();
@@ -246,8 +246,8 @@ public class MemberIntegrationTest {
 	        // Test with missing password
 	        MemberRequest requestWithMissingPassword = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("Test")
-	            .lastname("Member")
+	            .firstName("Test")
+	            .lastName("Member")
 	            .email("test@example.com")
 	            .build();
 	
@@ -256,7 +256,7 @@ public class MemberIntegrationTest {
 	        // Test with missing firstName
 	        MemberRequest requestWithMissingFirstName = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .lastname("Member")
+	            .lastName("Member")
 	            .email("test@example.com")
 	            .password("password123")
 	            .build();
@@ -266,7 +266,7 @@ public class MemberIntegrationTest {
 	        // Test with missing lastName
 	        MemberRequest requestWithMissingLastName = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("Test")
+	            .firstName("Test")
 	            .email("test@example.com")
 	            .password("password123")
 	            .build();
@@ -275,8 +275,8 @@ public class MemberIntegrationTest {
 	
 	        // Test with missing organizationId
 	        MemberRequest requestWithMissingOrgId = MemberRequest.builder()
-	            .firstname("Test")
-	            .lastname("Member")
+	            .firstName("Test")
+	            .lastName("Member")
 	            .email("test@example.com")
 	            .password("password123")
 	            .build();
@@ -290,7 +290,7 @@ public class MemberIntegrationTest {
 	        // Given
 	        // Use the email of the testMember that's already created in the setup method
 	        MemberRequest memberRequest = MemberRequest.builder()
-				.organizationId(orgResponse.getPublicId()).firstname("Test Admin").lastname("Member")
+				.organizationId(orgResponse.getPublicId()).firstName("Test Admin").lastName("Member")
 				.email("testadminuser1@gmail.com").password("test#admin$password123#")
 	            .build();
 	
@@ -306,8 +306,8 @@ public class MemberIntegrationTest {
 	
 	        MemberRequest memberRequest = MemberRequest.builder()
 	            .organizationId(nonExistentOrgId)
-	            .firstname("New")
-	            .lastname("Member")
+	            .firstName("New")
+	            .lastName("Member")
 	            .email("newmember@example.com")
 	            .password("password123")
 	            .build();
@@ -325,8 +325,8 @@ public class MemberIntegrationTest {
 	
 	        MemberRequest memberRequest = MemberRequest.builder()
 	            .organizationId(orgResponse.getPublicId())
-	            .firstname("No")
-	            .lastname("Invitation")
+	            .firstName("No")
+	            .lastName("Invitation")
 	            .email(emailWithoutInvitation)
 	            .password("password123")
 	            .build();

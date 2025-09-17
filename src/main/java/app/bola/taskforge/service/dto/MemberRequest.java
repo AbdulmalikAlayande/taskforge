@@ -22,15 +22,15 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberRequest implements Serializable {
 
-	// @Email(message = "Invalid email format", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+	@Email(message = "Invalid email format", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
 	@NotBlank
 	String email;
 	@NotBlank
 	String password;
 	@NotBlank
-	String firstname;
+	String firstName;
 	@NotBlank
-	String lastname;
+	String lastName;
 	@NotBlank
 	String organizationId;
 }

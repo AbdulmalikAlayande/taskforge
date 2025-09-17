@@ -71,8 +71,8 @@ class ProjectIntegrationTest {
 					MemberRequest.builder()
 							.password("password-" + index+System.currentTimeMillis())
 							.email(email)
-							.firstname("Test"+index)
-							.lastname("Member"+index)
+							.firstName("Test"+index)
+							.lastName("Member"+index)
 							.organizationId(testOrg.getPublicId())
 							.build()
 			);
@@ -214,7 +214,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			return memberService.createNew(MemberRequest.builder().email("testadminmember@gmail.com").password("test-admin-member@#123")
-				.firstname("Test Admin").lastname("Member").organizationId(testOrg.getPublicId()).build());
+				.firstName("Test Admin").lastName("Member").organizationId(testOrg.getPublicId()).build());
 		}
 		
 		@Test
@@ -310,7 +310,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			return memberService.createNew(MemberRequest.builder().email("testadminmember2@gmail.com").password("test-admin-member2@#123")
-				.firstname("Test Admin").lastname("Member2").organizationId(testOrg.getPublicId()).build());
+				.firstName("Test Admin").lastName("Member2").organizationId(testOrg.getPublicId()).build());
 		}
 		
 		@Test
@@ -376,7 +376,7 @@ class ProjectIntegrationTest {
 			memberService.acceptInvitation(invResponse.getInvitationLink().split("=")[1]);
 			
 			MemberResponse member = memberService.createNew(MemberRequest.builder().email("testadminmember3@gmail.com").password("test-admin-member3@#123")
-					                                                .firstname("Test Admin").lastname("Member3").organizationId(testOrg.getPublicId()).build());
+					                                                .firstName("Test Admin").lastName("Member3").organizationId(testOrg.getPublicId()).build());
 			
 			// When: I try to remove a member that is not in the project
 			// Then: The operation should complete without throwing an exception

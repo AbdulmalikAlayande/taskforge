@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * Response DTO for {@link Member}
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberResponse implements Serializable {
 	
-	Role role;
+	Set<Role> role;
 	String email;
 	boolean active;
 	boolean deleted;

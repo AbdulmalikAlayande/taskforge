@@ -204,8 +204,8 @@ public class OrganizationIntegrationTest {
         private MemberRequest buildMemberRequest() {
             return MemberRequest.builder()
                            .email("john.doe." + uniqueIdentifier + "@example.com")
-                           .firstname("John")
-                           .lastname("Doe")
+                           .firstName("John")
+                           .lastName("Doe")
                            .password("password123")
                            .organizationId(organizationResponse.getPublicId())
                            .build();
@@ -301,8 +301,8 @@ public class OrganizationIntegrationTest {
 		    
 		    MemberRequest secondOrgMemberRequest = MemberRequest.builder()
 				                                           .organizationId(secondOrgResponse.getPublicId())
-				                                           .firstname("Second")
-				                                           .lastname("Member")
+				                                           .firstName("Second")
+				                                           .lastName("Member")
 				                                           .email("secondmember@example.com")
 				                                           .password("password123")
 				                                           .build();
