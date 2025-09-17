@@ -16,6 +16,7 @@ public class PreferenceManager {
 	
 	public NotificationPreference getPreference(String userId) {
 		Optional<NotificationPreference> optionalPreference = preferenceRepository.findByUserId(userId);
+		System.out.println("Fetched preference for userId " + userId + ": " + optionalPreference.get());
 		return optionalPreference.orElse(null);
 	}
 }

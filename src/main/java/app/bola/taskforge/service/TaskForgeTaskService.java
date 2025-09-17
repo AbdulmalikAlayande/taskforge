@@ -14,6 +14,7 @@ import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.TaskRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.CommentResponse;
+import app.bola.taskforge.service.dto.MemberResponse;
 import app.bola.taskforge.service.dto.TaskRequest;
 import app.bola.taskforge.service.dto.TaskResponse;
 import app.bola.taskforge.service.dto.TaskUpdateRequest;
@@ -61,7 +62,7 @@ public class TaskForgeTaskService implements TaskService{
 			.orElseThrow(() -> new EntityNotFoundException("Project not found"));
 		
 		Task task = modelMapper.map(taskRequest, Task.class);
-		if (!taskRequest.getAssigneeId().isBlank()) {
+		if (StringUtils.isNotBlank(taskRequest.getAssigneeId())) {
 			Optional<Member> member = userRepository.findByEmail(taskRequest.getAssigneeId());
 			if (member.isPresent()) {
 				task.setAssignee(member.get());
@@ -85,20 +86,22 @@ public class TaskForgeTaskService implements TaskService{
 		TaskResponse response = toResponse(savedTask);
 		response.setOrganizationId(organization.getPublicId());
 		response.setProjectId(project.getPublicId());
-		
-		TaskEvent event = buildTaskEvent(savedTask, project, organization.getId());
+		response.setAssigneeId(savedTask.getAssignee() != null ? savedTask.getAssignee().getPublicId() : null);
+		response.setAssignee(savedTask.getAssignee() != null ? modelMapper.map(savedTask.getAssignee(), MemberResponse.class) : null);
+
+		TaskEvent event = buildTaskEvent(savedTask, project, organization);
 		eventPublisher.publishEvent(event);
 		
 		return response;
 	}
-	
-	private static TaskEvent buildTaskEvent(Task savedTask, Project project, String organizationId) {
-		
+
+	private static TaskEvent buildTaskEvent(Task savedTask, Project project, Organization organization) {
+
 		TaskEvent event = new TaskEvent(savedTask);
 		
 		event.setTaskId(savedTask.getId());
 		event.setProjectId(project.getId());
-		event.setOrganizationId(organizationId);
+		event.setOrganizationId(organization.getId());
 		event.setDateTimeStamp(LocalDateTime.now());
 		event.setEventType(TaskEvent.EventType.TASK_CREATED);
 		event.setUserIdList(project.getMembers().stream().map(Member::getPublicId).collect(Collectors.toList()));

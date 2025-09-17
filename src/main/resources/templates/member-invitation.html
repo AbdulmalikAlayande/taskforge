@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>You're Invited to Join [[${organizationName}]]!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body style="margin:0; padding:0; background-color:#f7fafc;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7fafc;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#fff; margin:40px 0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <!-- Header with logo -->
+          <tr>
+            <td align="center" style="padding:32px 0 16px 0;">
+              <img th:src="@{${organizationLogoUrl}}" src="https://via.placeholder.com/120x40?text=Logo" alt="[[${organizationName}]] Logo" width="120" height="40" style="display:block; border-radius:4px;">
+            </td>
+          </tr>
+          <!-- Invitation message -->
+          <tr>
+            <td style="padding:0 40px 24px 40px; font-family:Arial,sans-serif; color:#222;">
+              <h2 style="margin:0 0 12px 0; font-size:26px; color:#2a7ae2;">You're Invited, <span th:text="${inviteeName}">Friend</span>!</h2>
+              <p style="margin:0 0 16px 0; font-size:16px; line-height:1.6;">
+                <strong th:text="${inviterName}">A team member</strong> has invited you to join <strong th:text="${organizationName}">Our Organization</strong> on our platform.
+              </p>
+              <p style="margin:0 0 16px 0; font-size:16px; line-height:1.6;">
+                As a valued addition, you'll be able to collaborate, manage projects, and connect with your new team.
+              </p>
+              <div style="text-align:center; margin:32px 0;">
+                <a th:href="@{${invitationLink}}" href="https://yourapp.com/invite/accept?token=..." style="background:#2a7ae2; color:#fff; text-decoration:none; padding:14px 32px; border-radius:6px; font-size:18px; font-weight:bold; display:inline-block;">
+                  Accept Invitation
+                </a>
+              </div>
+              <p style="margin:0 0 16px 0; font-size:15px; color:#666;">
+                If the button above doesn't work, copy and paste this link into your browser:<br>
+                <span style="word-break:break-all; color:#2a7ae2;" th:text="${invitationLink}">https://yourapp.com/invite/accept?token=...</span>
+              </p>
+              <hr style="border:none; border-top:1px solid #eee; margin:32px 0;">
+              <p style="margin:0 0 8px 0; font-size:15px; color:#888;">
+                <strong>Why join [[${organizationName}]]?</strong>
+              </p>
+              <ul style="margin:0 0 16px 20px; font-size:15px; line-height:1.6; color:#444;">
+                <li>Collaborate with passionate people</li>
+                <li>Access powerful tools for productivity</li>
+                <li>Grow your skills and make an impact</li>
+              </ul>
+              <p style="margin:0 0 0 0; font-size:15px; color:#888;">
+                This invitation was sent to <span th:text="${inviteeEmail}">your@email.com</span> and will expire in <span th:text=\"${expirationDays}\">7</span> days.
+              </p>
+            </td>
+          </tr>
+          <!-- Social links -->
+          <tr>
+            <td align="center" style="padding:24px 0 16px 0;">
+              <a th:href="@{${facebookUrl}}" href="https://facebook.com/" style="margin:0 8px; display:inline-block;">
+                <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" width="24" height="24" style="vertical-align:middle;">
+              </a>
+              <a th:href="@{${twitterUrl}}" href="https://twitter.com/" style="margin:0 8px; display:inline-block;">
+                <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" width="24" height="24" style="vertical-align:middle;">
+              </a>
+              <a th:href="@{${linkedinUrl}}" href="https://linkedin.com/" style="margin:0 8px; display:inline-block;">
+                <img src="https://cdn-icons-png.flaticon.com/24/733/733561.png" alt="LinkedIn" width="24" height="24" style="vertical-align:middle;">
+              </a>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:0 40px 32px 40px; font-family:Arial,sans-serif; color:#888; font-size:13px;">
+              <p style="margin:0;">
+                &copy; [[${year}]] [[${organizationName}]]. All rights reserved.<br>
+                <span th:text="${organizationAddress}">123 Main St, City, Country</span>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

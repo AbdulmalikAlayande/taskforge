@@ -2,6 +2,7 @@ package app.bola.taskforge.service;
 
 import app.bola.taskforge.domain.entity.Invitation;
 import app.bola.taskforge.domain.entity.Member;
+import app.bola.taskforge.domain.entity.NotificationPreference;
 import app.bola.taskforge.domain.entity.Organization;
 import app.bola.taskforge.domain.enums.InvitationStatus;
 import app.bola.taskforge.exception.EntityNotFoundException;
@@ -57,8 +58,15 @@ public class TaskForgeMemberService implements MemberService {
 		member.setActive(true);
 		member.setRoles(invitation.getRoles() == null ? null : new java.util.HashSet<>(invitation.getRoles()));
 		member.setOrganization(organization);
-
+		
+		NotificationPreference preference = NotificationPreference.builder()
+				                                    .allowNotification(true)
+				                                    .allowInApp(true)
+				                                    .allowEmail(true)
+				                                    .build();
+		member.setNotificationPreference(preference);
 		Member savedMember = userRepository.save(member);
+		
 		return toResponse(savedMember);
 	}
 	

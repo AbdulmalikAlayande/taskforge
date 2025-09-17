@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Welcome to [[${organizationName}]]!</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body style="margin: 0; padding: 0; background-color: #f4f4f4">
+		<table
+			width="100%"
+			cellpadding="0"
+			cellspacing="0"
+			border="0"
+			style="background-color: #f4f4f4"
+		>
+			<tr>
+				<td align="center">
+					<table
+						width="600"
+						cellpadding="0"
+						cellspacing="0"
+						border="0"
+						style="
+							background: #fff;
+							margin: 40px 0;
+							border-radius: 8px;
+							box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+						"
+					>
+						<!-- Header with logo -->
+						<tr>
+							<td align="center" style="padding: 32px 0 16px 0">
+								<img
+									th:src="@{${organizationLogoUrl}}"
+									src="https://via.placeholder.com/120x40?text=Logo"
+									alt="[[${organizationName}]] Logo"
+									width="120"
+									height="40"
+									style="display: block; border-radius: 4px"
+								/>
+							</td>
+						</tr>
+						<!-- Welcome message -->
+						<tr>
+							<td
+								style="
+									padding: 0 40px 24px 40px;
+									font-family: Arial, sans-serif;
+									color: #222;
+								"
+							>
+								<h2 style="margin: 0 0 12px 0; font-size: 28px; color: #2a7ae2">
+									Welcome, <span th:text="${userFirstName}">User</span>!
+								</h2>
+								<p
+									style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6"
+								>
+									We're excited to have you and your organization,
+									<strong th:text="${organizationName}"
+										>Your Organization</strong
+									>, join our platform.
+								</p>
+								<p
+									style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6"
+								>
+									Here’s what you can do next:
+								</p>
+								<ul
+									style="
+										margin: 0 0 16px 20px;
+										font-size: 16px;
+										line-height: 1.6;
+										color: #444;
+									"
+								>
+									<li>Invite your team members</li>
+									<li>Set up your first project</li>
+									<li>Explore our features and integrations</li>
+								</ul>
+								<p
+									style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6"
+								>
+									If you have any questions, our support team is here to help!
+								</p>
+								<div style="text-align: center; margin: 32px 0">
+									<a
+										th:href="@{${dashboardUrl}}"
+										href="https://yourapp.com/dashboard"
+										style="
+											background: #2a7ae2;
+											color: #fff;
+											text-decoration: none;
+											padding: 14px 32px;
+											border-radius: 6px;
+											font-size: 18px;
+											font-weight: bold;
+											display: inline-block;
+										"
+									>
+										Go to Dashboard
+									</a>
+								</div>
+							</td>
+						</tr>
+						<!-- Social links -->
+						<tr>
+							<td align="center" style="padding: 24px 0 16px 0">
+								<a
+									th:href="@{${facebookUrl}}"
+									href="https://facebook.com/"
+									style="margin: 0 8px; display: inline-block"
+								>
+									<img
+										src="https://cdn-icons-png.flaticon.com/24/733/733547.png"
+										alt="Facebook"
+										width="24"
+										height="24"
+										style="vertical-align: middle"
+									/>
+								</a>
+								<a
+									th:href="@{${twitterUrl}}"
+									href="https://twitter.com/"
+									style="margin: 0 8px; display: inline-block"
+								>
+									<img
+										src="https://cdn-icons-png.flaticon.com/24/733/733579.png"
+										alt="Twitter"
+										width="24"
+										height="24"
+										style="vertical-align: middle"
+									/>
+								</a>
+								<a
+									th:href="@{${linkedinUrl}}"
+									href="https://linkedin.com/"
+									style="margin: 0 8px; display: inline-block"
+								>
+									<img
+										src="https://cdn-icons-png.flaticon.com/24/733/733561.png"
+										alt="LinkedIn"
+										width="24"
+										height="24"
+										style="vertical-align: middle"
+									/>
+								</a>
+							</td>
+						</tr>
+						<!-- Footer -->
+						<tr>
+							<td
+								align="center"
+								style="
+									padding: 0 40px 32px 40px;
+									font-family: Arial, sans-serif;
+									color: #888;
+									font-size: 13px;
+								"
+							>
+								<p style="margin: 0">
+									&copy; [[${year}]] [[${organizationName}]]. All rights
+									reserved.<br />
+									<span th:text="${organizationAddress}"
+										>123 Main St, City, Country</span
+									>
+								</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

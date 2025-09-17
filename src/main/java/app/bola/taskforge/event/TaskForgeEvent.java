@@ -1,5 +1,6 @@
 package app.bola.taskforge.event;
 
+import java.lang.StringBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,20 @@ public class TaskForgeEvent extends ApplicationEvent {
 	
 	public TaskForgeEvent(Object source) {
 		super(source);
+	}
+
+	@Override
+	public String toString() {
+		
+		return new StringBuilder().append("[")
+								.append("initiatorId: "+initiatorId+", ")
+								.append("userIdList: "+userIdList+", ")
+								.append("userEmailList: "+userEmailList+", ")
+								.append("organizationId: "+organizationId+", ")
+								.append("dateTimeStamp: "+dateTimeStamp)
+								.append("]")
+								.toString();
+								
 	}
 	
 }

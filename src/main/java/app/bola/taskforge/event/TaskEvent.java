@@ -25,4 +25,23 @@ public class TaskEvent extends TaskForgeEvent {
 		TASK_ASSIGNED,
 		TASK_COMPLETED,
 	}
+
+	@Override
+	public String toString() {
+		String superStr = super.toString();
+		if (superStr.startsWith("[") && superStr.endsWith("]")) {
+			superStr = superStr.substring(1, superStr.length() - 1);
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("TaskEvent{");
+		if (!superStr.isEmpty()) {
+			sb.append(superStr).append(", ");
+		}
+		sb.append("taskId='").append(taskId).append('\'');
+		sb.append(", projectId='").append(projectId).append('\'');
+		sb.append(", eventType=").append(eventType);
+		sb.append(", sourceEntityType='").append(sourceEntityType).append('\'');
+		sb.append('}');
+		return sb.toString();
+	}
 }

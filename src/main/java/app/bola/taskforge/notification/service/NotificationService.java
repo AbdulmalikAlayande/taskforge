@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,10 +26,13 @@ public class NotificationService {
 	public void processTaskEvent(TaskEvent event) {
 		
 		try {
-			List<NotificationPreference> preferences = event.getUserIdList().stream()
-															.map(userId -> preferenceManager.getPreference(userId))
-				                                            .filter(NotificationPreference::isAllowNotification)
-				                                            .toList();
+			List<String> userIdList = event.getUserIdList();
+			List<NotificationPreference> preferences = new ArrayList<>();
+			for (String userId: userIdList)      {
+				NotificationPreference preference = preferenceManager.getPreference(userId);
+				if(preference != null && preference.isAllowNotification())
+					preferences.add(preference);
+			}
 			
 			if (preferences.isEmpty()) {
 				log.info("No notification preferences found for users: {}", event.getUserIdList());

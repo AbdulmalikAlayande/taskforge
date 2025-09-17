@@ -6,11 +6,13 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalTime;
 
 @Entity
 @Getter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationPreference extends BaseEntity {
@@ -28,6 +30,6 @@ public class NotificationPreference extends BaseEntity {
 		if (quietHoursStart == null || quietHoursEnd == null) {
 			return false;
 		}
-		return currentTime.isBefore(quietHoursStart) || currentTime.isAfter(quietHoursEnd);
+		return currentTime.isAfter(quietHoursStart) && currentTime.isBefore(quietHoursEnd);
 	}
 }
