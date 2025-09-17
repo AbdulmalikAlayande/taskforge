@@ -32,7 +32,7 @@ public class MemberController implements BaseController<MemberRequest, MemberRes
 	private final MemberService memberService;
 	
 	@Override
-	@PostMapping
+	// @PostMapping("create-new")
 	@Operation(summary = "Create a new member", description = "Creates a new member with the provided details")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Member created successfully",

@@ -55,9 +55,9 @@ public class TaskForgeMemberService implements MemberService {
 		Member member = modelMapper.map(memberRequest, Member.class);
 		member.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
 		member.setActive(true);
-		member.setRoles(invitation.getRoles());
+		member.setRoles(invitation.getRoles() == null ? null : new java.util.HashSet<>(invitation.getRoles()));
 		member.setOrganization(organization);
-		
+
 		Member savedMember = userRepository.save(member);
 		return toResponse(savedMember);
 	}
