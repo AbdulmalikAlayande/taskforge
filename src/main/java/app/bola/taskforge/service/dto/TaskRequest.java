@@ -24,6 +24,7 @@ public class TaskRequest {
 	@NotBlank
 	String title;
 	String description;
+	String assigneeId;
 	@NotBlank
 	String projectId;
 	@NotNull

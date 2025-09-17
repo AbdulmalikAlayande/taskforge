@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,9 +112,15 @@ public class TaskForgeProjectService implements ProjectService{
 	
 	@Override
 	public ProjectResponse addMember(@NonNull String projectId, @NonNull String memberId) {
-		Member member = userRepository.findByIdScoped(memberId)
+		Optional<Member> optionalMember = userRepository.findByEmail(memberId);
+		Member member;		
+		if (optionalMember.isPresent()) {
+			member = optionalMember.get();
+		}
+		else {
+			member = userRepository.findByIdScoped(memberId)
 				.orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
-		
+		}
 		Project project = projectRepository.findByIdScoped(projectId)
 				.orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
 		

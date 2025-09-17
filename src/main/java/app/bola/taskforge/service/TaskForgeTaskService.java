@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,9 +61,25 @@ public class TaskForgeTaskService implements TaskService{
 			.orElseThrow(() -> new EntityNotFoundException("Project not found"));
 		
 		Task task = modelMapper.map(taskRequest, Task.class);
+		if (!taskRequest.getAssigneeId().isBlank()) {
+			Optional<Member> member = userRepository.findByEmail(taskRequest.getAssigneeId());
+			if (member.isPresent()) {
+				task.setAssignee(member.get());
+			}
+			else {
+				member = userRepository.findByIdScoped(taskRequest.getAssigneeId());
+				if (member.isPresent()) {
+					task.setAssignee(member.get());
+				}
+				else{
+					log.warn("Invalid assignee ID passed for creation of task. ID: {}", taskRequest.getAssigneeId());
+				}
+			}
+		}
 		task.setOrganization(organization);
 		task.setProject(project);
 		task.setStatus(TaskStatus.TODO);
+
 		
 		Task savedTask = taskRepository.save(task);
 		TaskResponse response = toResponse(savedTask);
