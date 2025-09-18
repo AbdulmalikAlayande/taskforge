@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Base64;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -115,40 +116,52 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		performValidation(validator, request);
 		
 		log.info("Inviting member with email: {} to organization with ID: {}", request.getEmail(), request.getOrganizationId());
+		
 		userRepository.findByEmail(request.getEmail()).ifPresent(entity -> {
-			throw new TaskForgeException("User with email %s already exists and belongs to %s org".formatted(request.getEmail(), entity.getOrganization().getName()));
+			throw new TaskForgeException("User with email %s already exists and belongs to %s org"
+				.formatted(request.getEmail(), entity.getOrganization().getName()));
 		});
 		
 		invitationRepository.findByEmail(request.getEmail()).ifPresent(invitation -> {
 			if (invitation.getStatus() == InvitationStatus.ACCEPTED) {
-				throw new TaskForgeException("User with email %s already accepted an invitation".formatted(request.getEmail()));
-			} else if (invitation.getStatus() == InvitationStatus.PENDING || invitation.getExpiresAt().isAfter(LocalDateTime.now())) {
-				throw new TaskForgeException("User with email %s already has a pending invitation".formatted(request.getEmail()));
+				throw new TaskForgeException("User with email %s already accepted an invitation"
+					.formatted(request.getEmail()));
+			} else if (invitation.getStatus() == InvitationStatus.PENDING || 
+					  invitation.getExpiresAt().isAfter(LocalDateTime.now())) {
+				throw new TaskForgeException("User with email %s already has a pending invitation"
+					.formatted(request.getEmail()));
 			}
 		});
 		
 		Organization organization = organizationRepository.findByIdScoped(request.getOrganizationId())
-				                            .orElseThrow(() -> new EntityNotFoundException("Organization not found:: Identifier: " + request.getOrganizationId()));
+			.orElseThrow(() -> new EntityNotFoundException(
+				"Organization not found:: Identifier: " + request.getOrganizationId()));
 		
-		Member invitedBy = null;
-		Optional<Member> optionalMember = userRepository.findByIdScoped(request.getInvitedBy());
-		if (optionalMember.isEmpty()) {
-			if (!Objects.equals(request.getRole(), Role.ORGANIZATION_ADMIN.name()))
-				throw new EntityNotFoundException("Member(InvitedBy) with id: %s not found".formatted(request.getInvitedBy()));
-		} else {
-			invitedBy = optionalMember.get();
+		Member invitedBy = userRepository.findByIdScoped(request.getInvitedBy()).orElse(null);
+		if (invitedBy == null && !Objects.equals(request.getRole(), Role.ORGANIZATION_ADMIN.name())) {
+			throw new EntityNotFoundException("Member(InvitedBy) with id: %s not found"
+				.formatted(request.getInvitedBy()));
 		}
 		
-		String token = jwtTokenProvider.generateToken(request.getEmail(), organization.getPublicId());
+		String token = jwtTokenProvider.generateToken(
+			"Invitation Acceptance", 
+			request.getEmail(), 
+			request.getInviteeName(), 
+			organization.getPublicId()
+		);
+		
+		String base64Token = Base64.getEncoder().encodeToString(token.getBytes());
 		
 		Invitation invitation = modelMapper.map(request, Invitation.class);
 		invitation.setRoles(Set.of(Role.valueOf(request.getRole().toUpperCase())));
 		invitation.setOrganization(organization);
 		invitation.setInvitedBy(invitedBy);
-		invitation.setToken(token);
+		invitation.setToken(token);  
 		invitation.setStatus(InvitationStatus.PENDING);
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
-		invitation.setInvitationLink(String.format("https://taskforge.com/accept?token=%s", token));
+		invitation.setInvitationLink(String.format("https://taskforge.com/%s/accept/%s", 
+			organization.getName().toLowerCase().replaceAll("\\s+", "-"), 
+			base64Token));
 		
 		invitationRepository.save(invitation);
 		mailSender.sendInvitationMail(invitation, organization.getName());
