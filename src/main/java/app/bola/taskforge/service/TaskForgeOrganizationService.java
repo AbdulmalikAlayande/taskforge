@@ -142,13 +142,18 @@ public class TaskForgeOrganizationService implements OrganizationService {
 			throw new EntityNotFoundException("Member(InvitedBy) with id: %s not found"
 				.formatted(request.getInvitedBy()));
 		}
-		
-		String token = jwtTokenProvider.generateToken(
-			"Invitation Acceptance", 
-			request.getEmail(), 
-			request.getInviteeName(), 
-			organization.getPublicId()
+		Map<String, Object> claims = Map.of(
+			"subject", "Invitation Acceptance", 
+			"email", request.getEmail(), 
+			"name", request.getInviteeName(),  
+			"id", organization.getPublicId(),
+			"date", LocalDateTime.now().toString(),
+			"role", request.getRole(),
+			"organizationName", organization.getName(),
+			"organizationLogoUrl", organization.getLogoUrl()
 		);
+		String token = jwtTokenProvider.generateToken(claims);
+		
 		
 		String base64Token = Base64.getEncoder().encodeToString(token.getBytes());
 		

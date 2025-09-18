@@ -67,20 +67,13 @@ public class JwtTokenProvider {
 	
 	/**
 	 * Generates a JWT token with the given name and id.
-	 *
-	 * @param name the name to include in the token
-	 * @param id the id to include in the token
-	 * @return a JWT token as a String
 	 */
-	public String generateToken(final String subject, final String email, final String name, String id) {
-		return generateToken(Map.of("subject", subject, "email", email, "name", name, "id", id), this.tokenSecret, Long.parseLong(tokenExpiration));
+	public String generateToken(final Map<String, Object> claims) {
+		return generateToken(claims, this.tokenSecret, Long.parseLong(tokenExpiration));
 	}
 
 	/**
 	 * Generates a JWT token with the given name and id.
-	 * @param name
-	 * @param id
-	 * @return
 	 */ 
 	public String generateToken(final String name, String id) {
 		return generateToken(Map.of("subject", name, "id", id), this.tokenSecret, Long.parseLong(tokenExpiration));
