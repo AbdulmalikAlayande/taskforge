@@ -68,11 +68,9 @@ public class SecurityConfig {
 	               )
 			   	.authorizeHttpRequests(auth -> auth
 					.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**","/webjars/**", "/swagger-resources/**", "/api/health" ).permitAll()
-					.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new", "/api/members/create-new").permitAll()
+					.requestMatchers("/api/auth/**", "/api/organization/**", "/api/admin/create-new", "/api/members/create-new", "/api/members/accept-invitation").permitAll()
 					.requestMatchers("/api/organization/create-new", "/api/organization/invite-member").hasAnyRole("ORGANIZATION_ADMIN", "ORGANIZATION_OWNER")
 					.requestMatchers("/api/project/**", "/api/tasks/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
-					// .requestMatchers("/api/members/create-new").permitAll()
-					// .requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
 					.requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
 			   	)
 			   	.exceptionHandling(exceptionHandling -> exceptionHandling

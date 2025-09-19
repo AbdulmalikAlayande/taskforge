@@ -33,4 +33,6 @@ public class MemberRequest implements Serializable {
 	String lastName;
 	@NotBlank
 	String organizationId;
+	boolean acceptTerms;
+	boolean marketingEmails;
 }

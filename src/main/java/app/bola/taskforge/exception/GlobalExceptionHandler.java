@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TaskForgeException.class)
     public ResponseEntity<Map<String, Object>> handleTaskForge(TaskForgeException ex, HttpServletRequest request) {
         return buildErrorResponse(request, ex.getMessage(), "TASKFORGE_ERROR", 400);
+    }   
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResourceException(DataIntegrityViolationException ex, HttpServletRequest request) {
+        return buildErrorResponse(request, ex.getMessage(), "DUPLICATE_RESOURCE", 409);
     }
+
+    // @ExceptionHandler(ValidationException.class)
+    // public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException ex, HttpServletRequest request) {
+    //     return buildErrorResponse(request, ex.getMessage(), "VALIDATION_ERROR", 422);
+    // }
 
     @ExceptionHandler(AuthenticationFailedException.class)
     public ResponseEntity<Map<String, Object>> handleAuthFailed(AuthenticationFailedException ex, HttpServletRequest request) {

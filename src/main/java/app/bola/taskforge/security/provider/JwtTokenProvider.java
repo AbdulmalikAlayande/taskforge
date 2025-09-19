@@ -86,7 +86,7 @@ public class JwtTokenProvider {
 				       .build()
 				       .parseSignedClaims(token)
 				       .getPayload()
-				       .get("subject", String.class);
+				       .get("email", String.class);
 	}
 	
 	public Object extractClaimFromToken(String token, String claimKey) {

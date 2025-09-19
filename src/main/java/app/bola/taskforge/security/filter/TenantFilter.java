@@ -19,7 +19,8 @@ public class TenantFilter extends OncePerRequestFilter {
 		"/api/organization/create-new", "/api/admin/create-new", "/swagger-ui",
 		"/api/auth/oauth", "/api/auth/login", "/api/log/create-new",
 		"/swagger-ui/index.html", "/swagger-ui.html", "/api-docs" ,
-		"/swagger-ui/index.css", "/favicon.ico", "/api/health"
+		"/swagger-ui/index.css", "/favicon.ico", "/api/health",
+		"/api/members/accept-invitation"
 	);
 	
 	private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(TenantFilter.class);

@@ -25,6 +25,7 @@ import jakarta.validation.Validator;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,8 +66,8 @@ public class TaskForgeMemberService implements MemberService {
 				                                    .allowEmail(true)
 				                                    .build();
 		member.setNotificationPreference(preference);
-		Member savedMember = userRepository.save(member);
 		
+		Member savedMember = userRepository.save(member);
 		return toResponse(savedMember);
 	}
 	
@@ -114,15 +115,26 @@ public class TaskForgeMemberService implements MemberService {
 	@Transactional
 	public InvitationResponse acceptInvitation(String token) {
 		log.info("Accepting invitation with token: {}", token);
-		if (jwtTokenProvider.isValidToken(token)) {
-			if (jwtTokenProvider.isExpiredToken(token)) {
+		
+		String decodedToken = token;
+		try {
+			if (!token.startsWith("eyJ")) {
+				decodedToken = new String(Base64.getDecoder().decode(token));
+				log.info("Decoded token from Base64: {}", decodedToken);
+			}
+		} catch (IllegalArgumentException e) {
+			log.warn("Token doesn't appear to be Base64 encoded, proceeding with original token");
+		}
+		
+		if (jwtTokenProvider.isValidToken(decodedToken)) {
+			if (jwtTokenProvider.isExpiredToken(decodedToken)) {
 				throw new InvalidRequestException("Invitation token is expired");
 			}
 		} else {
 			throw new InvalidRequestException("Invalid invitation token");
 		}
 
-		String email = jwtTokenProvider.extractClaimFromToken(token);
+		String email = jwtTokenProvider.extractClaimFromToken(decodedToken);
 
 		Invitation invitation = invitationRepository.findByEmail(email)
                     .orElseThrow(() -> new EntityNotFoundException("Invitation does not exist for email: " + email));

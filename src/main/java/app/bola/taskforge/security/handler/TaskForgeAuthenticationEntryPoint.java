@@ -19,7 +19,10 @@ public class TaskForgeAuthenticationEntryPoint implements AuthenticationEntryPoi
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException authException) throws IOException {
-        System.out.println(request);
+        org.slf4j.LoggerFactory.getLogger(TaskForgeAuthenticationEntryPoint.class)
+            .warn("Authentication failed for path: {}, method: {}, message: {}", 
+                request.getRequestURI(), request.getMethod(), authException.getMessage());
+            
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

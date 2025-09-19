@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,9 @@ import org.thymeleaf.context.Context;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class MailSender {
 	
@@ -30,7 +33,8 @@ public class MailSender {
 	
 	
 	public MailSender(@Value("${app.brevo.api-key}") String apiKey,
-	                  RestTemplate restTemplate, Context context, TemplateEngine templateEngine) {
+	                  RestTemplate restTemplate, Context context, 
+					  @Qualifier("emailTemplateEngine") TemplateEngine templateEngine) {
 		this.apiKey = apiKey;
 		this.restTemplate = restTemplate;
 		this.context = context;
@@ -57,7 +61,14 @@ public class MailSender {
 			"dashboardUrl", "https://app.taskforge.com/dashboard"
 		);
 		context.setVariables(contextVariables);
-		String htmlContent = templateEngine.process("admin-welcome", context);
+		String htmlContent = templateEngine.process("admin-welcome.html", context);
+		log.info("This is the html content {}", htmlContent);
+		log.info("This is the html content length: {} characters", htmlContent != null ? htmlContent.length() : 0);
+		if (htmlContent == null || htmlContent.isEmpty() || htmlContent.equals("admin-welcome.html")) {
+			log.error("Failed to process template. Check Thymeleaf configuration.");
+			htmlContent = "<html><body><h1>Welcome to TaskForge</h1><p>Hello " + username + 
+				",</p><p>Welcome to " + organizationName + "!</p></body></html>";
+		}
 		return sendEmail("Welcome to TaskForge", htmlContent, List.of(new Notification.Recipient(email, username)));
 	}
 	
@@ -68,11 +79,22 @@ public class MailSender {
 			"inviteeName", inviteeName,
 			"inviterName", invitation.getInvitedBy().getFirstName()+" "+invitation.getInvitedBy().getLastName(),
 			"inviteeEmail", invitation.getEmail(),
+			"expirationDays", 7,
 			"invitationLink", invitation.getInvitationLink(),
 			"organizationName", organizationName
 		);
 		context.setVariables(contextVariables);
-		String htmlContent = templateEngine.process("member-invitation", context);
+		String htmlContent = templateEngine.process("member-invitation.html", context);
+
+		if (htmlContent == null || htmlContent.isEmpty() || htmlContent.equals("member-invitation.html")) {
+			log.error("Failed to process invitation template. Check Thymeleaf configuration.");
+
+			htmlContent = "<html><body><h1>Invitation to join " + organizationName + "</h1>" +
+				"<p>Hello " + inviteeName + ",</p>" +
+				"<p>You've been invited to join " + organizationName + " on TaskForge.</p>" +
+				"<p><a href='" + invitation.getInvitationLink() + "'>Click here to accept the invitation</a></p>" +
+				"</body></html>";
+		}
 		return sendEmail(String.format("Invitation to join %s on TaskForge", organizationName), htmlContent,
 				List.of(new Notification.Recipient(invitation.getEmail(), inviteeName)));
 	}
@@ -85,6 +107,7 @@ public class MailSender {
 		
 		ResponseEntity<Notification> response = restTemplate.postForEntity(brevoUrl, requestEntity, Notification.class);
 		if (response.getBody() != null && response.getStatusCode().is2xxSuccessful()) {
+			log.info("Email sent successfully to: {}");
 			return ResponseEntity.status(HttpStatus.OK).body(response.getBody());
 		}
 		else if (response.getBody() != null && !response.getStatusCode().is2xxSuccessful()){

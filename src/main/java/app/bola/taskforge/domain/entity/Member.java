@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
 	private String firstName;
 	private boolean active;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private NotificationPreference notificationPreference;
 	
 	@ManyToOne

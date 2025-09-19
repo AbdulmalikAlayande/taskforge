@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -16,14 +17,17 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationPreference extends BaseEntity {
-	
+
+	@Builder.Default
 	private boolean allowNotification = Boolean.TRUE;
+	@Builder.Default
 	private boolean allowInApp = Boolean.TRUE;
+	@Builder.Default
 	private boolean allowEmail = Boolean.FALSE;
 	private LocalTime quietHoursStart;
 	private LocalTime quietHoursEnd;
 	
-	@OneToOne
+	@OneToOne(mappedBy = "notificationPreference")
 	private Member member;
 	
 	public boolean isInQuietHours(LocalTime currentTime) {

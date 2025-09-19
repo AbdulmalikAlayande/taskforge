@@ -1,5 +1,6 @@
 package app.bola.taskforge.service;
 
+import app.bola.taskforge.common.utilities.Constants;
 import app.bola.taskforge.domain.entity.Invitation;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.enums.InvitationStatus;
@@ -149,6 +150,8 @@ public class TaskForgeOrganizationService implements OrganizationService {
 			"id", organization.getPublicId(),
 			"date", LocalDateTime.now().toString(),
 			"role", request.getRole(),
+			"inviterName", invitedBy != null ? invitedBy.getFirstName() + " " + invitedBy.getLastName() : "Someone",
+			"organizationId", organization.getPublicId(),
 			"organizationName", organization.getName(),
 			"organizationLogoUrl", organization.getLogoUrl()
 		);
@@ -164,7 +167,7 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		invitation.setToken(token);  
 		invitation.setStatus(InvitationStatus.PENDING);
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
-		invitation.setInvitationLink(String.format("https://taskforge.com/%s/accept/%s", 
+		invitation.setInvitationLink(String.format(Constants.INVITATION_URL, 
 			organization.getName().toLowerCase().replaceAll("\\s+", "-"), 
 			base64Token));
 		
