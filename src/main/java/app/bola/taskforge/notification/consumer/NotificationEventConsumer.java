@@ -17,11 +17,11 @@ public class NotificationEventConsumer {
 	
 	@EventListener
 	public void consumeTaskEvent(TaskEvent event) {
-		notificationService.processTaskEvent(event);
+		notificationService.processEvent(event);
 	}
 
 	@EventListener
 	public void consumeProjectEvent(ProjectEvent event){
-		notificationService.processProjectEvent(event);
+		notificationService.processEvent(event);
 	}
 }
