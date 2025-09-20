@@ -1,5 +1,6 @@
 package app.bola.taskforge.service;
 
+import app.bola.taskforge.common.entity.BaseEntity;
 import app.bola.taskforge.domain.entity.DateRange;
 import app.bola.taskforge.domain.entity.Member;
 import app.bola.taskforge.domain.entity.Organization;
@@ -23,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -77,8 +79,19 @@ public class TaskForgeProjectService implements ProjectService{
 		project.setDateRange(new DateRange(projectRequest.getStartDate(), projectRequest.getEndDate()));
 		
 		Project savedProject = projectRepository.save(project);
-		eventPublisher.publishEvent(new ProjectEvent(savedProject, savedProject.getPublicId(), "create"));
+		eventPublisher.publishEvent(createProjectEvent(savedProject, organization));
 		return toResponse(savedProject);
+	}
+	
+	private static ProjectEvent createProjectEvent(Project project, Organization organization) {
+		ProjectEvent projectEvent = new ProjectEvent(project, project.getPublicId(), "create");
+		projectEvent.setInitiatorId("SYSTEM");
+		projectEvent.setMetadata(null);
+		projectEvent.setOrganizationId(organization.getPublicId());
+		projectEvent.setUserIdList(project.getMembers().stream().map(BaseEntity::getPublicId).toList());
+		projectEvent.setUserEmailList(project.getMembers().stream().map(Member::getEmail).toList());
+		projectEvent.setDateTimeStamp(LocalDateTime.now());
+		return projectEvent;
 	}
 	
 	@Override

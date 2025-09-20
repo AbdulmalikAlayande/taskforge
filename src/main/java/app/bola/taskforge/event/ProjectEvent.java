@@ -2,7 +2,7 @@ package app.bola.taskforge.event;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.lang.StringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Getter
 @Setter
@@ -21,6 +21,8 @@ public class ProjectEvent extends TaskForgeEvent {
         this.projectId = projectId;
         this.eventType = EventType.fromEvent(eventType);
     }
+	
+    @Getter
     public enum EventType {
 
         PROJECT_CREATED("create"),
@@ -31,12 +33,8 @@ public class ProjectEvent extends TaskForgeEvent {
         EventType(String event) {
             this.event = event;
         }
-
-        public String getEvent() {
-            return event;
-        }
-
-        public static EventType fromEvent(String event) {
+	    
+	    public static EventType fromEvent(String event) {
             for (EventType type : values()) {
                 if (type.getEvent().equalsIgnoreCase(event)) {
                     return type;
@@ -45,15 +43,13 @@ public class ProjectEvent extends TaskForgeEvent {
             throw new IllegalArgumentException("Unknown event: " + event);
         }
     }
-
-
-    @Override
-    public String toString() {
-        return new StringBuilder().append("Project [")
-                                .append(sourceEntityType.toUpperCase()+", ")
-                                .append(eventType)
-                                .append("]").toString();
-
-    }
-    
+	
+	
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				       .append("projectId", projectId)
+				       .append("sourceEntityType", sourceEntityType)
+				       .toString();
+	}
 }
