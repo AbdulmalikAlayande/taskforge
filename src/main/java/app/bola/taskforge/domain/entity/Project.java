@@ -36,7 +36,10 @@ public class Project extends BaseEntity {
 
 	@Enumerated(value = EnumType.STRING)
 	private ProjectPriority priority;
-
+	
+	@OneToOne
+	private Member teamLead;
+	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@Builder.Default
 	private Set<Member> members = new HashSet<>();

@@ -5,7 +5,6 @@ import app.bola.taskforge.domain.enums.ProjectCategory;
 import app.bola.taskforge.domain.enums.ProjectPriority;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.*;
@@ -33,6 +32,7 @@ public class ProjectRequest implements Serializable {
 	LocalDate startDate;
 	@NotBlank
 	String organizationId;
+	String teamLeadId;
 	List<String> memberIds;
 	@NotNull
 	ProjectCategory category;

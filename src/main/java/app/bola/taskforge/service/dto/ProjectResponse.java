@@ -34,6 +34,7 @@ public class ProjectResponse implements Serializable {
 	LocalDate startDate;
 	LocalDateTime createdAt;
 	LocalDateTime lastModifiedAt;
+	MemberResponse teamLead;
 	Set<MemberResponse> members;
 	
 	@Override

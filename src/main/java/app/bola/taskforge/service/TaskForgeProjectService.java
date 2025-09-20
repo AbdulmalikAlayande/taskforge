@@ -18,6 +18,7 @@ import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,10 @@ public class TaskForgeProjectService implements ProjectService{
 		performValidation(validator, projectRequest);
 		Organization organization = organizationRepository.findByIdScoped(projectRequest.getOrganizationId())
 				                            .orElseThrow(() -> new EntityNotFoundException("Organization not found with id: " + projectRequest.getOrganizationId()));
+		Member teamLead = null;
+		if (StringUtils.isNotBlank(projectRequest.getTeamLeadId())) {
+			teamLead = userRepository.findByIdScoped(projectRequest.getTeamLeadId()).orElse(null);
+		}
 		
 		List<Member> members = userRepository.findAllByIdScoped(projectRequest.getMemberIds());
 		
@@ -67,9 +72,10 @@ public class TaskForgeProjectService implements ProjectService{
 		Project project = modelMapper.map(projectRequest, Project.class);
 		project.setOrganization(organization);
 		project.setStatus(ProjectStatus.ACTIVE);
+		project.setTeamLead(teamLead);
 		project.setMembers(new HashSet<>(members));
 		project.setDateRange(new DateRange(projectRequest.getStartDate(), projectRequest.getEndDate()));
-				
+		
 		Project savedProject = projectRepository.save(project);
 		eventPublisher.publishEvent(new ProjectEvent(savedProject, savedProject.getPublicId(), "create"));
 		return toResponse(savedProject);
@@ -113,14 +119,8 @@ public class TaskForgeProjectService implements ProjectService{
 	@Override
 	public ProjectResponse addMember(@NonNull String projectId, @NonNull String memberId) {
 		Optional<Member> optionalMember = userRepository.findByEmail(memberId);
-		Member member;		
-		if (optionalMember.isPresent()) {
-			member = optionalMember.get();
-		}
-		else {
-			member = userRepository.findByIdScoped(memberId)
-				.orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId));
-		}
+		Member member = optionalMember.orElseGet(() -> userRepository.findByIdScoped(memberId)
+				                                        .orElseThrow(() -> new EntityNotFoundException("Member not found with id: " + memberId)));
 		Project project = projectRepository.findByIdScoped(projectId)
 				.orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectId));
 		

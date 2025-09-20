@@ -1,6 +1,7 @@
 package app.bola.taskforge.service;
 
 import app.bola.taskforge.domain.entity.Member;
+import app.bola.taskforge.domain.entity.NotificationPreference;
 import app.bola.taskforge.domain.enums.Role;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.CreateAdminRequest;
@@ -34,6 +35,8 @@ public class AdminService {
 		admin.setPassword(passwordEncoder.encode(request.getPassword()));
 		admin.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
 		admin.setActive(true);
+		// Not a bug, not a mistake, Builder.Default takes care of setting those values
+		admin.setNotificationPreference(NotificationPreference.builder().build());
 		
 		Member savedAdmin = userRepository.save(admin);
 		return toResponse(savedAdmin);
