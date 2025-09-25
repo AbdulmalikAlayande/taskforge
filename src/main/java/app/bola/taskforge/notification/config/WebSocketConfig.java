@@ -1,7 +1,9 @@
 package app.bola.taskforge.notification.config;
 
+import app.bola.taskforge.notification.interceptor.TenantChannelInterceptor;
 import app.bola.taskforge.notification.interceptor.WebsocketLoggingHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -11,11 +13,19 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	
+	final TenantChannelInterceptor tenantChannelInterceptor;
 	final WebsocketLoggingHandshakeInterceptor loggingHandshakeInterceptor;
 	
-	public WebSocketConfig(WebsocketLoggingHandshakeInterceptor loggingHandshakeInterceptor) {
+	public WebSocketConfig(TenantChannelInterceptor tenantChannelInterceptor, WebsocketLoggingHandshakeInterceptor loggingHandshakeInterceptor) {
+		this.tenantChannelInterceptor = tenantChannelInterceptor;
 		this.loggingHandshakeInterceptor = loggingHandshakeInterceptor;
 	}
+	
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(tenantChannelInterceptor);
+	}
+	
 	
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
