@@ -30,7 +30,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		registry.setApplicationDestinationPrefixes("/taskforge")
-				.enableSimpleBroker("/topic");
+				.enableStompBrokerRelay("/topic", "/queue")
+				.setRelayHost("rabbitmq-host")
+				.setRelayPort(61613)
+				.setClientLogin("stomp-user")
+				.setClientPasscode("stomp-pass");
 	}
 	
 	@Override
