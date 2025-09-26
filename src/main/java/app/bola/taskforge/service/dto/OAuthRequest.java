@@ -17,13 +17,14 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OAuthRequest {
 	
+	String name;
 	@NotBlank
 	String email;
-	@NotBlank
-	String firstname;
-	String lastname;
-	String image;
+	String imageUrl;
 	@NotBlank
 	String provider;
 	String providerId;
+	@NotBlank
+	String accessToken;
+	//	String lastname;
 }

@@ -1,10 +1,12 @@
 package app.bola.taskforge.notification.channel;
 
+import app.bola.taskforge.exception.TaskForgeException;
 import app.bola.taskforge.notification.model.ChannelType;
 import app.bola.taskforge.notification.model.DeliveryResult;
 import app.bola.taskforge.notification.model.NotificationBundle;
 import app.bola.taskforge.notification.template.NotificationTemplateRenderer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -39,7 +41,11 @@ public class WebSocketChannelHandler implements ChannelHandler{
 		String message = templateRenderer.render(bundle.getTemplateName(), "push", bundle.getTemplateVariables());
 		bundle.setMessage(message);
 		try {
-			String destination = "/user/" + bundle.getUserId() + "/notifications";
+			String tenantId = bundle.getPayload().get("tenantId").toString();
+			if (StringUtils.isBlank(tenantId)) {
+				throw new TaskForgeException("Tenant ID not found in NotificationBundle");
+			}
+			String destination = String.format("/topic/%s/user/%s", tenantId, bundle.getUserId());
 			messagingTemplate.convertAndSendToUser(bundle.getUserId(), destination, bundle);
 			
 			log.debug("WebSocket notification sent to user: {}", bundle.getUserId());
