@@ -9,6 +9,7 @@ import app.bola.taskforge.security.dto.LoginRequest;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
 import app.bola.taskforge.service.dto.MemberResponse;
 import app.bola.taskforge.service.dto.OAuthRequest;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -81,6 +82,30 @@ public class AuthService {
 				                     .build();
 		log.info("Login successful for user: {}; Auth Response: {}", loginRequest.getEmail(), authResponse);
 		return authResponse;
+	}
+	
+	public AuthResponse oauthLogin(OAuthRequest request) {
+		UserInfo userInfo = verifyWithProvider(request);
+		Member member = findOrCreateUser(userInfo, request);
+		
+		Set<String> roles = member.getRoles().stream().map(Role::name).collect(Collectors.toSet());
+		String accessToken = jwtTokenProvider.generateAccessToken(member.getEmail(), roles);
+		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getEmail(), roles);
+		
+		return AuthResponse.builder()
+				       .userId(member.getPublicId())
+				       .accessToken(accessToken)
+				       .refreshToken(refreshToken)
+				       .build();
+	}
+	
+	private Member findOrCreateUser(UserInfo userInfo, OAuthRequest request) {
+		return null;
+	}
+	
+	private UserInfo verifyWithProvider(OAuthRequest request) {
+		return null;
+	
 	}
 	
 	public AuthResponse generateRefreshToken(String refreshToken) {

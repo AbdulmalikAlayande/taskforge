@@ -4,8 +4,6 @@ import app.bola.taskforge.security.filter.TaskForgeAuthenticationFilter;
 import app.bola.taskforge.security.filter.TaskForgeAuthorizationFilter;
 import app.bola.taskforge.security.filter.TenantFilter;
 import app.bola.taskforge.security.handler.OauthLoginSuccessHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,7 +29,7 @@ import app.bola.taskforge.security.handler.TaskForgeAccessDeniedHandler;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private final ObjectMapper objectMapper;
+	
 	private final TaskForgeAuthenticationEntryPoint authenticationEntryPoint;
 	private final TaskForgeAccessDeniedHandler accessDeniedHandler;
 	private final OauthLoginSuccessHandler oauthLoginSuccessHandler;
@@ -75,9 +72,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/project/**", "/api/tasks/assign/**").hasAnyRole("PROJECT_MANAGER", "ORGANIZATION_ADMIN")
 						.requestMatchers("/api/members/**", "/api/comments/**", "/api/tasks/**").authenticated()
 				    )
-			        .oauth2Login(customizer -> {
-						customizer.successHandler(oauthLoginSuccessHandler);
-			        })
+			        .oauth2Login(customizer -> customizer.successHandler(oauthLoginSuccessHandler))
 				    .exceptionHandling(exceptionHandling -> exceptionHandling
 					   .authenticationEntryPoint(authenticationEntryPoint)
 					   .accessDeniedHandler(accessDeniedHandler)

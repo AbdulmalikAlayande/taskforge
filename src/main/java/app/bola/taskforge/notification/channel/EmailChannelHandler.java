@@ -32,7 +32,6 @@ public class EmailChannelHandler implements ChannelHandler{
 	final NotificationTemplateRenderer templateRender;
 	@Value("${app.brevo.api-key}")
 	private String mailApiKey;
-	
 	@Value("${app.brevo.api-url}")
 	private String mailClientProviderUrl;
 	

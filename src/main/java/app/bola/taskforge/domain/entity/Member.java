@@ -30,6 +30,10 @@ public class Member extends BaseEntity {
 	private String firstName;
 	private boolean active;
 	
+	@Builder.Default
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	private Set<OAuthAccount> oauthAccounts = new HashSet<>();
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	private NotificationPreference notificationPreference;
 	
