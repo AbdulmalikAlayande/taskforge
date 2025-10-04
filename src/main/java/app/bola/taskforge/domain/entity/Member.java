@@ -30,7 +30,6 @@ public class Member extends BaseEntity {
 	private String firstName;
 	private boolean active;
 	
-	@Lob
 	@Column(length = 1000)
 	private String imageUrl;
 	

@@ -42,6 +42,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> oauthLogin(@Valid @RequestBody OAuthRequest request) {
         log.info("OAuth Request:: {}", request);
         AuthResponse response = authService.manageOAuthUser(request);
+		log.info("OAuth Response:: {}", response);
         return ResponseEntity.ok(response);
     }
     
