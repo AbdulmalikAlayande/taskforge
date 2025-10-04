@@ -30,6 +30,10 @@ public class Member extends BaseEntity {
 	private String firstName;
 	private boolean active;
 	
+	@Lob
+	@Column(length = 1000)
+	private String imageUrl;
+	
 	@Builder.Default
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private Set<OAuthAccount> oauthAccounts = new HashSet<>();
