@@ -2,7 +2,9 @@ package app.bola.taskforge.security.service;
 
 import app.bola.taskforge.domain.context.TenantContext;
 import app.bola.taskforge.domain.entity.Member;
+import app.bola.taskforge.domain.entity.OAuthAccount;
 import app.bola.taskforge.domain.enums.Role;
+import app.bola.taskforge.repository.OAuthAccountRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.security.dto.AuthResponse;
 import app.bola.taskforge.security.dto.LoginRequest;
@@ -16,10 +18,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,6 +36,8 @@ public class AuthService {
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final OAuthVerifierFactory verifierFactory;
+	private final OAuthAccountRepository oAuthAccountRepository;
+	private final BCryptPasswordEncoder passwordEncoder;
 	
 	public AuthResponse manageOAuthUser(OAuthRequest request) {
 		log.info("Processing OAuth login for provider: {}, email: {}", request.getProvider(), request.getEmail());
