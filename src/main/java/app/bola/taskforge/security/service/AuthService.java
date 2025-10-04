@@ -192,12 +192,17 @@ public class AuthService {
 		String newRefreshToken = jwtTokenProvider.generateRefreshToken(email, roles);
 		
 		log.info("Token refresh successful for user: {}", email);
-		
+		return toResponse(user, newAccessToken, newRefreshToken, null, roles);
+	}
+	
+	private AuthResponse toResponse(Member member, String accessToken, String refreshToken, String orgId, Set<String> roles){
 		return AuthResponse.builder()
-				       .userId(user.getPublicId())
-				       .accessToken(newAccessToken)
-				       .refreshToken(newRefreshToken)
-				       .email(email)
+				       .userId(member.getPublicId())
+				       .email(member.getEmail())
+				       .accessToken(accessToken)
+				       .refreshToken(refreshToken)
+				       .tenantId(orgId)
+				       .organizationId(orgId)
 				       .roles(roles)
 				       .build();
 	}
