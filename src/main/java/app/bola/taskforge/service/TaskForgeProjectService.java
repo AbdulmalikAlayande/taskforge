@@ -15,6 +15,7 @@ import app.bola.taskforge.repository.ProjectRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
+import app.bola.taskforge.service.dto.MemberResponse;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -217,6 +218,14 @@ public class TaskForgeProjectService implements ProjectService{
 		projectRepository.save(project);
 	}
 	
+	@Override
+	public Set<MemberResponse> getProjectMembers(String projectId) {
+		Project project = projectRepository.findByIdScoped(projectId)
+				                  .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+		return project.getMembers().stream()
+				       .map(member -> modelMapper.map(member, MemberResponse.class))
+				       .collect(Collectors.toSet());
+	}
 	
 	@Override
 	public Set<ProjectResponse> toResponse(Collection<Project> entities){

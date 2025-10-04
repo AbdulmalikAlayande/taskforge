@@ -4,6 +4,7 @@ import app.bola.taskforge.common.controller.BaseController;
 import app.bola.taskforge.service.ProjectService;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
+import app.bola.taskforge.service.dto.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -162,5 +163,20 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 			@Parameter(description = "ID of the organization", required = true)
 			@PathVariable String organizationId) {
 		return ResponseEntity.ok(projectService.getAllByOrganizationId(organizationId));
+	}
+	
+	
+	@GetMapping("{projectId}/members")
+	@Operation(summary = "Get all members in project", description = "Retrieves all members for a specific project")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "List of members",
+				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProjectResponse.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+		@ApiResponse(responseCode = "404", description = "Project not found", content = @Content)
+	})
+	public ResponseEntity<Set<MemberResponse>> getProjectMembers(
+			@Parameter(description = "ID of the project", required = true)
+			@PathVariable String projectId) {
+		return ResponseEntity.ok(projectService.getProjectMembers(projectId));
 	}
 }
