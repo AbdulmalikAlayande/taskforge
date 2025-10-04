@@ -1,9 +1,10 @@
 package app.bola.taskforge.security.service;
 
 import app.bola.taskforge.service.dto.OAuthUserInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -13,7 +14,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GoogleOAuthVerifier implements OAuthVerifier {
 	
 	@Value("${spring.security.oauth2.client.registration.google.client-id}")
