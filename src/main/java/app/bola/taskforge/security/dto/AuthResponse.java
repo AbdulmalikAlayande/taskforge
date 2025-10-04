@@ -29,8 +29,7 @@ public class AuthResponse implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof AuthResponse)) return false;
-		AuthResponse that = (AuthResponse) obj;
+		if (!(obj instanceof AuthResponse that)) return false;
 		return userId.equals(that.userId) &&
 				email.equals(that.email) &&
 				accessToken.equals(that.accessToken) &&

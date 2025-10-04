@@ -1,10 +1,10 @@
 package app.bola.taskforge.security.service;
 
-import app.bola.taskforge.service.dto.UserInfo;
+import app.bola.taskforge.service.dto.OAuthUserInfo;
 
 public interface OAuthVerifier {
 	
-	UserInfo verifyToken(String accessToken);
+	OAuthUserInfo verifyToken(String accessToken);
 	String getProviderName();
 	
 }

@@ -7,12 +7,10 @@ import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.security.dto.AuthResponse;
 import app.bola.taskforge.security.dto.LoginRequest;
 import app.bola.taskforge.security.provider.JwtTokenProvider;
-import app.bola.taskforge.service.dto.MemberResponse;
 import app.bola.taskforge.service.dto.OAuthRequest;
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+import app.bola.taskforge.service.dto.OAuthUserInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,27 +28,49 @@ import java.util.stream.Collectors;
 public class AuthService {
 	
 	
-	private final ModelMapper modelMapper;
 	private final UserRepository userRepository;
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final OAuthVerifierFactory verifierFactory;
 	
-	public MemberResponse manageOAuthUser(OAuthRequest request) {
-		Optional<Member> optionalMember = userRepository.findByEmail(request.getEmail());
-		if (optionalMember.isPresent()) {
-			log.info("User with email {} already exists, returning existing user", request.getEmail());
-			return modelMapper.map(optionalMember.get(), MemberResponse.class);
+	public AuthResponse manageOAuthUser(OAuthRequest request) {
+		log.info("Processing OAuth login for provider: {}, email: {}", request.getProvider(), request.getEmail());
+		
+		OAuthVerifier verifier = verifierFactory.getVerifier(request.getProvider());
+		OAuthUserInfo userInfo = verifier.verifyToken(request.getAccessToken());
+		if (userInfo == null || !userInfo.getEmail().equalsIgnoreCase(request.getEmail())) {
+			log.error("Invalid token or email mismatch for provider: {}", request.getProvider());
+			throw new RuntimeException("OAuth token verification failed, Invalid token or email mismatch");
 		}
-		Member member = modelMapper.map(request, Member.class);
-		member.setActive(true);
-		member.setRoles(Set.of(Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_OWNER, Role.ORGANIZATION_MEMBER));
-		Member savedMember = userRepository.save(member);
-		return toResponse(savedMember);
+		
+		log.info("OAuth token verified successfully for: {}", userInfo.getEmail());
+		Member member = findOrCreateOAuthUser(request);
+		Set<String> roles = member.getRoles().stream()
+				                    .map(Role::name)
+				                    .collect(Collectors.toSet());
+		
+		String accessToken = jwtTokenProvider.generateAccessToken(member.getEmail(), roles);
+		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getEmail(), roles);
+		
+		log.info("Generated JWT tokens for user: {}", member.getEmail());
+		String orgId = member.getOrganization() != null ? member.getOrganization().getPublicId() : null;
+		return toResponse(member, accessToken, refreshToken, orgId, roles);
+		
 	}
 	
-	private MemberResponse toResponse(Member savedMember) {
-		return modelMapper.map(savedMember, MemberResponse.class);
+	private AuthResponse toResponse(Member member, String accessToken, String refreshToken, String orgId, Set<String> roles){
+		return AuthResponse.builder()
+				       .userId(member.getPublicId())
+				       .email(member.getEmail())
+				       .accessToken(accessToken)
+				       .refreshToken(refreshToken)
+				       .tenantId(orgId)
+				       .organizationId(orgId)
+				       .roles(roles)
+				       .build();
+		
 	}
+	
 	
 	public AuthResponse login(LoginRequest loginRequest) {
 		System.out.println("Initiating Login");
@@ -70,45 +90,76 @@ public class AuthService {
 		Member user = userRepository.findByEmail(loginRequest.getEmail())
 				            .orElseThrow(() -> new RuntimeException("User not found with email: " + loginRequest.getEmail()));
 		
-		String userId = user.getPublicId();
-		AuthResponse authResponse = AuthResponse.builder()
-				                     .userId(userId)
-				                     .accessToken(accessToken)
-				                     .refreshToken(refreshToken)
-				                     .tenantId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
-				                     .organizationId(TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null)
-				                     .email(loginRequest.getEmail())
-				                     .roles(roles)
-				                     .build();
+		String orgId = TenantContext.getCurrentTenant() != null ? TenantContext.getCurrentTenant() : user.getOrganization() != null ? user.getOrganization().getPublicId() : null;
+		AuthResponse authResponse = toResponse(user, accessToken, refreshToken, orgId, roles);
 		log.info("Login successful for user: {}; Auth Response: {}", loginRequest.getEmail(), authResponse);
 		return authResponse;
 	}
 	
-	public AuthResponse oauthLogin(OAuthRequest request) {
-		UserInfo userInfo = verifyWithProvider(request);
-		Member member = findOrCreateUser(userInfo, request);
+	
+	private Member findOrCreateOAuthUser(OAuthRequest request) {
+		Optional<Member> optionalMember = userRepository.findByEmail(request.getEmail());
+		if (optionalMember.isPresent()){
+			Member member = optionalMember.get();
+			if (request.getName() != null) {
+				String[] nameParts = request.getName().split(" ", 2);
+				member.setFirstName(nameParts[0]);
+				member.setLastName(nameParts.length > 1 ? nameParts[1] : "");
+			}
+			if (request.getImageUrl() != null) {
+				member.setImageUrl(request.getImageUrl());
+			}
+			return userRepository.save(member);
+		}
 		
-		Set<String> roles = member.getRoles().stream().map(Role::name).collect(Collectors.toSet());
-		String accessToken = jwtTokenProvider.generateAccessToken(member.getEmail(), roles);
-		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getEmail(), roles);
+		log.info("Creating new user for email: {}", request.getEmail());
+		Member newMember = new Member();
+		String[] nameParts = request.getName() != null ?
+				                     request.getName().split(" ", 2) : new String[]{"User", ""};
+		newMember.setFirstName(nameParts[0]);
+		newMember.setLastName(nameParts.length > 1 ? nameParts[1] : "");
+		newMember.setEmail(request.getEmail());
+		newMember.setImageUrl(request.getImageUrl());
+		newMember.setActive(true);
+		// newMember.setEmailVerified(true);
+		newMember.setRoles(Set.of(
+				Role.ORGANIZATION_OWNER,
+				Role.ORGANIZATION_ADMIN,
+				Role.ORGANIZATION_MEMBER
+		));
 		
-		return AuthResponse.builder()
-				       .userId(member.getPublicId())
-				       .accessToken(accessToken)
-				       .refreshToken(refreshToken)
-				       .build();
-	}
-	
-	private Member findOrCreateUser(UserInfo userInfo, OAuthRequest request) {
-		return null;
-	}
-	
-	private UserInfo verifyWithProvider(OAuthRequest request) {
-		return null;
-	
+		return userRepository.save(newMember);
 	}
 	
 	public AuthResponse generateRefreshToken(String refreshToken) {
-		return null;
+		log.info("Processing token refresh request");
+		
+		if (!jwtTokenProvider.isValidToken(refreshToken) ||
+				    jwtTokenProvider.isExpiredToken(refreshToken)) {
+			log.error("Invalid or expired refresh token");
+			throw new RuntimeException("Invalid or expired refresh token");
+		}
+		
+		String email = (String) jwtTokenProvider.extractClaimFromToken(
+				refreshToken, "email");
+		Member user = userRepository.findByEmail(email)
+				              .orElseThrow(() -> new RuntimeException("User not found"));
+		
+		Set<String> roles = user.getRoles().stream()
+				                    .map(Role::name)
+				                    .collect(Collectors.toSet());
+		
+		String newAccessToken = jwtTokenProvider.generateAccessToken(email, roles);
+		String newRefreshToken = jwtTokenProvider.generateRefreshToken(email, roles);
+		
+		log.info("Token refresh successful for user: {}", email);
+		
+		return AuthResponse.builder()
+				       .userId(user.getPublicId())
+				       .accessToken(newAccessToken)
+				       .refreshToken(newRefreshToken)
+				       .email(email)
+				       .roles(roles)
+				       .build();
 	}
 }
