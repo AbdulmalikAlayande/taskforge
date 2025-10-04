@@ -39,9 +39,9 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "OAuth authentication failed", content = @Content)
     })
     @PostMapping("/oauth")
-    public ResponseEntity<MemberResponse> oauthLogin(@Valid @RequestBody OAuthRequest request) {
+    public ResponseEntity<AuthResponse> oauthLogin(@Valid @RequestBody OAuthRequest request) {
         log.info("OAuth Request:: {}", request);
-        MemberResponse response = authService.manageOAuthUser(request);
+        AuthResponse response = authService.manageOAuthUser(request);
         return ResponseEntity.ok(response);
     }
     
