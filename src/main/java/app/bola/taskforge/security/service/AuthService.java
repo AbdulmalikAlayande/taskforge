@@ -50,7 +50,7 @@ public class AuthService {
 		}
 		
 		log.info("OAuth token verified successfully for: {}", userInfo.getEmail());
-		Member member = findOrCreateOAuthUser(request);
+		Member member = findOrCreateOAuthUser(request, userInfo);
 		Set<String> roles = member.getRoles().stream()
 				                    .map(Role::name)
 				                    .collect(Collectors.toSet());
@@ -64,19 +64,87 @@ public class AuthService {
 		
 	}
 	
-	private AuthResponse toResponse(Member member, String accessToken, String refreshToken, String orgId, Set<String> roles){
-		return AuthResponse.builder()
-				       .userId(member.getPublicId())
-				       .email(member.getEmail())
-				       .accessToken(accessToken)
-				       .refreshToken(refreshToken)
-				       .tenantId(orgId)
-				       .organizationId(orgId)
-				       .roles(roles)
-				       .build();
+	private Member findOrCreateOAuthUser(OAuthRequest request, OAuthUserInfo userInfo) {
+		String provider = request.getProvider().toLowerCase();
+		String providerId = userInfo.getProviderId();
+		String email = userInfo.getEmail();
 		
+		Optional<OAuthAccount> existingOAuth = oAuthAccountRepository.findByProviderAndProviderId(provider, providerId);
+		if (existingOAuth.isPresent()) {
+			log.info("Found existing OAuth account for provider: {}, id: {}", provider, providerId);
+			Member member = existingOAuth.get().getMember();
+			OAuthAccount oauthAccount = existingOAuth.get();
+			if (!email.equals(oauthAccount.getEmail())) {
+				oauthAccount.setEmail(email);
+				oAuthAccountRepository.save(oauthAccount);
+			}
+			updateMemberFromOAuth(member, userInfo);
+			return member;
+		}
+		
+		Optional<Member> optionalMember = userRepository.findByEmail(request.getEmail());
+		if (optionalMember.isPresent()){
+			Member member = optionalMember.get();
+			OAuthAccount oauthAccount = new OAuthAccount();
+			oauthAccount.setProvider(provider);
+			oauthAccount.setProviderId(providerId);
+			oauthAccount.setEmail(email);
+			oauthAccount.setMember(member);
+			oAuthAccountRepository.save(oauthAccount);
+			updateMemberFromOAuth(member, userInfo);
+			return member;
+		}
+		
+		log.info("Creating new user for email: {}", request.getEmail());
+		Member newMember = new Member();
+		String[] nameParts = userInfo.getName() != null
+				                     ? userInfo.getName().split(" ", 2)
+				                     : new String[]{"", ""};
+		newMember.setFirstName(nameParts[0]);
+		newMember.setLastName(nameParts.length > 1 ? nameParts[1] : "");
+		newMember.setEmail(email);
+		newMember.setImageUrl(userInfo.getImageUrl());
+		newMember.setActive(true);
+//		newMember.setEmailVerified(true);
+		newMember.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+		newMember.setRoles(Set.of(Role.ORGANIZATION_OWNER, Role.ORGANIZATION_ADMIN, Role.ORGANIZATION_MEMBER));
+		Member savedMember = userRepository.save(newMember);
+		
+		OAuthAccount oauthAccount = new OAuthAccount();
+		oauthAccount.setProvider(provider);
+		oauthAccount.setProviderId(providerId);
+		oauthAccount.setEmail(email);
+		oauthAccount.setMember(savedMember);
+		
+		oAuthAccountRepository.save(oauthAccount);
+		log.info("Successfully created new user and OAuth account for: {}", email);
+		return savedMember;
 	}
 	
+	private void updateMemberFromOAuth(Member member, OAuthUserInfo userInfo) {
+		boolean updated = false;
+		if (userInfo.getImageUrl() != null &&
+				    !userInfo.getImageUrl().equals(member.getImageUrl())) {
+			member.setImageUrl(userInfo.getImageUrl());
+			updated = true;
+		}
+		if (userInfo.getName() != null) {
+			String[] nameParts = userInfo.getName().split(" ", 2);
+			String firstName = nameParts[0];
+			String lastName = nameParts.length > 1 ? nameParts[1] : "";
+			
+			if (!firstName.equals(member.getFirstName()) ||
+					    !lastName.equals(member.getLastName())) {
+				member.setFirstName(firstName);
+				member.setLastName(lastName);
+				updated = true;
+			}
+		}
+		if (updated) {
+			userRepository.save(member);
+			log.info("Updated member profile from OAuth data for: {}", member.getEmail());
+		}
+	}
 	
 	public AuthResponse login(LoginRequest loginRequest) {
 		System.out.println("Initiating Login");
@@ -100,41 +168,6 @@ public class AuthService {
 		AuthResponse authResponse = toResponse(user, accessToken, refreshToken, orgId, roles);
 		log.info("Login successful for user: {}; Auth Response: {}", loginRequest.getEmail(), authResponse);
 		return authResponse;
-	}
-	
-	
-	private Member findOrCreateOAuthUser(OAuthRequest request) {
-		Optional<Member> optionalMember = userRepository.findByEmail(request.getEmail());
-		if (optionalMember.isPresent()){
-			Member member = optionalMember.get();
-			if (request.getName() != null) {
-				String[] nameParts = request.getName().split(" ", 2);
-				member.setFirstName(nameParts[0]);
-				member.setLastName(nameParts.length > 1 ? nameParts[1] : "");
-			}
-			if (request.getImageUrl() != null) {
-				member.setImageUrl(request.getImageUrl());
-			}
-			return userRepository.save(member);
-		}
-		
-		log.info("Creating new user for email: {}", request.getEmail());
-		Member newMember = new Member();
-		String[] nameParts = request.getName() != null ?
-				                     request.getName().split(" ", 2) : new String[]{"User", ""};
-		newMember.setFirstName(nameParts[0]);
-		newMember.setLastName(nameParts.length > 1 ? nameParts[1] : "");
-		newMember.setEmail(request.getEmail());
-		newMember.setImageUrl(request.getImageUrl());
-		newMember.setActive(true);
-		// newMember.setEmailVerified(true);
-		newMember.setRoles(Set.of(
-				Role.ORGANIZATION_OWNER,
-				Role.ORGANIZATION_ADMIN,
-				Role.ORGANIZATION_MEMBER
-		));
-		
-		return userRepository.save(newMember);
 	}
 	
 	public AuthResponse generateRefreshToken(String refreshToken) {
