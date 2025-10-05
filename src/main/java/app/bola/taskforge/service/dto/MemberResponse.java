@@ -28,12 +28,12 @@ public class MemberResponse implements Serializable {
 	String email;
 	boolean active;
 	boolean deleted;
-	String password;
 	String lastName;
 	String publicId;
 	String firstName;
 	String createdBy;
 	String modifiedBy;
+	String image;
 	LocalDateTime createdAt;
 	LocalDateTime lastModifiedAt;
 	
@@ -43,7 +43,6 @@ public class MemberResponse implements Serializable {
 				       .append("email", email)
 				       .append("active", active)
 				       .append("deleted", deleted)
-				       .append("password", password)
 				       .append("lastName", lastName)
 				       .append("publicId", publicId)
 				       .append("firstName", firstName)
