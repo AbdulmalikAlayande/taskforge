@@ -6,6 +6,7 @@ import app.bola.taskforge.domain.enums.ProjectStatus;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
 import app.bola.taskforge.service.dto.MemberResponse;
+import app.bola.taskforge.service.dto.TaskResponse;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
@@ -23,5 +24,6 @@ public interface ProjectService extends BaseService<ProjectRequest, Project, Pro
 	ProjectResponse findById(String publicId);
 	void delete(String publicId);
 	Set<MemberResponse> getProjectMembers(String projectId);
+	Set<TaskResponse> getProjectTasks(String projectId);
 //	Object getActivityLog(String projectId);
 }
