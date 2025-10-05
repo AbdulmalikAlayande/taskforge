@@ -16,9 +16,10 @@ import app.bola.taskforge.security.provider.JwtTokenProvider;
 import app.bola.taskforge.service.dto.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,10 +31,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TaskForgeOrganizationService implements OrganizationService {
-	private final InvitationRepository invitationRepository;
 	
+	@Value("${app.frontend.base-url}")
+	private String FRONTEND_BASE_URL;
+	private final InvitationRepository invitationRepository;
 	final UserRepository userRepository;
 	final ModelMapper modelMapper;
 	final OrganizationRepository organizationRepository;
@@ -167,9 +170,8 @@ public class TaskForgeOrganizationService implements OrganizationService {
 		invitation.setToken(token);  
 		invitation.setStatus(InvitationStatus.PENDING);
 		invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
-		invitation.setInvitationLink(String.format(Constants.INVITATION_URL, 
-			organization.getName().toLowerCase().replaceAll("\\s+", "-"), 
-			base64Token));
+		invitation.setInvitationLink(String.format(Constants.INVITATION_URL,
+			FRONTEND_BASE_URL, organization.getName().toLowerCase().replaceAll("\\s+", "-"), base64Token));
 		
 		invitationRepository.save(invitation);
 		mailSender.sendInvitationMail(invitation, organization.getName());
