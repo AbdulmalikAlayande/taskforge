@@ -5,6 +5,7 @@ import app.bola.taskforge.service.ProjectService;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
 import app.bola.taskforge.service.dto.MemberResponse;
+import app.bola.taskforge.service.dto.TaskResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -178,5 +179,13 @@ public class ProjectController implements BaseController<ProjectRequest, Project
 			@Parameter(description = "ID of the project", required = true)
 			@PathVariable String projectId) {
 		return ResponseEntity.ok(projectService.getProjectMembers(projectId));
+	}
+	
+	@GetMapping("{projectId}/tasks")
+	@Operation(summary = "Get all tasks in project", description = "Retrieves all tasks for a specific project")
+	public ResponseEntity<Set<TaskResponse>> getProjectTasks(
+			@Parameter(description = "ID of the project", required = true) 
+			@PathVariable String projectId) {
+		return ResponseEntity.ok(projectService.getProjectTasks(projectId));
 	}
 }
