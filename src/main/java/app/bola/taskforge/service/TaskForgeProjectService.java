@@ -1,10 +1,7 @@
 package app.bola.taskforge.service;
 
 import app.bola.taskforge.common.entity.BaseEntity;
-import app.bola.taskforge.domain.entity.DateRange;
-import app.bola.taskforge.domain.entity.Member;
-import app.bola.taskforge.domain.entity.Organization;
-import app.bola.taskforge.domain.entity.Project;
+import app.bola.taskforge.domain.entity.*;
 import app.bola.taskforge.domain.enums.ProjectStatus;
 import app.bola.taskforge.event.publisher.EventPublisher;
 import app.bola.taskforge.event.ProjectEvent;
@@ -12,10 +9,12 @@ import app.bola.taskforge.exception.EntityNotFoundException;
 import app.bola.taskforge.exception.InvalidRequestException;
 import app.bola.taskforge.repository.OrganizationRepository;
 import app.bola.taskforge.repository.ProjectRepository;
+import app.bola.taskforge.repository.TaskRepository;
 import app.bola.taskforge.repository.UserRepository;
 import app.bola.taskforge.service.dto.ProjectRequest;
 import app.bola.taskforge.service.dto.ProjectResponse;
 import app.bola.taskforge.service.dto.MemberResponse;
+import app.bola.taskforge.service.dto.TaskResponse;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -45,8 +44,9 @@ public class TaskForgeProjectService implements ProjectService{
 	private final ProjectRepository projectRepository;
 	private final Validator validator;
 	private final EventPublisher eventPublisher;
+	private final TaskRepository taskRepository;
 	
-
+	
 	@Override
 	public ProjectResponse createNew(@NonNull ProjectRequest projectRequest) {
 		performValidation(validator, projectRequest);
@@ -225,6 +225,16 @@ public class TaskForgeProjectService implements ProjectService{
 		return project.getMembers().stream()
 				       .map(member -> modelMapper.map(member, MemberResponse.class))
 				       .collect(Collectors.toSet());
+	}
+
+	@Override
+	public Set<TaskResponse> getProjectTasks(String projectId) {
+		Project project = projectRepository.findByIdScoped(projectId)
+				                  .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+		List<Task> tasks = taskRepository.findByProject_Id(project.getId());
+		if (!tasks.isEmpty())
+			return tasks.stream().map(task -> modelMapper.map(task, TaskResponse.class)).collect(Collectors.toSet());
+		return project.getTasks().stream().map(task -> modelMapper.map(task, TaskResponse.class)).collect(Collectors.toSet());
 	}
 	
 	@Override
